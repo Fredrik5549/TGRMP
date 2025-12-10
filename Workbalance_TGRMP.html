@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Workbalance – TRATON</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f5f7;
+      padding: 20px;
+      color: #12213b;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .logo-wrapper img {
+      height: 40px;
+      width: auto;
+    }
+
+    .header-text {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: 0.5px;
+    }
+
+    .traton-label {
+      margin-top: 2px;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #555;
+    }
+
+    .intro {
+      margin: 8px 0 10px 0;
+      font-size: 14px;
+      max-width: 800px;
+    }
+
+    /* --- CENTRAL CIRCLE + AREA CARDS AROUND --- */
+
+    .circle-layout {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+      margin-bottom: 24px;
+    }
+
+    .circle-layout-inner {
+      position: relative;
+      max-width: 820px;
+      width: 100%;
+      min-height: 500px;
+      margin: 0 auto;
+    }
+
+    .circle-wrapper {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: inline-block;
+    }
+
+    .circle-wrapper img {
+      max-width: 560px;   /* bigger circle */
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.16);
+      display: block;
+    }
+
+    /* overlays on circle with B/G/Y/R per area */
+    .area-overlay-box {
+      position: absolute;
+      background: rgba(255,255,255,0.92);
+      border-radius: 6px;
+      padding: 4px 6px;
+      font-size: 11px;
+      text-align: left;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      min-width: 95px;
+    }
+
+    .overlay-title {
+      font-weight: bold;
+      font-size: 11px;
+    }
+
+    /* positions approx for bigger circle */
+    #overlay-Manageability { top: 13%; left: 12%; }
+    #overlay-Comprehensibility { top: 13%; right: 12%; }
+    #overlay-Meaningfulness { bottom: 11%; left: 12%; }
+    #overlay-Recovery { bottom: 11%; right: 12%; }
+
+    /* area cards around circle */
+    .area-card {
+      position: absolute;
+      width: 190px;
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 8px 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      font-size: 12px;
+    }
+
+    .area-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .area-title {
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    .info-link {
+      font-size: 11px;
+      text-decoration: underline;
+      color: #1a73e8;
+      cursor: pointer;
+    }
+
+    .buttons-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 6px;
+    }
+
+    .color-btn {
+      border: none;
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 11px;
+      color: #fff;
+      min-width: 58px;
+    }
+
+    .blue  { background: #2b6cb0; }
+    .green { background: #38a169; }
+    .yellow{ background: #ecc94b; color: #000; }
+    .red   { background: #e53e3e; }
+
+    .counts {
+      font-size: 11px;
+    }
+
+    .counts span {
+      margin-right: 4px;
+    }
+
+    /* placement of cards around circle */
+    #card-Manageability { top: 6px; left: 0; }
+    #card-Comprehensibility { top: 6px; right: 0; }
+    #card-Meaningfulness { bottom: 6px; left: 0; }
+    #card-Recovery { bottom: 6px; right: 0; }
+
+    /* --- INSPIRATIONAL EMOJIS --- */
+
+    .inspiration {
+      margin-top: 10px;
+      padding: 16px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .inspiration-title {
+      font-size: 16px;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    .main-emojis {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      margin-top: 4px;
+    }
+
+    .emoji-btn-main {
+      border: 1px solid #ddd;
+      border-radius: 14px;
+      padding: 6px 12px;
+      cursor: pointer;
+      background: #f9f9f9;
+      font-size: 40px;  /* very big emojis */
+    }
+
+    .colour-help-link {
+      margin-top: 10px;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .colour-help-link span {
+      text-decoration: underline;
+      color: #1a73e8;
+      cursor: pointer;
+    }
+
+    /* Emoji toast */
+    .emoji-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      background: rgba(18,33,59,0.9);
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-size: 16px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      z-index: 2000;
+    }
+
+    /* Team member view */
+    .members-toggle {
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    .members-section {
+      margin-top: 10px;
+      padding: 12px 16px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      display: none;
+    }
+
+    .members-section h2 {
+      margin-top: 0;
+      font-size: 18px;
+    }
+
+    .members-section p {
+      font-size: 13px;
+      margin-top: 0;
+    }
+
+    .mini-circle {
+      text-align: center;
+      margin: 8px 0 12px 0;
+    }
+
+    .mini-circle img {
+      max-width: 260px;
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+
+    .member-controls {
+      margin-bottom: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .member-controls input {
+      padding: 6px 8px;
+      font-size: 13px;
+    }
+
+    .member-controls button {
+      padding: 6px 10px;
+      font-size: 13px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background: #12213b;
+      color: #ffffff;
+    }
+
+    table.members-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    table.members-table th,
+    table.members-table td {
+      border: 1px solid #ccc;
+      padding: 4px 6px;
+      text-align: center;
+    }
+
+    table.members-table th {
+      background: #12213b;
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .emoji-buttons {
+      display: flex;
+      gap: 2px;
+      flex-wrap: wrap;
+    }
+
+    .emoji-btn {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 1px 4px;
+      cursor: pointer;
+      background: #f9f9f9;
+    }
+
+    .emoji-input {
+      width: 70px;
+      padding: 2px 4px;
+      font-size: 12px;
+      margin-left: 2px;
+    }
+
+    /* Meta + export at bottom */
+    .bottom-meta {
+      margin-top: 20px;
+      padding: 12px 16px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .bottom-meta label {
+      font-size: 13px;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .bottom-meta input,
+    .bottom-meta textarea {
+      width: 100%;
+      padding: 6px 8px;
+      font-size: 13px;
+      box-sizing: border-box;
+    }
+
+    .bottom-meta textarea {
+      resize: vertical;
+      min-height: 50px;
+    }
+
+    .export-container {
+      text-align: right;
+      margin-top: 8px;
+    }
+
+    .export-container button {
+      padding: 8px 14px;
+      font-size: 13px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background: #12213b;
+      color: #ffffff;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal {
+      background: #ffffff;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      border-radius: 10px;
+      padding: 18px 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .modal h3 {
+      margin-top: 0;
+    }
+
+    .modal section {
+      margin-bottom: 10px;
+    }
+
+    .modal-close {
+      float: right;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    @media (max-width: 800px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .logo-wrapper img {
+        height: 32px;
+      }
+
+      .circle-layout-inner {
+        min-height: auto;
+      }
+
+      .area-card {
+        position: static;
+        width: 100%;
+        margin-top: 8px;
+      }
+
+      .circle-wrapper {
+        position: static;
+        transform: none;
+        display: flex;
+        justify-content: center;
+        margin-bottom: 10px;
+      }
+
+      .area-overlay-box {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-wrapper">
+      <img src="https://tratongroup.sharepoint.com/:i:/r/sites/GIO-Modularization/MODULARIZATIONA0006/03_Improvement%20work/Workbalance_Traton/Traton_logo.png"
+           alt="TRATON Group logo">
+    </div>
+    <div class="header-text">
+      <h1>Workbalance</h1>
+      <div class="traton-label">TRATON GROUP – WORK BALANCE DIALOGUE</div>
+    </div>
+  </header>
+
+  <div class="intro">
+    Workbalance is a support for dialogue in the team about how sustainable the work situation is.
+    You rate four areas together – Manageability, Comprehensibility, Meaningfulness and Recovery –
+    using the colours blue, green, yellow and red. The overview helps you see strengths to keep
+    and early signals that need action or further support.
+  </div>
+
+  <!-- CIRCLE + area cards around -->
+  <div class="circle-layout">
+    <div class="circle-layout-inner">
+      <div class="circle-wrapper">
+        <img src="https://tratongroup.sharepoint.com/:i:/r/sites/GIO-Modularization/MODULARIZATIONA0006/03_Improvement%20work/Workbalance_Traton/workbalance_circle.png"
+             alt="Work Balance Model">
+        <!-- overlays on circle -->
+        <div class="area-overlay-box" id="overlay-Manageability">
+          <div class="overlay-title">Manageability</div>
+          <div class="overlay-counts"></div>
+        </div>
+        <div class="area-overlay-box" id="overlay-Comprehensibility">
+          <div class="overlay-title">Comprehensibility</div>
+          <div class="overlay-counts"></div>
+        </div>
+        <div class="area-overlay-box" id="overlay-Meaningfulness">
+          <div class="overlay-title">Meaningfulness</div>
+          <div class="overlay-counts"></div>
+        </div>
+        <div class="area-overlay-box" id="overlay-Recovery">
+          <div class="overlay-title">Recovery</div>
+          <div class="overlay-counts"></div>
+        </div>
+      </div>
+
+      <!-- area cards around the circle -->
+      <div class="area-card" id="card-Manageability">
+        <div class="area-title-row">
+          <div class="area-title">Manageability</div>
+          <span class="info-link" onclick="openAreaInfo('Manageability')">What does this mean?</span>
+        </div>
+        <div class="buttons-row">
+          <button class="color-btn blue"   onclick="increment('Manageability','blue')">Blue +1</button>
+          <button class="color-btn green"  onclick="increment('Manageability','green')">Green +1</button>
+          <button class="color-btn yellow" onclick="increment('Manageability','yellow')">Yellow +1</button>
+          <button class="color-btn red"    onclick="increment('Manageability','red')">Red +1</button>
+        </div>
+        <div class="counts" id="counts-Manageability"></div>
+      </div>
+
+      <div class="area-card" id="card-Comprehensibility">
+        <div class="area-title-row">
+          <div class="area-title">Comprehensibility</div>
+          <span class="info-link" onclick="openAreaInfo('Comprehensibility')">What does this mean?</span>
+        </div>
+        <div class="buttons-row">
+          <button class="color-btn blue"   onclick="increment('Comprehensibility','blue')">Blue +1</button>
+          <button class="color-btn green"  onclick="increment('Comprehensibility','green')">Green +1</button>
+          <button class="color-btn yellow" onclick="increment('Comprehensibility','yellow')">Yellow +1</button>
+          <button class="color-btn red"    onclick="increment('Comprehensibility','red')">Red +1</button>
+        </div>
+        <div class="counts" id="counts-Comprehensibility"></div>
+      </div>
+
+      <div class="area-card" id="card-Meaningfulness">
+        <div class="area-title-row">
+          <div class="area-title">Meaningfulness</div>
+          <span class="info-link" onclick="openAreaInfo('Meaningfulness')">What does this mean?</span>
+        </div>
+        <div class="buttons-row">
+          <button class="color-btn blue"   onclick="increment('Meaningfulness','blue')">Blue +1</button>
+          <button class="color-btn green"  onclick="increment('Meaningfulness','green')">Green +1</button>
+          <button class="color-btn yellow" onclick="increment('Meaningfulness','yellow')">Yellow +1</button>
+          <button class="color-btn red"    onclick="increment('Meaningfulness','red')">Red +1</button>
+        </div>
+        <div class="counts" id="counts-Meaningfulness"></div>
+      </div>
+
+      <div class="area-card" id="card-Recovery">
+        <div class="area-title-row">
+          <div class="area-title">Recovery</div>
+          <span class="info-link" onclick="openAreaInfo('Recovery')">What does this mean?</span>
+        </div>
+        <div class="buttons-row">
+          <button class="color-btn blue"   onclick="increment('Recovery','blue')">Blue +1</button>
+          <button class="color-btn green"  onclick="increment('Recovery','green')">Green +1</button>
+          <button class="color-btn yellow" onclick="increment('Recovery','yellow')">Yellow +1</button>
+          <button class="color-btn red"    onclick="increment('Recovery','red')">Red +1</button>
+        </div>
+        <div class="counts" id="counts-Recovery"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSPIRATIONAL EMOJIS -->
+  <div class="inspiration">
+    <div class="inspiration-title">Send some inspiration to your team</div>
+    <div class="main-emojis">
+      <button type="button" class="emoji-btn-main" onclick="showMainEmojiToast('👍')">👍</button>
+      <button type="button" class="emoji-btn-main" onclick="showMainEmojiToast('😊')">😊</button>
+      <button type="button" class="emoji-btn-main" onclick="showMainEmojiToast('💪')">💪</button>
+      <button type="button" class="emoji-btn-main" onclick="showMainEmojiToast('🙏')">🙏</button>
+      <button type="button" class="emoji-btn-main" onclick="showMainEmojiToast('🌟')">🌟</button>
+      <button type="button" class="emoji-btn-main" onclick="showMainEmojiToast('❤️')">❤️</button>
+    </div>
+    <div class="colour-help-link">
+      <span onclick="openStatusInfo()">What should we do with blue/green and yellow/red?</span>
+    </div>
+  </div>
+
+  <!-- Team member view (optional) -->
+  <div class="members-toggle">
+    <label>
+      <input type="checkbox" id="toggleMembers" onchange="toggleMembersSection()">
+      Add status per team member (optional – see individual status and add support emojis)
+    </label>
+  </div>
+
+  <div class="members-section" id="membersSection">
+    <h2>Team member view (optional)</h2>
+    <p>
+      Here you can add team members and assign a status for each area.
+      Use emojis to show support for your colleagues (for example 👍 😊 💪 ❤️).
+    </p>
+
+    <!-- small circle here so you still see the model -->
+    <div class="mini-circle">
+      <img src="https://tratongroup.sharepoint.com/:i:/r/sites/GIO-Modularization/MODULARIZATIONA0006/03_Improvement%20work/Workbalance_Traton/workbalance_circle.png"
+           alt="Work Balance Model (mini)">
+    </div>
+
+    <div class="member-controls">
+      <input type="text" id="memberNameInput" placeholder="Team member name" />
+      <button type="button" onclick="addMember()">Add member</button>
+    </div>
+
+    <div style="max-height: 260px; overflow-y: auto;">
+      <table class="members-table" id="membersTable">
+        <thead>
+          <tr>
+            <th>Member</th>
+            <th>Manageability</th>
+            <th>Comprehensibility</th>
+            <th>Meaningfulness</th>
+            <th>Recovery</th>
+            <th>Support emojis</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- rows via JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Meta + Export at bottom -->
+  <div class="bottom-meta">
+    <div class="meta-grid">
+      <div>
+        <label for="weekInput">Week</label>
+        <input id="weekInput" type="text" placeholder="e.g. 2025–12 or W15" />
+      </div>
+      <div>
+        <label for="teamInput">Team / Function</label>
+        <input id="teamInput" type="text" placeholder="e.g. XTIE – DevOps" />
+      </div>
+      <div style="grid-column: 1 / -1;">
+        <label for="notesInput">Notes (optional – will also be exported)</label>
+        <textarea id="notesInput" placeholder="Type of meeting, agreed actions, etc."></textarea>
+      </div>
+    </div>
+
+    <div class="export-container">
+      <button onclick="exportToExcel()">Export to Excel</button>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal" id="modal">
+      <span class="modal-close" onclick="closeModal()">&times;</span>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- Emoji toast -->
+  <div class="emoji-toast" id="emojiToast">
+    <span id="emojiToastIcon"></span>
+    <span>Thanks for supporting your team!</span>
+  </div>
+
+  <script>
+    const areas = [
+      "Manageability",
+      "Comprehensibility",
+      "Meaningfulness",
+      "Recovery"
+    ];
+
+    const areaInfo = {
+      "Manageability": {
+        definition:
+          "Manageability is about your overall conditions at work – the balance between demands and resources, support, clarity and the possibility to influence.",
+        questions: [
+          "Do you have sufficient time and resources to complete your duties?",
+          "Are the right demands being made of you?",
+          "Are you able to influence your work situation?",
+          "Can you raise and escalate issues – and do you get support when you do?",
+          "Do you know what is expected of you and are there working methods that make things easier?"
+        ]
+      },
+      "Comprehensibility": {
+        definition:
+          "Comprehensibility is the feeling of understanding the organisation’s goals and how your work contributes. It requires openness and a clear overall picture.",
+        questions: [
+          "Do you understand what is going on in the organisation?",
+          "Do you feel coherence with the organisational goals?",
+          "If you have different roles, do they fit together?",
+          "Do you feel safe and treated with respect at work?",
+          "Do you receive continuous feedback that helps you progress?"
+        ]
+      },
+      "Meaningfulness": {
+        definition:
+          "Meaningfulness is about being appreciated and included in a fair and stimulating social climate. A high sense of meaningfulness generates motivation and creativity.",
+        questions: [
+          "Do you feel fairly treated in relation to your colleagues?",
+          "Do you feel included in what is going on and encouraged to participate?",
+          "Do you receive sufficient acknowledgement and do you celebrate success?",
+          "Do you find your work tasks motivating?",
+          "Do you follow your personal development plan?"
+        ]
+      },
+      "Recovery": {
+        definition:
+          "Recovery is about variation in work, the ability to use breaks for movement or rest, and having time for focus and reflection so that energy can be restored.",
+        questions: [
+          "Can you put work thoughts aside outside working hours?",
+          "Can you use breaks at work to relax and recover?",
+          "Are you able to move around during breaks?",
+          "Do you feel energised coming to work and have energy left when you go home?",
+          "Do you have time for reflection and conditions for focused work?"
+        ]
+      }
+    };
+
+    const statusAdvice = {
+      title: "How to work with the colours",
+      html: `
+        <section>
+          <strong>Blue–Green: Maintain what works</strong><br/>
+          Focus: keep and strengthen helpful conditions.<br/>
+          • Identify which behaviours, routines or conditions make the area blue/green.<br/>
+          • Make them visible in the team – “what do we want to protect and continue doing?”.<br/>
+          • Use them as examples when you work with yellow/red areas.<br/>
+          • Write down concrete habits and ways of working that you want to keep.
+        </section>
+        <section>
+          <strong>Yellow–Red: Act and improve</strong><br/>
+          Focus: early signals, dialogue and concrete improvements.<br/>
+          • Use the reflection questions for the area to understand why the status is yellow or red.<br/>
+          • Decide on 1–3 small, realistic improvements to test before the next check-in.<br/>
+          • Clarify who does what and by when – and follow up at the next Workbalance dialogue.<br/>
+          • Long-lasting red status should always lead to action or escalation (manager/HR/work environment support).
+        </section>
+      `
+    };
+
+    const areaData = {};
+    const overall = { blue: 0, green: 0, yellow: 0, red: 0 }; // kept for export totals
+
+    const members = []; // {name, ratings:{area:color}, emojis:string}
+    const supportEmojis = ["👍","😊","💪","🙏","🌟","❤️"];
+
+    let toastTimeout = null;
+
+    function initAreas() {
+      areas.forEach(area => {
+        if (!areaData[area]) {
+          areaData[area] = { blue: 0, green: 0, yellow: 0, red: 0 };
+        }
+        updateAreaCounts(area);
+      });
+      updateOverlayAreas();
+    }
+
+    function increment(area, color) {
+      areaData[area][color]++;
+      overall[color]++;
+      updateAreaCounts(area);
+      updateOverlayAreas();
+    }
+
+    function updateAreaCounts(area) {
+      const el = document.getElementById("counts-" + area.replace(/\s/g, ""));
+      if (!el) return;
+      const d = areaData[area];
+      el.innerHTML = `
+        <span><strong>B:</strong> ${d.blue}</span>
+        <span><strong>G:</strong> ${d.green}</span>
+        <span><strong>Y:</strong> ${d.yellow}</span>
+        <span><strong>R:</strong> ${d.red}</span>
+      `;
+    }
+
+    function updateOverlayAreas() {
+      areas.forEach(area => {
+        const overlay = document.getElementById("overlay-" + area);
+        if (!overlay) return;
+        const countsDiv = overlay.querySelector(".overlay-counts");
+        const d = areaData[area] || { blue: 0, green: 0, yellow: 0, red: 0 };
+        countsDiv.innerHTML = `
+          B:${d.blue} G:${d.green}<br/>
+          Y:${d.yellow} R:${d.red}
+        `;
+      });
+    }
+
+    function openModal(html) {
+      document.getElementById("modalContent").innerHTML = html;
+      document.getElementById("modalBackdrop").style.display = "flex";
+    }
+
+    function closeModal() {
+      document.getElementById("modalBackdrop").style.display = "none";
+    }
+
+    function openAreaInfo(area) {
+      const info = areaInfo[area];
+      if (!info) return;
+      const html = `
+        <h3>${area}</h3>
+        <section><strong>Definition:</strong><br/>${info.definition}</section>
+        <section><strong>Reflection questions:</strong>
+          <ul>${info.questions.map(q => `<li>${q}</li>`).join("")}</ul>
+        </section>
+        <section>
+          <strong>Colour hints:</strong><br/>
+          • Blue/Green – keep and spread what works.<br/>
+          • Yellow – follow up and agree on improvements.<br/>
+          • Red – urgent: understand causes, act and consider escalation.
+        </section>`;
+      openModal(html);
+    }
+
+    function openStatusInfo() {
+      const html = `<h3>${statusAdvice.title}</h3>${statusAdvice.html}`;
+      openModal(html);
+    }
+
+    function toggleMembersSection() {
+      const checked = document.getElementById("toggleMembers").checked;
+      const section = document.getElementById("membersSection");
+      section.style.display = checked ? "block" : "none";
+    }
+
+    function addMember() {
+      const nameInput = document.getElementById("memberNameInput");
+      const name = nameInput.value.trim();
+      if (!name) return;
+      members.push({
+        name,
+        ratings: { },
+        emojis: ""
+      });
+      nameInput.value = "";
+      renderMembersTable();
+    }
+
+    function renderMembersTable() {
+      const tbody = document.getElementById("membersTable").querySelector("tbody");
+      tbody.innerHTML = "";
+
+      members.forEach(member => {
+        const row = document.createElement("tr");
+
+        const nameTd = document.createElement("td");
+        nameTd.textContent = member.name;
+        row.appendChild(nameTd);
+
+        areas.forEach(area => {
+          const td = document.createElement("td");
+          const select = document.createElement("select");
+          select.style.fontSize = "11px";
+          ["", "blue", "green", "yellow", "red"].forEach(val => {
+            const opt = document.createElement("option");
+            opt.value = val;
+            opt.textContent =
+              val === "" ? "-" :
+              val.charAt(0).toUpperCase() + val.slice(1);
+            if (member.ratings[area] === val) opt.selected = true;
+            select.appendChild(opt);
+          });
+          select.addEventListener("change", () => {
+            member.ratings[area] = select.value;
+          });
+          td.appendChild(select);
+          row.appendChild(td);
+        });
+
+        const emojisTd = document.createElement("td");
+        const emojiBtns = document.createElement("div");
+        emojiBtns.className = "emoji-buttons";
+        const emojiInput = document.createElement("input");
+        emojiInput.className = "emoji-input";
+        emojiInput.type = "text";
+        emojiInput.placeholder = "👍💪❤️";
+        emojiInput.value = member.emojis || "";
+        emojiInput.addEventListener("input", () => {
+          member.emojis = emojiInput.value;
+        });
+
+        supportEmojis.forEach(e => {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.className = "emoji-btn";
+          b.textContent = e;
+          b.addEventListener("click", () => {
+            emojiInput.value += e;
+            member.emojis = emojiInput.value;
+          });
+          emojiBtns.appendChild(b);
+        });
+
+        emojisTd.appendChild(emojiBtns);
+        emojisTd.appendChild(emojiInput);
+        row.appendChild(emojisTd);
+
+        tbody.appendChild(row);
+      });
+    }
+
+    function showMainEmojiToast(emoji) {
+      const toast = document.getElementById("emojiToast");
+      const icon = document.getElementById("emojiToastIcon");
+      icon.textContent = emoji;
+      toast.style.display = "flex";
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.style.display = "none";
+      }, 2500);
+    }
+
+    function exportToExcel() {
+      const week = document.getElementById("weekInput").value || "";
+      const team = document.getElementById("teamInput").value || "";
+      const notes = document.getElementById("notesInput").value || "";
+
+      let html = `
+        <table border="1">
+          <tr><th colspan="2">Workbalance – TRATON</th></tr>
+          <tr><td>Week</td><td>${escapeHtml(week)}</td></tr>
+          <tr><td>Team / Function</td><td>${escapeHtml(team)}</td></tr>
+          <tr><td>Notes</td><td>${escapeHtml(notes).replace(/\n/g,"<br/>")}</td></tr>
+        </table>
+        <br/>
+        <table border="1">
+          <tr>
+            <th>Area</th>
+            <th>Blue (excellent)</th>
+            <th>Green (good)</th>
+            <th>Yellow (insufficient)</th>
+            <th>Red (poor)</th>
+          </tr>`;
+
+      areas.forEach(area => {
+        const d = areaData[area];
+        html += `
+          <tr>
+            <td>${escapeHtml(area)}</td>
+            <td>${d.blue}</td>
+            <td>${d.green}</td>
+            <td>${d.yellow}</td>
+            <td>${d.red}</td>
+          </tr>`;
+      });
+
+      html += `
+          <tr>
+            <th>Total</th>
+            <th>${overall.blue}</th>
+            <th>${overall.green}</th>
+            <th>${overall.yellow}</th>
+            <th>${overall.red}</th>
+          </tr>
+        </table>`;
+
+      if (members.length > 0) {
+        html += `
+          <br/>
+          <table border="1">
+            <tr>
+              <th>Member</th>
+              <th>Manageability</th>
+              <th>Comprehensibility</th>
+              <th>Meaningfulness</th>
+              <th>Recovery</th>
+              <th>Support emojis</th>
+            </tr>`;
+
+        members.forEach(m => {
+          html += `
+            <tr>
+              <td>${escapeHtml(m.name)}</td>
+              <td>${escapeHtml(m.ratings["Manageability"] || "")}</td>
+              <td>${escapeHtml(m.ratings["Comprehensibility"] || "")}</td>
+              <td>${escapeHtml(m.ratings["Meaningfulness"] || "")}</td>
+              <td>${escapeHtml(m.ratings["Recovery"] || "")}</td>
+              <td>${escapeHtml(m.emojis || "")}</td>
+            </tr>`;
+        });
+
+        html += `</table>`;
+      }
+
+      const blob = new Blob(
+        ['\ufeff<html><head><meta charset="UTF-8"></head><body>' + html + '</body></html>'],
+        { type: 'application/vnd.ms-excel' }
+      );
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const fileWeek = week ? "_" + week.replace(/\s+/g,"_") : "";
+      const fileTeam = team ? "_" + team.replace(/\s+/g,"_") : "";
+      a.href = url;
+      a.download = "Workbalance" + fileWeek + fileTeam + ".xls";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      initAreas();
+    });
+  </script>
+</body>
+</html>
