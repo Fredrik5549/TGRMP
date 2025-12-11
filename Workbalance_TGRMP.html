@@ -6,9 +6,20 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f5f7;
+      background: #f4f5f7 url("PMO_mission.png") center/cover fixed no-repeat;
+      margin: 0;
       padding: 20px;
       color: #12213b;
+    }
+
+    /* Semi-transparent panel above the background */
+    .page-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 16px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+      padding: 20px 24px 24px 24px;
     }
 
     header {
@@ -45,10 +56,21 @@
       color: #555;
     }
 
-    .intro {
+    .intro-block {
       margin: 8px 0 10px 0;
+      max-width: 900px;
       font-size: 14px;
-      max-width: 800px;
+    }
+
+    .intro-text {
+      margin-bottom: 4px;
+    }
+
+    .helper-link {
+      font-size: 13px;
+      color: #1a73e8;
+      text-decoration: underline;
+      cursor: pointer;
     }
 
     /* --- CENTRAL CIRCLE + AREA CARDS AROUND --- */
@@ -88,7 +110,7 @@
     /* overlays on circle with icons per area */
     .area-overlay-box {
       position: absolute;
-      background: rgba(255,255,255,0.92);
+      background: rgba(255,255,255,0.9);
       border-radius: 10px;
       padding: 4px 6px;
       font-size: 16px;
@@ -437,6 +459,12 @@
     }
 
     @media (max-width: 800px) {
+      body {
+        padding: 8px;
+      }
+      .page-shell {
+        padding: 14px;
+      }
       header {
         flex-direction: column;
         align-items: flex-start;
@@ -470,187 +498,193 @@
   </style>
 </head>
 <body>
-  <header>
-    <div class="logo-wrapper">
-      <!-- Adjust src if needed (for GitHub Pages: put Traton_logo.png in same folder) -->
-      <img src="Traton_logo.png" alt="TRATON Group logo">
-    </div>
-    <div class="header-text">
-      <h1>Workbalance</h1>
-      <div class="traton-label">TRATON GROUP – WORK BALANCE DIALOGUE</div>
-    </div>
-  </header>
-
-  <div class="intro">
-    Workbalance is a support for dialogue in the team about how sustainable the work situation is.
-    You rate four areas together – Manageability, Comprehensibility, Meaningfulness and Recovery –
-    using the colours blue, green, yellow and red. The overview helps you see strengths to keep
-    and early signals that need action or further support.
-  </div>
-
-  <!-- CIRCLE + area cards around -->
-  <div class="circle-layout">
-    <div class="circle-layout-inner">
-      <div class="circle-wrapper">
-        <!-- Adjust src if needed -->
-        <img src="workbalance_circle.png" alt="Work Balance Model">
-        <!-- overlays on circle with ICONS -->
-        <div class="area-overlay-box" id="overlay-Manageability">
-          <div class="overlay-title">Manageability</div>
-          <div class="overlay-icons"></div>
-        </div>
-        <div class="area-overlay-box" id="overlay-Comprehensibility">
-          <div class="overlay-title">Comprehensibility</div>
-          <div class="overlay-icons"></div>
-        </div>
-        <div class="area-overlay-box" id="overlay-Meaningfulness">
-          <div class="overlay-title">Meaningfulness</div>
-          <div class="overlay-icons"></div>
-        </div>
-        <div class="area-overlay-box" id="overlay-Recovery">
-          <div class="overlay-title">Recovery</div>
-          <div class="overlay-icons"></div>
-        </div>
+  <div class="page-shell">
+    <header>
+      <div class="logo-wrapper">
+        <img src="Traton_logo.png" alt="TRATON Group logo">
       </div>
-
-      <!-- area cards around the circle -->
-      <div class="area-card" id="card-Manageability">
-        <div class="area-title-row">
-          <div class="area-title">Manageability</div>
-          <span class="info-link" onclick="openAreaInfo('Manageability')">What does this mean?</span>
-        </div>
-        <div class="buttons-row">
-          <button class="color-btn blue"   onclick="increment('Manageability','blue')">Blue +1</button>
-          <button class="color-btn green"  onclick="increment('Manageability','green')">Green +1</button>
-          <button class="color-btn yellow" onclick="increment('Manageability','yellow')">Yellow +1</button>
-          <button class="color-btn red"    onclick="increment('Manageability','red')">Red +1</button>
-        </div>
-        <div class="counts" id="counts-Manageability"></div>
+      <div class="header-text">
+        <h1>Workbalance</h1>
+        <div class="traton-label">TRATON GROUP – WORK BALANCE DIALOGUE</div>
       </div>
+    </header>
 
-      <div class="area-card" id="card-Comprehensibility">
-        <div class="area-title-row">
-          <div class="area-title">Comprehensibility</div>
-          <span class="info-link" onclick="openAreaInfo('Comprehensibility')">What does this mean?</span>
-        </div>
-        <div class="buttons-row">
-          <button class="color-btn blue"   onclick="increment('Comprehensibility','blue')">Blue +1</button>
-          <button class="color-btn green"  onclick="increment('Comprehensibility','green')">Green +1</button>
-          <button class="color-btn yellow" onclick="increment('Comprehensibility','yellow')">Yellow +1</button>
-          <button class="color-btn red"    onclick="increment('Comprehensibility','red')">Red +1</button>
-        </div>
-        <div class="counts" id="counts-Comprehensibility"></div>
+    <div class="intro-block">
+      <div class="intro-text">
+        Workbalance is a support for dialogue in the team about how sustainable the work situation is.
+        You rate four areas together – Manageability, Comprehensibility, Meaningfulness and Recovery –
+        using the colours blue, green, yellow and red. The model is based on structured reflection and
+        shared responsibility: everyone contributes with experiences, the team identifies patterns, and
+        you agree on concrete actions to strengthen a healthy balance over time.
       </div>
-
-      <div class="area-card" id="card-Meaningfulness">
-        <div class="area-title-row">
-          <div class="area-title">Meaningfulness</div>
-          <span class="info-link" onclick="openAreaInfo('Meaningfulness')">What does this mean?</span>
-        </div>
-        <div class="buttons-row">
-          <button class="color-btn blue"   onclick="increment('Meaningfulness','blue')">Blue +1</button>
-          <button class="color-btn green"  onclick="increment('Meaningfulness','green')">Green +1</button>
-          <button class="color-btn yellow" onclick="increment('Meaningfulness','yellow')">Yellow +1</button>
-          <button class="color-btn red"    onclick="increment('Meaningfulness','red')">Red +1</button>
-        </div>
-        <div class="counts" id="counts-Meaningfulness"></div>
-      </div>
-
-      <div class="area-card" id="card-Recovery">
-        <div class="area-title-row">
-          <div class="area-title">Recovery</div>
-          <span class="info-link" onclick="openAreaInfo('Recovery')">What does this mean?</span>
-        </div>
-        <div class="buttons-row">
-          <button class="color-btn blue"   onclick="increment('Recovery','blue')">Blue +1</button>
-          <button class="color-btn green"  onclick="increment('Recovery','green')">Green +1</button>
-          <button class="color-btn yellow" onclick="increment('Recovery','yellow')">Yellow +1</button>
-          <button class="color-btn red"    onclick="increment('Recovery','red')">Red +1</button>
-        </div>
-        <div class="counts" id="counts-Recovery"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- INSPIRATIONAL EMOJIS -->
-  <div class="inspiration">
-    <div class="inspiration-title">Send some inspiration to your team</div>
-    <div class="main-emojis">
-      <button type="button" class="emoji-btn-main" onclick="showMainEmojiToast('👍')">👍</button>
-      <button type="button" class="emoji-btn-main" onclick="showMainEmojiToast('😊')">😊</button>
-      <button type="button" class="emoji-btn-main" onclick="showMainEmojiToast('💪')">💪</button>
-      <button type="button" class="emoji-btn-main" onclick="showMainEmojiToast('🙏')">🙏</button>
-      <button type="button" class="emoji-btn-main" onclick="showMainEmojiToast('🌟')">🌟</button>
-      <button type="button" class="emoji-btn-main" onclick="showMainEmojiToast('❤️')">❤️</button>
-    </div>
-    <div class="colour-help-link">
-      <span onclick="openStatusInfo()">What should we do with blue/green and yellow/red?</span>
-    </div>
-  </div>
-
-  <!-- Team member view (optional) -->
-  <div class="members-toggle">
-    <label>
-      <input type="checkbox" id="toggleMembers" onchange="toggleMembersSection()">
-      Add status per team member (optional – see individual status and add support emojis)
-    </label>
-  </div>
-
-  <div class="members-section" id="membersSection">
-    <h2>Team member view (optional)</h2>
-    <p>
-      Here you can add team members and assign a status for each area.
-      Use emojis to show support for your colleagues (for example 👍 😊 💪 ❤️).
-    </p>
-
-    <!-- small circle here so you still see the model -->
-    <div class="mini-circle">
-      <img src="workbalance_circle.png" alt="Work Balance Model (mini)">
+      <span class="helper-link" onclick="openUsageInfo()" title="Short guide to how this page works">
+        How do we use this page?
+      </span>
     </div>
 
-    <div class="member-controls">
-      <input type="text" id="memberNameInput" placeholder="Team member name" />
-      <button type="button" onclick="addMember()">Add member</button>
-    </div>
+    <!-- CIRCLE + area cards around -->
+    <div class="circle-layout">
+      <div class="circle-layout-inner">
+        <div class="circle-wrapper">
+          <img src="workbalance_circle.png" alt="Work Balance Model">
+          <!-- overlays on circle with ICONS -->
+          <div class="area-overlay-box" id="overlay-Manageability">
+            <div class="overlay-title">Manageability</div>
+            <div class="overlay-icons"></div>
+          </div>
+          <div class="area-overlay-box" id="overlay-Comprehensibility">
+            <div class="overlay-title">Comprehensibility</div>
+            <div class="overlay-icons"></div>
+          </div>
+          <div class="area-overlay-box" id="overlay-Meaningfulness">
+            <div class="overlay-title">Meaningfulness</div>
+            <div class="overlay-icons"></div>
+          </div>
+          <div class="area-overlay-box" id="overlay-Recovery">
+            <div class="overlay-title">Recovery</div>
+            <div class="overlay-icons"></div>
+          </div>
+        </div>
 
-    <div style="max-height: 260px; overflow-y: auto;">
-      <table class="members-table" id="membersTable">
-        <thead>
-          <tr>
-            <th>Member</th>
-            <th>Manageability</th>
-            <th>Comprehensibility</th>
-            <th>Meaningfulness</th>
-            <th>Recovery</th>
-            <th>Support emojis</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- rows via JS -->
-        </tbody>
-      </table>
-    </div>
-  </div>
+        <!-- area cards around the circle -->
+        <div class="area-card" id="card-Manageability">
+          <div class="area-title-row">
+            <div class="area-title">Manageability</div>
+            <span class="info-link" onclick="openAreaInfo('Manageability')">What does this mean?</span>
+          </div>
+          <div class="buttons-row">
+            <button class="color-btn blue"   onclick="increment('Manageability','blue')">Blue +1</button>
+            <button class="color-btn green"  onclick="increment('Manageability','green')">Green +1</button>
+            <button class="color-btn yellow" onclick="increment('Manageability','yellow')">Yellow +1</button>
+            <button class="color-btn red"    onclick="increment('Manageability','red')">Red +1</button>
+          </div>
+          <div class="counts" id="counts-Manageability"></div>
+        </div>
 
-  <!-- Meta + Export at bottom -->
-  <div class="bottom-meta">
-    <div class="meta-grid">
-      <div>
-        <label for="weekInput">Week</label>
-        <input id="weekInput" type="text" placeholder="e.g. 2025–12 or W15" />
-      </div>
-      <div>
-        <label for="teamInput">Team / Function</label>
-        <input id="teamInput" type="text" placeholder="e.g. XTIE – DevOps" />
-      </div>
-      <div style="grid-column: 1 / -1;">
-        <label for="notesInput">Notes (optional – will also be exported)</label>
-        <textarea id="notesInput" placeholder="Type of meeting, agreed actions, etc."></textarea>
+        <div class="area-card" id="card-Comprehensibility">
+          <div class="area-title-row">
+            <div class="area-title">Comprehensibility</div>
+            <span class="info-link" onclick="openAreaInfo('Comprehensibility')">What does this mean?</span>
+          </div>
+          <div class="buttons-row">
+            <button class="color-btn blue"   onclick="increment('Comprehensibility','blue')">Blue +1</button>
+            <button class="color-btn green"  onclick="increment('Comprehensibility','green')">Green +1</button>
+            <button class="color-btn yellow" onclick="increment('Comprehensibility','yellow')">Yellow +1</button>
+            <button class="color-btn red"    onclick="increment('Comprehensibility','red')">Red +1</button>
+          </div>
+          <div class="counts" id="counts-Comprehensibility"></div>
+        </div>
+
+        <div class="area-card" id="card-Meaningfulness">
+          <div class="area-title-row">
+            <div class="area-title">Meaningfulness</div>
+            <span class="info-link" onclick="openAreaInfo('Meaningfulness')">What does this mean?</span>
+          </div>
+          <div class="buttons-row">
+            <button class="color-btn blue"   onclick="increment('Meaningfulness','blue')">Blue +1</button>
+            <button class="color-btn green"  onclick="increment('Meaningfulness','green')">Green +1</button>
+            <button class="color-btn yellow" onclick="increment('Meaningfulness','yellow')">Yellow +1</button>
+            <button class="color-btn red"    onclick="increment('Meaningfulness','red')">Red +1</button>
+          </div>
+          <div class="counts" id="counts-Meaningfulness"></div>
+        </div>
+
+        <div class="area-card" id="card-Recovery">
+          <div class="area-title-row">
+            <div class="area-title">Recovery</div>
+            <span class="info-link" onclick="openAreaInfo('Recovery')">What does this mean?</span>
+          </div>
+          <div class="buttons-row">
+            <button class="color-btn blue"   onclick="increment('Recovery','blue')">Blue +1</button>
+            <button class="color-btn green"  onclick="increment('Recovery','green')">Green +1</button>
+            <button class="color-btn yellow" onclick="increment('Recovery','yellow')">Yellow +1</button>
+            <button class="color-btn red"    onclick="increment('Recovery','red')">Red +1</button>
+          </div>
+          <div class="counts" id="counts-Recovery"></div>
+        </div>
       </div>
     </div>
 
-    <div class="export-container">
-      <button onclick="exportToExcel()">Export to Excel</button>
+    <!-- INSPIRATIONAL EMOJIS -->
+    <div class="inspiration">
+      <div class="inspiration-title">Send some inspiration to your team</div>
+      <div class="main-emojis">
+        <button type="button" class="emoji-btn-main" onclick="showMainEmojiToast('👍')">👍</button>
+        <button type="button" class="emoji-btn-main" onclick="showMainEmojiToast('😊')">😊</button>
+        <button type="button" class="emoji-btn-main" onclick="showMainEmojiToast('💪')">💪</button>
+        <button type="button" class="emoji-btn-main" onclick="showMainEmojiToast('🙏')">🙏</button>
+        <button type="button" class="emoji-btn-main" onclick="showMainEmojiToast('🌟')">🌟</button>
+        <button type="button" class="emoji-btn-main" onclick="showMainEmojiToast('❤️')">❤️</button>
+      </div>
+      <div class="colour-help-link">
+        <span onclick="openStatusInfo()">What should we do with blue/green and yellow/red?</span>
+      </div>
+    </div>
+
+    <!-- Team member view (optional) -->
+    <div class="members-toggle">
+      <label>
+        <input type="checkbox" id="toggleMembers" onchange="toggleMembersSection()">
+        Add status per team member (optional – see individual status and add support emojis)
+      </label>
+    </div>
+
+    <div class="members-section" id="membersSection">
+      <h2>Team member view (optional)</h2>
+      <p>
+        Here you can add team members and assign a status for each area.
+        Use emojis to show support for your colleagues (for example 👍 😊 💪 ❤️).
+      </p>
+
+      <!-- small circle here so you still see the model -->
+      <div class="mini-circle">
+        <img src="workbalance_circle.png" alt="Work Balance Model (mini)">
+      </div>
+
+      <div class="member-controls">
+        <input type="text" id="memberNameInput" placeholder="Team member name" />
+        <button type="button" onclick="addMember()">Add member</button>
+      </div>
+
+      <div style="max-height: 260px; overflow-y: auto;">
+        <table class="members-table" id="membersTable">
+          <thead>
+            <tr>
+              <th>Member</th>
+              <th>Manageability</th>
+              <th>Comprehensibility</th>
+              <th>Meaningfulness</th>
+              <th>Recovery</th>
+              <th>Support emojis</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- rows via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Meta + Export at bottom -->
+    <div class="bottom-meta">
+      <div class="meta-grid">
+        <div>
+          <label for="weekInput">Week</label>
+          <input id="weekInput" type="text" placeholder="e.g. 2025–12 or W15" />
+        </div>
+        <div>
+          <label for="teamInput">Team / Function</label>
+          <input id="teamInput" type="text" placeholder="e.g. XTIE – DevOps" />
+        </div>
+        <div style="grid-column: 1 / -1;">
+          <label for="notesInput">Notes (optional – will also be exported)</label>
+          <textarea id="notesInput" placeholder="Type of meeting, agreed actions, etc."></textarea>
+        </div>
+      </div>
+
+      <div class="export-container">
+        <button onclick="exportToExcel()">Export to Excel</button>
+      </div>
     </div>
   </div>
 
@@ -741,6 +775,31 @@
           • Decide on 1–3 small, realistic improvements to test before the next check-in.<br/>
           • Clarify who does what and by when – and follow up at the next Workbalance dialogue.<br/>
           • Long-lasting red status should always lead to action or escalation (manager/HR/work environment support).
+        </section>
+      `
+    };
+
+    const usageInfo = {
+      title: "How to use this page",
+      html: `
+        <section>
+          <strong>1. Start with a joint check-in</strong><br/>
+          Briefly introduce the four areas and agree on which team, week and situation the dialogue refers to.
+        </section>
+        <section>
+          <strong>2. Rate each area together</strong><br/>
+          For every area, click the colour buttons (blue, green, yellow, red) to represent the voices in the team.
+          The icons on the Workbalance circle show how many of each status you have in every quadrant.
+        </section>
+        <section>
+          <strong>3. Explore what is behind the colours</strong><br/>
+          Use “What does this mean?” to open the reflection questions. Talk about why an area is blue/green
+          (what you want to keep) or yellow/red (what needs to change).
+        </section>
+        <section>
+          <strong>4. Agree actions and follow up</strong><br/>
+          Use the notes field and optional team member view to document actions and support.
+          When you are done, use “Export to Excel” to save the result from the dialogue.
         </section>
       `
     };
@@ -842,6 +901,11 @@
 
     function openStatusInfo() {
       const html = `<h3>${statusAdvice.title}</h3>${statusAdvice.html}`;
+      openModal(html);
+    }
+
+    function openUsageInfo() {
+      const html = `<h3>${usageInfo.title}</h3>${usageInfo.html}`;
       openModal(html);
     }
 
