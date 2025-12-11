@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Workbalance – TRATON (icon overlays)</title>
+  <title>Workbalance – TRATON (team members + import)</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -12,7 +12,6 @@
       color: #12213b;
     }
 
-    /* Semi-transparent panel above the background */
     .page-shell {
       max-width: 1200px;
       margin: 0 auto;
@@ -73,7 +72,7 @@
       cursor: pointer;
     }
 
-    /* --- CENTRAL CIRCLE + AREA CARDS AROUND --- */
+    /* CIRCLE + AREA CARDS */
 
     .circle-layout {
       display: flex;
@@ -99,7 +98,7 @@
     }
 
     .circle-wrapper img {
-      max-width: 560px;   /* bigger circle */
+      max-width: 560px;
       width: 100%;
       height: auto;
       border-radius: 10px;
@@ -107,7 +106,6 @@
       display: block;
     }
 
-    /* overlays on circle with icons per area */
     .area-overlay-box {
       position: absolute;
       background: rgba(255,255,255,0.9);
@@ -124,21 +122,15 @@
       line-height: 1.2;
     }
 
-    .overlay-title {
-      display: none; /* we only show icons now */
-    }
-
     .overlay-icons span {
       margin: 0 1px;
     }
 
-    /* positions approx for bigger circle */
     #overlay-Manageability { top: 13%; left: 12%; }
     #overlay-Comprehensibility { top: 13%; right: 12%; }
     #overlay-Meaningfulness { bottom: 11%; left: 12%; }
     #overlay-Recovery { bottom: 11%; right: 12%; }
 
-    /* area cards around circle */
     .area-card {
       position: absolute;
       width: 190px;
@@ -198,13 +190,12 @@
       margin-right: 4px;
     }
 
-    /* placement of cards around circle */
     #card-Manageability { top: 6px; left: 0; }
     #card-Comprehensibility { top: 6px; right: 0; }
     #card-Meaningfulness { bottom: 6px; left: 0; }
     #card-Recovery { bottom: 6px; right: 0; }
 
-    /* --- INSPIRATIONAL EMOJIS --- */
+    /* Inspiration */
 
     .inspiration {
       margin-top: 10px;
@@ -236,7 +227,7 @@
       padding: 6px 12px;
       cursor: pointer;
       background: #f9f9f9;
-      font-size: 40px;  /* very big emojis */
+      font-size: 40px;
     }
 
     .colour-help-link {
@@ -251,7 +242,6 @@
       cursor: pointer;
     }
 
-    /* Emoji toast */
     .emoji-toast {
       position: fixed;
       left: 50%;
@@ -269,6 +259,7 @@
     }
 
     /* Team member view */
+
     .members-toggle {
       margin-top: 20px;
       font-size: 14px;
@@ -329,6 +320,37 @@
       color: #ffffff;
     }
 
+    .member-file-controls {
+      margin: 6px 0 10px 0;
+      font-size: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .member-file-controls button {
+      padding: 5px 10px;
+      font-size: 12px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background: #1a73e8;
+      color: #ffffff;
+    }
+
+    .member-file-hint {
+      font-size: 12px;
+      color: #555;
+    }
+
+    .member-help-link {
+      font-size: 12px;
+      color: #1a73e8;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
     table.members-table {
       width: 100%;
       border-collapse: collapse;
@@ -372,44 +394,31 @@
       margin-left: 2px;
     }
 
-    /* Meta + export at bottom */
+    /* Bottom meta (only week) */
+
     .bottom-meta {
       margin-top: 20px;
       padding: 12px 16px;
       background: #ffffff;
       border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
-    .meta-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .bottom-meta label {
+    .week-field label {
       font-size: 13px;
       display: block;
       margin-bottom: 2px;
     }
 
-    .bottom-meta input,
-    .bottom-meta textarea {
-      width: 100%;
+    .week-field input {
       padding: 6px 8px;
       font-size: 13px;
-      box-sizing: border-box;
-    }
-
-    .bottom-meta textarea {
-      resize: vertical;
-      min-height: 50px;
-    }
-
-    .export-container {
-      text-align: right;
-      margin-top: 8px;
+      min-width: 140px;
     }
 
     .export-container button {
@@ -423,6 +432,7 @@
     }
 
     /* Modal */
+
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -459,30 +469,12 @@
     }
 
     @media (max-width: 800px) {
-      body {
-        padding: 8px;
-      }
-      .page-shell {
-        padding: 14px;
-      }
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .logo-wrapper img {
-        height: 32px;
-      }
-
-      .circle-layout-inner {
-        min-height: auto;
-      }
-
-      .area-card {
-        position: static;
-        width: 100%;
-        margin-top: 8px;
-      }
-
+      body { padding: 8px; }
+      .page-shell { padding: 14px; }
+      header { flex-direction: column; align-items: flex-start; }
+      .logo-wrapper img { height: 32px; }
+      .circle-layout-inner { min-height: auto; }
+      .area-card { position: static; width: 100%; margin-top: 8px; }
       .circle-wrapper {
         position: static;
         transform: none;
@@ -490,10 +482,8 @@
         justify-content: center;
         margin-bottom: 10px;
       }
-
-      .area-overlay-box {
-        display: none;
-      }
+      .area-overlay-box { display: none; }
+      .bottom-meta { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
@@ -522,31 +512,17 @@
       </span>
     </div>
 
-    <!-- CIRCLE + area cards around -->
+    <!-- CIRCLE + AREA CARDS -->
     <div class="circle-layout">
       <div class="circle-layout-inner">
         <div class="circle-wrapper">
           <img src="workbalance_circle.png" alt="Work Balance Model">
-          <!-- overlays on circle with ICONS -->
-          <div class="area-overlay-box" id="overlay-Manageability">
-            <div class="overlay-title">Manageability</div>
-            <div class="overlay-icons"></div>
-          </div>
-          <div class="area-overlay-box" id="overlay-Comprehensibility">
-            <div class="overlay-title">Comprehensibility</div>
-            <div class="overlay-icons"></div>
-          </div>
-          <div class="area-overlay-box" id="overlay-Meaningfulness">
-            <div class="overlay-title">Meaningfulness</div>
-            <div class="overlay-icons"></div>
-          </div>
-          <div class="area-overlay-box" id="overlay-Recovery">
-            <div class="overlay-title">Recovery</div>
-            <div class="overlay-icons"></div>
-          </div>
+          <div class="area-overlay-box" id="overlay-Manageability"><div class="overlay-icons"></div></div>
+          <div class="area-overlay-box" id="overlay-Comprehensibility"><div class="overlay-icons"></div></div>
+          <div class="area-overlay-box" id="overlay-Meaningfulness"><div class="overlay-icons"></div></div>
+          <div class="area-overlay-box" id="overlay-Recovery"><div class="overlay-icons"></div></div>
         </div>
 
-        <!-- area cards around the circle -->
         <div class="area-card" id="card-Manageability">
           <div class="area-title-row">
             <div class="area-title">Manageability</div>
@@ -621,7 +597,7 @@
       </div>
     </div>
 
-    <!-- Team member view (optional) -->
+    <!-- TEAM MEMBER VIEW -->
     <div class="members-toggle">
       <label>
         <input type="checkbox" id="toggleMembers" onchange="toggleMembersSection()">
@@ -632,11 +608,10 @@
     <div class="members-section" id="membersSection">
       <h2>Team member view (optional)</h2>
       <p>
-        Here you can add team members and assign a status for each area.
-        Use emojis to show support for your colleagues (for example 👍 😊 💪 ❤️).
+        Here you can add team members and assign a colour per area.
+        You can reuse names and previous inputs by importing an Excel file that was exported from this page.
       </p>
 
-      <!-- small circle here so you still see the model -->
       <div class="mini-circle">
         <img src="workbalance_circle.png" alt="Work Balance Model (mini)">
       </div>
@@ -644,6 +619,20 @@
       <div class="member-controls">
         <input type="text" id="memberNameInput" placeholder="Team member name" />
         <button type="button" onclick="addMember()">Add member</button>
+      </div>
+
+      <div class="member-file-controls">
+        <button type="button" onclick="document.getElementById('memberFileInput').click()">
+          Import from Excel (this tool)
+        </button>
+        <span class="member-file-hint">
+          Use a file exported via “Export to Excel” to bring back names, colours and emojis from a previous week.
+        </span>
+        <span class="member-help-link" onclick="openMemberFileInfo()">
+          How does import / export work?
+        </span>
+        <input type="file" id="memberFileInput" accept=".xls,.xlsx,.html,.htm" style="display:none"
+               onchange="handleMemberFileImport(this.files[0])">
       </div>
 
       <div style="max-height: 260px; overflow-y: auto;">
@@ -658,37 +647,24 @@
               <th>Support emojis</th>
             </tr>
           </thead>
-          <tbody>
-            <!-- rows via JS -->
-          </tbody>
+          <tbody></tbody>
         </table>
       </div>
     </div>
 
-    <!-- Meta + Export at bottom -->
+    <!-- WEEK + EXPORT -->
     <div class="bottom-meta">
-      <div class="meta-grid">
-        <div>
-          <label for="weekInput">Week</label>
-          <input id="weekInput" type="text" placeholder="e.g. 2025–12 or W15" />
-        </div>
-        <div>
-          <label for="teamInput">Team / Function</label>
-          <input id="teamInput" type="text" placeholder="e.g. XTIE – DevOps" />
-        </div>
-        <div style="grid-column: 1 / -1;">
-          <label for="notesInput">Notes (optional – will also be exported)</label>
-          <textarea id="notesInput" placeholder="Type of meeting, agreed actions, etc."></textarea>
-        </div>
+      <div class="week-field">
+        <label for="weekInput">Week</label>
+        <input id="weekInput" type="text" placeholder="e.g. 2025–12 or W15" />
       </div>
-
       <div class="export-container">
         <button onclick="exportToExcel()">Export to Excel</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal -->
+  <!-- MODAL -->
   <div class="modal-backdrop" id="modalBackdrop">
     <div class="modal" id="modal">
       <span class="modal-close" onclick="closeModal()">&times;</span>
@@ -696,7 +672,7 @@
     </div>
   </div>
 
-  <!-- Emoji toast -->
+  <!-- EMOJI TOAST -->
   <div class="emoji-toast" id="emojiToast">
     <span id="emojiToastIcon"></span>
     <span>Thanks for supporting your team!</span>
@@ -784,7 +760,7 @@
       html: `
         <section>
           <strong>1. Start with a joint check-in</strong><br/>
-          Briefly introduce the four areas and agree on which team, week and situation the dialogue refers to.
+          Briefly introduce the four areas and agree on which week and situation the dialogue refers to.
         </section>
         <section>
           <strong>2. Rate each area together</strong><br/>
@@ -797,26 +773,50 @@
           (what you want to keep) or yellow/red (what needs to change).
         </section>
         <section>
-          <strong>4. Agree actions and follow up</strong><br/>
-          Use the notes field and optional team member view to document actions and support.
-          When you are done, use “Export to Excel” to save the result from the dialogue.
+          <strong>4. Use the team member view when needed</strong><br/>
+          If you want to go deeper, activate the team member view to see status per person and add support emojis.
+          You can reuse previous sessions by importing an Excel file that was exported from this page.
+        </section>
+        <section>
+          <strong>5. Export for follow-up</strong><br/>
+          When you are done, type the week and use “Export to Excel” to save the result.
+          Next time you meet, you can import the same file to continue working from where you left off.
+        </section>
+      `
+    };
+
+    const memberFileInfo = {
+      title: "Import / export for team members",
+      html: `
+        <section>
+          <strong>Export</strong><br/>
+          “Export to Excel” creates an .xls file with your current week, the colour summary per area
+          and – if you use the team member view – a table with all members, their colours and support emojis.
+        </section>
+        <section>
+          <strong>Import</strong><br/>
+          To reuse names and colours, go to the team member view and click
+          “Import from Excel (this tool)”. Choose a file that was exported from this Workbalance page.
+          The tool reads the member table in the file and repopulates the list of members, their colours and emojis.
+        </section>
+        <section>
+          <strong>Updating the circle</strong><br/>
+          When you change colours in the team member table – or after importing a file – the top Workbalance circle
+          is recalculated from the team member data. This gives you one consistent overview for the current week.
         </section>
       `
     };
 
     const areaData = {};
-    const overall = { blue: 0, green: 0, yellow: 0, red: 0 }; // kept for export totals
+    const overall = { blue: 0, green: 0, yellow: 0, red: 0 };
 
-    const members = []; // {name, ratings:{area:color}, emojis:string}
+    const members = [];
     const supportEmojis = ["👍","😊","💪","🙏","🌟","❤️"];
-
     let toastTimeout = null;
 
     function initAreas() {
       areas.forEach(area => {
-        if (!areaData[area]) {
-          areaData[area] = { blue: 0, green: 0, yellow: 0, red: 0 };
-        }
+        areaData[area] = areaData[area] || { blue: 0, green: 0, yellow: 0, red: 0 };
         updateAreaCounts(area);
       });
       updateOverlayAreas();
@@ -841,24 +841,13 @@
       `;
     }
 
-    /* NEW: icons overlay instead of raw numbers */
     function makeStatusIcons(d) {
       const icons = [];
-      if (d.blue > 0) {
-        icons.push("🔵".repeat(Math.min(d.blue, 10)) + (d.blue > 10 ? "+" : ""));
-      }
-      if (d.green > 0) {
-        icons.push("🟢".repeat(Math.min(d.green, 10)) + (d.green > 10 ? "+" : ""));
-      }
-      if (d.yellow > 0) {
-        icons.push("🟡".repeat(Math.min(d.yellow, 10)) + (d.yellow > 10 ? "+" : ""));
-      }
-      if (d.red > 0) {
-        icons.push("🔴".repeat(Math.min(d.red, 10)) + (d.red > 10 ? "+" : ""));
-      }
-      if (icons.length === 0) {
-        return '<span style="font-size:11px;color:#666;">–</span>';
-      }
+      if (d.blue > 0)  icons.push("🔵".repeat(Math.min(d.blue, 10)) + (d.blue > 10 ? "+" : ""));
+      if (d.green > 0) icons.push("🟢".repeat(Math.min(d.green, 10)) + (d.green > 10 ? "+" : ""));
+      if (d.yellow > 0)icons.push("🟡".repeat(Math.min(d.yellow, 10)) + (d.yellow > 10 ? "+" : ""));
+      if (d.red > 0)   icons.push("🔴".repeat(Math.min(d.red, 10)) + (d.red > 10 ? "+" : ""));
+      if (icons.length === 0) return '<span style="font-size:11px;color:#666;">–</span>';
       return icons.map(row => `<span>${row}</span>`).join("");
     }
 
@@ -876,14 +865,12 @@
       document.getElementById("modalContent").innerHTML = html;
       document.getElementById("modalBackdrop").style.display = "flex";
     }
-
     function closeModal() {
       document.getElementById("modalBackdrop").style.display = "none";
     }
 
     function openAreaInfo(area) {
       const info = areaInfo[area];
-      if (!info) return;
       const html = `
         <h3>${area}</h3>
         <section><strong>Definition:</strong><br/>${info.definition}</section>
@@ -898,43 +885,36 @@
         </section>`;
       openModal(html);
     }
-
     function openStatusInfo() {
-      const html = `<h3>${statusAdvice.title}</h3>${statusAdvice.html}`;
-      openModal(html);
+      openModal(`<h3>${statusAdvice.title}</h3>${statusAdvice.html}`);
     }
-
     function openUsageInfo() {
-      const html = `<h3>${usageInfo.title}</h3>${usageInfo.html}`;
-      openModal(html);
+      openModal(`<h3>${usageInfo.title}</h3>${usageInfo.html}`);
+    }
+    function openMemberFileInfo() {
+      openModal(`<h3>${memberFileInfo.title}</h3>${memberFileInfo.html}`);
     }
 
     function toggleMembersSection() {
       const checked = document.getElementById("toggleMembers").checked;
-      const section = document.getElementById("membersSection");
-      section.style.display = checked ? "block" : "none";
+      document.getElementById("membersSection").style.display = checked ? "block" : "none";
     }
 
     function addMember() {
       const nameInput = document.getElementById("memberNameInput");
       const name = nameInput.value.trim();
       if (!name) return;
-      members.push({
-        name,
-        ratings: { },
-        emojis: ""
-      });
+      members.push({ name, ratings: {}, emojis: "" });
       nameInput.value = "";
       renderMembersTable();
+      recalcFromMembers();
     }
 
     function renderMembersTable() {
       const tbody = document.getElementById("membersTable").querySelector("tbody");
       tbody.innerHTML = "";
-
       members.forEach(member => {
         const row = document.createElement("tr");
-
         const nameTd = document.createElement("td");
         nameTd.textContent = member.name;
         row.appendChild(nameTd);
@@ -946,14 +926,13 @@
           ["", "blue", "green", "yellow", "red"].forEach(val => {
             const opt = document.createElement("option");
             opt.value = val;
-            opt.textContent =
-              val === "" ? "-" :
-              val.charAt(0).toUpperCase() + val.slice(1);
-            if (member.ratings[area] === val) opt.selected = true;
+            opt.textContent = val === "" ? "-" : val.charAt(0).toUpperCase() + val.slice(1);
+            if ((member.ratings[area] || "") === val) opt.selected = true;
             select.appendChild(opt);
           });
           select.addEventListener("change", () => {
             member.ratings[area] = select.value;
+            recalcFromMembers();
           });
           td.appendChild(select);
           row.appendChild(td);
@@ -986,9 +965,83 @@
         emojisTd.appendChild(emojiBtns);
         emojisTd.appendChild(emojiInput);
         row.appendChild(emojisTd);
-
         tbody.appendChild(row);
       });
+    }
+
+    function recalcFromMembers() {
+      areas.forEach(area => { areaData[area] = { blue: 0, green: 0, yellow: 0, red: 0 }; });
+      overall.blue = overall.green = overall.yellow = overall.red = 0;
+
+      members.forEach(m => {
+        areas.forEach(area => {
+          const c = (m.ratings[area] || "").toLowerCase();
+          if (c && areaData[area][c] !== undefined) {
+            areaData[area][c]++;
+            overall[c]++;
+          }
+        });
+      });
+
+      areas.forEach(updateAreaCounts);
+      updateOverlayAreas();
+    }
+
+    function handleMemberFileImport(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const text = e.target.result;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, "text/html");
+
+        const tables = Array.from(doc.getElementsByTagName("table"));
+        if (tables.length > 0) {
+          const metaTable = tables[0];
+          const rows = metaTable.querySelectorAll("tr");
+          if (rows.length >= 2) {
+            const weekCell = rows[1].querySelectorAll("td")[1];
+            if (weekCell) document.getElementById("weekInput").value = weekCell.textContent.trim();
+          }
+        }
+
+        let memberTable = null;
+        for (const t of tables) {
+          const firstTh = t.querySelector("tr th");
+          if (!firstTh) continue;
+          if (firstTh.textContent.trim().toLowerCase() === "member") {
+            memberTable = t;
+            break;
+          }
+        }
+        if (!memberTable) {
+          alert("Could not find team member data in this file. Make sure it was exported from this Workbalance page.");
+          return;
+        }
+
+        members.length = 0;
+        const rows = memberTable.querySelectorAll("tr");
+        for (let i = 1; i < rows.length; i++) {
+          const cells = rows[i].querySelectorAll("td");
+          if (cells.length < 6) continue;
+          const name = cells[0].textContent.trim();
+          if (!name) continue;
+          members.push({
+            name,
+            ratings: {
+              "Manageability": cells[1].textContent.trim().toLowerCase(),
+              "Comprehensibility": cells[2].textContent.trim().toLowerCase(),
+              "Meaningfulness": cells[3].textContent.trim().toLowerCase(),
+              "Recovery": cells[4].textContent.trim().toLowerCase()
+            },
+            emojis: cells[5].textContent.trim()
+          });
+        }
+        renderMembersTable();
+        recalcFromMembers();
+        alert("Team members imported from file.");
+      };
+      reader.readAsText(file);
     }
 
     function showMainEmojiToast(emoji) {
@@ -997,22 +1050,16 @@
       icon.textContent = emoji;
       toast.style.display = "flex";
       if (toastTimeout) clearTimeout(toastTimeout);
-      toastTimeout = setTimeout(() => {
-        toast.style.display = "none";
-      }, 2500);
+      toastTimeout = setTimeout(() => { toast.style.display = "none"; }, 2500);
     }
 
     function exportToExcel() {
       const week = document.getElementById("weekInput").value || "";
-      const team = document.getElementById("teamInput").value || "";
-      const notes = document.getElementById("notesInput").value || "";
 
       let html = `
         <table border="1">
           <tr><th colspan="2">Workbalance – TRATON</th></tr>
           <tr><td>Week</td><td>${escapeHtml(week)}</td></tr>
-          <tr><td>Team / Function</td><td>${escapeHtml(team)}</td></tr>
-          <tr><td>Notes</td><td>${escapeHtml(notes).replace(/\n/g,"<br/>")}</td></tr>
         </table>
         <br/>
         <table border="1">
@@ -1058,7 +1105,6 @@
               <th>Recovery</th>
               <th>Support emojis</th>
             </tr>`;
-
         members.forEach(m => {
           html += `
             <tr>
@@ -1070,7 +1116,6 @@
               <td>${escapeHtml(m.emojis || "")}</td>
             </tr>`;
         });
-
         html += `</table>`;
       }
 
@@ -1082,9 +1127,8 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       const fileWeek = week ? "_" + week.replace(/\s+/g,"_") : "";
-      const fileTeam = team ? "_" + team.replace(/\s+/g,"_") : "";
       a.href = url;
-      a.download = "Workbalance" + fileWeek + fileTeam + ".xls";
+      a.download = "Workbalance" + fileWeek + ".xls";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -1100,9 +1144,7 @@
         .replace(/'/g, "&#039;");
     }
 
-    window.addEventListener("DOMContentLoaded", () => {
-      initAreas();
-    });
+    window.addEventListener("DOMContentLoaded", initAreas);
   </script>
 </body>
 </html>
