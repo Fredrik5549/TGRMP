@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Workbalance – TRATON (history + import/export)</title>
+  <title>Workbalance – TRATON (history + import/export v2)</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -218,10 +218,11 @@
 
     .members-section p {
       font-size: 13px;
-      margin-top: 0;
+      margin-top: 4px;
     }
 
     .member-controls {
+      margin-top: 10px;
       margin-bottom: 8px;
       display: flex;
       flex-wrap: wrap;
@@ -297,27 +298,6 @@
       z-index: 1;
     }
 
-    .emoji-buttons {
-      display: flex;
-      gap: 2px;
-      flex-wrap: wrap;
-    }
-
-    .emoji-btn {
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      padding: 1px 4px;
-      cursor: pointer;
-      background: #f9f9f9;
-    }
-
-    .emoji-input {
-      width: 70px;
-      padding: 2px 4px;
-      font-size: 12px;
-      margin-left: 2px;
-    }
-
     .remove-btn {
       border: none;
       background: #e53e3e;
@@ -326,6 +306,32 @@
       padding: 2px 6px;
       cursor: pointer;
       font-size: 11px;
+    }
+
+    .emoji-toggles {
+      display: flex;
+      gap: 4px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .emoji-toggle {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 2px 6px;
+      cursor: pointer;
+      background: #f9f9f9;
+      font-size: 16px;
+    }
+
+    .emoji-toggle.active {
+      background: #12213b;
+      color: #fff;
+    }
+
+    .prev-week-cell {
+      font-size: 11px;
+      line-height: 1.3;
     }
 
     /* Bottom – Week + Team + Export */
@@ -526,18 +532,35 @@
     <div class="members-toggle">
       <label>
         <input type="checkbox" id="toggleMembers" onchange="toggleMembersSection()">
-        Add status per team member (optional – keeps history week by week)
+        Add status per team member (optional – with weekly history)
       </label>
     </div>
 
     <div class="members-section" id="membersSection">
       <h2>Team member view (optional)</h2>
       <p>
-        Here you can add team members and assign a colour per area for the selected week and team.
-        When you import a file that was exported from this page you get back all earlier weeks,
-        and the upper circle is recalculated from the current week’s individual statuses.
-        <span class="member-help-link" onclick="openMemberFileInfo()">How does import / export work?</span>
+        Enter one row per team member for the selected week and team.
+        Importing a file exported from this page restores all previous weeks and lets you continue building history.
       </p>
+
+      <!-- TABLE FIRST so you can see the circle while typing -->
+      <div style="max-height: 280px; overflow-y: auto;">
+        <table class="members-table" id="membersTable">
+          <thead>
+            <tr>
+              <th>Member</th>
+              <th>Manageability</th>
+              <th>Comprehensibility</th>
+              <th>Meaningfulness</th>
+              <th>Recovery</th>
+              <th>Support emojis<br/>(🙏 ❤️ 👍)</th>
+              <th>Previous week<br/>(all 4 areas)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
 
       <div class="member-controls">
         <input type="text" id="memberNameInput" placeholder="Team member name" />
@@ -549,28 +572,13 @@
           Import from Excel (history file)
         </button>
         <span class="member-file-hint">
-          Use an .xlsx file exported from this page to bring back names and history.
+          Use an .xlsx file exported from this page to bring back names and all earlier weeks.
+        </span>
+        <span class="member-help-link" onclick="openMemberFileInfo()">
+          How does import / export work?
         </span>
         <input type="file" id="memberFileInput" accept=".xlsx" style="display:none"
                onchange="handleMemberFileImport(this.files[0])">
-      </div>
-
-      <div style="max-height: 280px; overflow-y: auto;">
-        <table class="members-table" id="membersTable">
-          <thead>
-            <tr>
-              <th>Member</th>
-              <th>Manageability</th>
-              <th>Comprehensibility</th>
-              <th>Meaningfulness</th>
-              <th>Recovery</th>
-              <th>Support emojis</th>
-              <th>Recent weeks</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
       </div>
     </div>
 
@@ -600,7 +608,7 @@
     </div>
   </div>
 
-  <!-- SheetJS for real Excel -->
+  <!-- SheetJS -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <script>
@@ -653,32 +661,11 @@
       }
     };
 
-    const statusAdvice = {
-      title: "How to work with the colours",
-      html: `
-        <section>
-          <strong>Blue–Green: Maintain what works</strong><br/>
-          Focus: keep and strengthen helpful conditions.<br/>
-          • Identify which behaviours, routines or conditions make the area blue/green.<br/>
-          • Make them visible in the team – “what do we want to protect and continue doing?”.<br/>
-          • Use them as examples when you work with yellow/red areas.
-        </section>
-        <section>
-          <strong>Yellow–Red: Act and improve</strong><br/>
-          Focus: early signals, dialogue and concrete improvements.<br/>
-          • Use the reflection questions for the area to understand why the status is yellow or red.<br/>
-          • Decide on 1–3 realistic improvements to test before the next check-in.<br/>
-          • Clarify who does what and by when – and follow up at the next Workbalance dialogue.<br/>
-          • Long-lasting red status should always lead to action or escalation.
-        </section>
-      `
-    };
-
     const usageInfo = {
       title: "How to use this page",
       html: `
         <section>
-          <strong>1. Decide week and team</strong><br/>
+          <strong>1. Decide team and week</strong><br/>
           At the bottom of the page, enter the team name and week that this dialogue refers to.
         </section>
         <section>
@@ -687,19 +674,19 @@
           The icons on the circle show how many blue, green, yellow and red you have in that area.
         </section>
         <section>
-          <strong>3. Optionally use team member view</strong><br/>
+          <strong>3. Use the team member view when needed</strong><br/>
           Turn on “Add status per team member” to rate per person.
-          The upper circle is then calculated from the team member statuses.
+          The upper circle is then calculated from the team member statuses for the selected week.
         </section>
         <section>
           <strong>4. Import old weeks</strong><br/>
-          Import an Excel file exported from this page to get back names and history.
-          You can then change the week field and add a new measurement while keeping older weeks.
+          Import an Excel file exported from this page to restore names and all previous weeks.
+          You then pick a new week and input fresh statuses while keeping the history.
         </section>
         <section>
           <strong>5. Export and keep building history</strong><br/>
-          “Export to Excel” saves the current week plus all earlier weeks in one file,
-          so you can keep reusing the same file as your Workbalance history.
+          “Export to Excel” saves the current week plus all earlier weeks in one file.
+          You can reuse the same file every time to keep the Workbalance history growing.
         </section>
       `
     };
@@ -716,40 +703,26 @@
           <strong>Import</strong><br/>
           • Click “Import from Excel (history file)” and select an .xlsx that was exported from this page.<br/>
           • All historical rows are loaded into memory.<br/>
-          • Team and week fields are filled from the last rows in the file.<br/>
-          • For the selected team, the latest status per member is shown in the table,
-            and the upper circle is updated accordingly.
+          • Team and week fields are set from the last row in the file.<br/>
+          • The team member list is created from the selected team, but all statuses and emojis are cleared
+            so you can enter new values for the next week.<br/>
+          • For each person you see a separate column with their four statuses from the previous week.
         </section>
         <section>
-          <strong>New week</strong><br/>
-          • Change the week field to a new value (for example W16).<br/>
-          • Adjust colours per member or add/remove members.<br/>
-          • When you export, new rows are added for this week, while previous weeks are kept.
-        </section>
-        <section>
-          <strong>Export</strong><br/>
-          “Export to Excel” creates a workbook with:<br/>
-          • Sheet “Summary” – overview for the currently selected week.<br/>
-          • Sheet “Members” – all imported rows plus the current week’s rows (old rows for that week/team are replaced).<br/>
-          Use the same file next time to keep building weekly history.
+          <strong>New week & export</strong><br/>
+          • Change the week field to a new value (you cannot export with a week that already exists for this team).<br/>
+          • Enter statuses and optional emojis per member.<br/>
+          • “Export to Excel” writes a <em>Summary</em> sheet for the current week and a <em>Members</em> sheet
+            with all history plus the new week added. Older weeks remain unchanged.
         </section>
       `
     };
 
     const areaData = {};
-    const overall = { blue: 0, green: 0, yellow: 0, red: 0 };
+    const overall = { blue:0, green:0, yellow:0, red:0 };
 
-    const members = []; // current week/team view [{name, ratings:{area:color}, emojis}]
-    const supportEmojis = ["👍","😊","💪","🙏","🌟","❤️"];
-
-    let historyRows = []; // all weeks, all teams
-    let toastTimeout = null;
-
-    function initAreas() {
-      areas.forEach(a => areaData[a] = { blue:0, green:0, yellow:0, red:0 });
-      areas.forEach(updateAreaCounts);
-      updateOverlayAreas();
-    }
+    const members = []; // current week/team [{name, ratings:{}, emojis:{gratitude, heart, thumb}}]
+    let historyRows = []; // all imported rows
 
     function openModal(html) {
       document.getElementById("modalContent").innerHTML = html;
@@ -759,8 +732,16 @@
       document.getElementById("modalBackdrop").style.display = "none";
     }
 
+    function openUsageInfo() {
+      openModal(`<h3>${usageInfo.title}</h3>${usageInfo.html}`);
+    }
+    function openMemberFileInfo() {
+      openModal(`<h3>${memberFileInfo.title}</h3>${memberFileInfo.html}`);
+    }
+
     function openAreaInfo(area) {
       const info = areaInfo[area];
+      if (!info) return;
       const html = `
         <h3>${area}</h3>
         <section><strong>Definition:</strong><br/>${info.definition}</section>
@@ -769,20 +750,22 @@
         </section>
         <section>
           <strong>Colour hints:</strong><br/>
-          • Blue/Green – keep and spread what works.<br/>
-          • Yellow – follow up and agree on improvements.<br/>
-          • Red – urgent: understand causes, act and consider escalation.
+          • 🔵🟢 – keep and spread what works.<br/>
+          • 🟡 – follow up and agree on improvements.<br/>
+          • 🔴 – urgent: understand causes, act and consider escalation.
         </section>`;
       openModal(html);
     }
-    function openStatusInfo() {
-      openModal(`<h3>${statusAdvice.title}</h3>${statusAdvice.html}`);
+
+    function toggleMembersSection() {
+      const checked = document.getElementById("toggleMembers").checked;
+      document.getElementById("membersSection").style.display = checked ? "block" : "none";
     }
-    function openUsageInfo() {
-      openModal(`<h3>${usageInfo.title}</h3>${usageInfo.html}`);
-    }
-    function openMemberFileInfo() {
-      openModal(`<h3>${memberFileInfo.title}</h3>${memberFileInfo.html}`);
+
+    function initAreas() {
+      areas.forEach(a => areaData[a] = { blue:0, green:0, yellow:0, red:0 });
+      areas.forEach(updateAreaCounts);
+      updateOverlayAreas();
     }
 
     function increment(area, colour) {
@@ -822,16 +805,15 @@
       });
     }
 
-    function toggleMembersSection() {
-      const checked = document.getElementById("toggleMembers").checked;
-      document.getElementById("membersSection").style.display = checked ? "block" : "none";
-    }
-
     function addMember() {
       const nameInput = document.getElementById("memberNameInput");
       const name = nameInput.value.trim();
       if (!name) return;
-      members.push({ name, ratings:{}, emojis:"" });
+      members.push({
+        name,
+        ratings: {},
+        emojis: { gratitude:false, heart:false, thumb:false }
+      });
       nameInput.value = "";
       renderMembersTable();
       recalcFromMembers();
@@ -843,102 +825,131 @@
       recalcFromMembers();
     }
 
+    function emojiSetString(emojis) {
+      let s = "";
+      if (emojis.gratitude) s += "🙏";
+      if (emojis.heart)     s += "❤️";
+      if (emojis.thumb)     s += "👍";
+      return s;
+    }
+
     function renderMembersTable() {
       const tbody = document.querySelector("#membersTable tbody");
       tbody.innerHTML = "";
       const team = document.getElementById("teamInput").value.trim();
+      const currentWeek = document.getElementById("weekInput").value.trim();
 
-      members.forEach((member, idx) => {
+      members.forEach((m, idx) => {
         const tr = document.createElement("tr");
 
+        // name
         const nameTd = document.createElement("td");
-        nameTd.textContent = member.name;
+        nameTd.textContent = m.name;
         tr.appendChild(nameTd);
 
+        // status dropdowns (🔵🟢🟡🔴)
         areas.forEach(area => {
           const td = document.createElement("td");
           const sel = document.createElement("select");
-          sel.style.fontSize = "11px";
-          ["","blue","green","yellow","red"].forEach(c => {
+          sel.style.fontSize = "16px";
+          sel.style.textAlign = "center";
+          const options = [
+            { value:"",   label:""   },
+            { value:"blue",   label:"🔵" },
+            { value:"green",  label:"🟢" },
+            { value:"yellow", label:"🟡" },
+            { value:"red",    label:"🔴" }
+          ];
+          options.forEach(o => {
             const opt = document.createElement("option");
-            opt.value = c;
-            opt.textContent = c===""?"-":c.charAt(0).toUpperCase()+c.slice(1);
-            if ((member.ratings[area] || "") === c) opt.selected = true;
+            opt.value = o.value;
+            opt.textContent = o.label;
+            if ((m.ratings[area] || "") === o.value) opt.selected = true;
             sel.appendChild(opt);
           });
           sel.addEventListener("change", () => {
-            member.ratings[area] = sel.value;
+            m.ratings[area] = sel.value;
             recalcFromMembers();
           });
           td.appendChild(sel);
           tr.appendChild(td);
         });
 
+        // emojis – three toggles: gratitude, heart, thumb
         const emojisTd = document.createElement("td");
-        const emojiBtns = document.createElement("div");
-        emojiBtns.className = "emoji-buttons";
-        const emojiInput = document.createElement("input");
-        emojiInput.className = "emoji-input";
-        emojiInput.type = "text";
-        emojiInput.placeholder = "👍💪❤️";
-        emojiInput.value = member.emojis || "";
-        emojiInput.addEventListener("input", () => {
-          member.emojis = emojiInput.value;
-        });
-        supportEmojis.forEach(e => {
-          const b = document.createElement("button");
-          b.type = "button";
-          b.className = "emoji-btn";
-          b.textContent = e;
-          b.addEventListener("click", () => {
-            emojiInput.value += e;
-            member.emojis = emojiInput.value;
+        const wrapper = document.createElement("div");
+        wrapper.className = "emoji-toggles";
+
+        const makeToggle = (key, symbol, title) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "emoji-toggle" + (m.emojis[key] ? " active" : "");
+          btn.textContent = symbol;
+          btn.title = title;
+          btn.addEventListener("click", () => {
+            m.emojis[key] = !m.emojis[key];
+            if (m.emojis[key]) btn.classList.add("active");
+            else btn.classList.remove("active");
           });
-          emojiBtns.appendChild(b);
-        });
-        emojisTd.appendChild(emojiBtns);
-        emojisTd.appendChild(emojiInput);
+          return btn;
+        };
+
+        wrapper.appendChild(makeToggle("gratitude","🙏","Gratitude / thanks"));
+        wrapper.appendChild(makeToggle("heart","❤️","Care / support"));
+        wrapper.appendChild(makeToggle("thumb","👍","Thumbs up / well done"));
+
+        emojisTd.appendChild(wrapper);
         tr.appendChild(emojisTd);
 
-        // history column
-        const histTd = document.createElement("td");
-        histTd.style.fontSize = "11px";
-        histTd.innerHTML = buildHistorySummary(member.name, team);
-        tr.appendChild(histTd);
+        // previous week 4 statuses
+        const prevTd = document.createElement("td");
+        prevTd.className = "prev-week-cell";
+        prevTd.innerHTML = buildPreviousWeekStatus(m.name, team, currentWeek);
+        tr.appendChild(prevTd);
 
+        // remove
         const removeTd = document.createElement("td");
-        const rmBtn = document.createElement("button");
-        rmBtn.className = "remove-btn";
-        rmBtn.textContent = "X";
-        rmBtn.onclick = () => removeMember(idx);
-        removeTd.appendChild(rmBtn);
+        const rm = document.createElement("button");
+        rm.className = "remove-btn";
+        rm.textContent = "X";
+        rm.title = "Remove member";
+        rm.onclick = () => removeMember(idx);
+        removeTd.appendChild(rm);
         tr.appendChild(removeTd);
 
         tbody.appendChild(tr);
       });
     }
 
-    // Build small history string for a member (last 5 entries)
-    function buildHistorySummary(name, team) {
+    function buildPreviousWeekStatus(name, team, currentWeek) {
       if (!historyRows.length) return "";
       const rows = historyRows.filter(r => r.Member === name && r.Team === team);
       if (!rows.length) return "";
-      // assume rows are in chronological order as they were added
-      const last = rows.slice(-5); // last up to 5
-      const colourRank = { red:4, yellow:3, green:2, blue:1 };
-      const colourEmoji = { blue:"🔵", green:"🟢", yellow:"🟡", red:"🔴" };
-      return last.map(r => {
-        let best = ""; let bestScore = 0;
-        areas.forEach(a => {
-          const c = (r[a] || "").toLowerCase();
-          if (colourRank[c] && colourRank[c] > bestScore) {
-            bestScore = colourRank[c];
-            best = c;
-          }
-        });
-        const emoji = colourEmoji[best] || "⚪";
-        return `${r.Week || "?"}:${emoji}`;
-      }).join("<br/>");
+      // last row that is NOT current week
+      let lastPrev = null;
+      for (let i = rows.length - 1; i >= 0; i--) {
+        if (rows[i].Week !== currentWeek) {
+          lastPrev = rows[i];
+          break;
+        }
+      }
+      if (!lastPrev) return "";
+      const mapDot = c => {
+        c = (c || "").toLowerCase();
+        if (c === "blue") return "🔵";
+        if (c === "green") return "🟢";
+        if (c === "yellow") return "🟡";
+        if (c === "red") return "🔴";
+        return "⚪";
+      };
+      const w = lastPrev.Week || "?";
+      return `
+        <strong>${w}</strong><br/>
+        M: ${mapDot(lastPrev.Manageability)}<br/>
+        C: ${mapDot(lastPrev.Comprehensibility)}<br/>
+        Me: ${mapDot(lastPrev.Meaningfulness)}<br/>
+        R: ${mapDot(lastPrev.Recovery)}
+      `;
     }
 
     function recalcFromMembers() {
@@ -960,7 +971,7 @@
       updateOverlayAreas();
     }
 
-    /* ---------- IMPORT REAL XLSX (history) ---------- */
+    /* ---------- IMPORT XLSX HISTORY ---------- */
 
     function handleMemberFileImport(file) {
       if (!file) return;
@@ -968,46 +979,37 @@
       reader.onload = e => {
         const data = new Uint8Array(e.target.result);
         const wb = XLSX.read(data, { type: "array" });
-
         const sheet = wb.Sheets["Members"] || wb.Sheets[wb.SheetNames[0]];
         if (!sheet) {
-          alert("No sheet named 'Members' (or first sheet) found in the file.");
+          alert("No sheet named 'Members' or first sheet found in the file.");
           return;
         }
-
         historyRows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
         if (!historyRows.length) {
           alert("The Members sheet is empty.");
           return;
         }
 
-        // derive team + latest week from last row
-        const lastRow = historyRows[historyRows.length - 1];
-        document.getElementById("teamInput").value = lastRow.Team || "";
-        document.getElementById("weekInput").value = lastRow.Week || "";
+        const last = historyRows[historyRows.length - 1];
+        const lastTeam = last.Team || "";
+        const lastWeek = last.Week || "";
 
-        // build members list with latest status for this team
-        const team = lastRow.Team || "";
-        const latest = {};
+        document.getElementById("teamInput").value = lastTeam;
+        document.getElementById("weekInput").value = lastWeek;
+
+        // Build member list for this team from history, but CLEAR current ratings/emojis
+        const latestByName = {};
         historyRows.forEach(r => {
-          if (r.Team !== team) return;
-          if (!r.Member) return;
-          // later rows overwrite earlier ones
-          latest[r.Member] = r;
+          if (!r.Member || r.Team !== lastTeam) return;
+          latestByName[r.Member] = r; // last wins
         });
 
         members.length = 0;
-        Object.keys(latest).forEach(name => {
-          const r = latest[name];
+        Object.keys(latestByName).forEach(name => {
           members.push({
             name,
-            ratings: {
-              "Manageability": (r.Manageability || "").toLowerCase(),
-              "Comprehensibility": (r.Comprehensibility || "").toLowerCase(),
-              "Meaningfulness": (r.Meaningfulness || "").toLowerCase(),
-              "Recovery": (r.Recovery || "").toLowerCase()
-            },
-            emojis: r.Emojis || ""
+            ratings: {}, // reset
+            emojis: { gratitude:false, heart:false, thumb:false } // reset
           });
         });
 
@@ -1015,17 +1017,22 @@
         document.getElementById("membersSection").style.display = "block";
 
         renderMembersTable();
-        recalcFromMembers();
-        alert("History imported. Latest week per member is now loaded.");
+        // also reset the circle when importing (no new week yet)
+        areas.forEach(a => areaData[a] = { blue:0, green:0, yellow:0, red:0 });
+        overall.blue = overall.green = overall.yellow = overall.red = 0;
+        areas.forEach(updateAreaCounts);
+        updateOverlayAreas();
+
+        alert("History imported. Team members loaded and statuses cleared. Previous week is shown per person.");
       };
       reader.readAsArrayBuffer(file);
     }
 
-    /* ---------- EXPORT XLSX (Summary + Members history) ---------- */
+    /* ---------- EXPORT XLSX ---------- */
 
     function exportToExcel() {
-      const week = document.getElementById("weekInput").value.trim();
       const team = document.getElementById("teamInput").value.trim();
+      const week = document.getElementById("weekInput").value.trim();
 
       if (!team) {
         alert("Please enter a team name before exporting.");
@@ -1036,10 +1043,16 @@
         return;
       }
 
-      // Build workbook
+      // Enforce that this week does not already exist for this team in history
+      const exists = historyRows.some(r => (r.Team || "") === team && (r.Week || "") === week);
+      if (exists) {
+        alert("This week already exists for this team in the history file. Please choose a new week so history can grow.");
+        return;
+      }
+
       const wb = XLSX.utils.book_new();
 
-      // Summary sheet only for current week
+      // Summary sheet
       const summaryData = [
         ["Workbalance – TRATON"],
         [],
@@ -1056,17 +1069,12 @@
       const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
       XLSX.utils.book_append_sheet(wb, wsSummary, "Summary");
 
-      // Members sheet – historyRows + current week rows (replace existing rows for same week+team)
-      const keyFor = r => (r.Team || "") + "||" + (r.Week || "");
-
-      const currentKey = team + "||" + week;
-      const preserved = historyRows.filter(r => keyFor(r) !== currentKey);
-
+      // Members sheet
       const header = ["Week","Team","Member","Manageability","Comprehensibility","Meaningfulness","Recovery","Emojis"];
       const rows = [header];
 
-      // old rows
-      preserved.forEach(r => {
+      // keep old rows
+      (historyRows || []).forEach(r => {
         rows.push([
           r.Week || "",
           r.Team || "",
@@ -1079,7 +1087,7 @@
         ]);
       });
 
-      // new rows for this week
+      // add current week rows
       members.forEach(m => {
         rows.push([
           week,
@@ -1089,14 +1097,14 @@
           m.ratings["Comprehensibility"] || "",
           m.ratings["Meaningfulness"] || "",
           m.ratings["Recovery"] || "",
-          m.emojis || ""
+          emojiSetString(m.emojis)
         ]);
       });
 
       const wsMembers = XLSX.utils.aoa_to_sheet(rows);
       XLSX.utils.book_append_sheet(wb, wsMembers, "Members");
 
-      // update in-memory history for future imports
+      // update in-memory history for next time
       historyRows = XLSX.utils.sheet_to_json(wsMembers, { defval: "" });
 
       const safeTeam = team.replace(/\s+/g,"_");
@@ -1104,30 +1112,10 @@
       XLSX.writeFile(wb, fileName);
     }
 
-    function updateAllHistoryBadges() {
-      // re-render only history column
-      const tbody = document.querySelector("#membersTable tbody");
-      const team = document.getElementById("teamInput").value.trim();
-      Array.from(tbody.rows).forEach((tr, idx) => {
-        const m = members[idx];
-        const histHtml = buildHistorySummary(m.name, team);
-        tr.cells[6].innerHTML = histHtml;
-      });
-    }
-
-    function showMainEmojiToast() {
-      // (no longer used – emojis removed from main view, but left stub in case)
-    }
+    /* --------- Helpers --------- */
 
     window.addEventListener("DOMContentLoaded", () => {
       initAreas();
-    });
-
-    // When team changes we want history badges to recalc
-    document.addEventListener("input", e => {
-      if (e.target && e.target.id === "teamInput") {
-        updateAllHistoryBadges();
-      }
     });
   </script>
 </body>
