@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Workbalance – TRATON (history + import/export v4)</title>
+  <title>Workbalance – TRATON (history + snapshots + celebrate)</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -56,7 +56,7 @@
     }
 
     .intro-block {
-      margin: 8px 0 10px 0;
+      margin: 8px 0 6px 0;
       max-width: 900px;
       font-size: 14px;
     }
@@ -70,6 +70,27 @@
       color: #1a73e8;
       text-decoration: underline;
       cursor: pointer;
+    }
+
+    .celebrate-row {
+      text-align: right;
+      margin: 4px 0 4px 0;
+    }
+
+    .celebrate-row button {
+      padding: 6px 12px;
+      border-radius: 18px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      background: linear-gradient(135deg,#ff9800,#f44336);
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+
+    /* Circle colour shift to TRATON turquoise */
+    .turquoise-circle {
+      filter: hue-rotate(170deg) saturate(130%) brightness(100%);
     }
 
     /* CIRCLE + AREA CARDS */
@@ -350,6 +371,59 @@
       margin-top: 4px;
     }
 
+    /* History circles at bottom */
+
+    .history-circles {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: center;
+    }
+
+    .history-circle-block {
+      text-align: center;
+      font-size: 11px;
+    }
+
+    .history-circle-week {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .history-circle-wrapper {
+      position: relative;
+      display: inline-block;
+      max-width: 220px;
+    }
+
+    .history-circle-img {
+      width: 100%;
+      max-width: 220px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .history-overlay {
+      position: absolute;
+      background: rgba(255,255,255,0.9);
+      border-radius: 8px;
+      padding: 2px 4px;
+      font-size: 13px;
+      min-width: 50px;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .history-overlay span {
+      margin: 0 1px;
+    }
+
+    .history-overlay-manage { top: 15%; left: 10%; }
+    .history-overlay-comp   { top: 15%; right: 10%; }
+    .history-overlay-mean   { bottom: 13%; left: 10%; }
+    .history-overlay-recov  { bottom: 13%; right: 10%; }
+
     /* Bottom – Week + Team + Export */
 
     .bottom-meta {
@@ -482,11 +556,15 @@
       </span>
     </div>
 
+    <div class="celebrate-row">
+      <button type="button" onclick="runCelebration()">Celebrate!</button>
+    </div>
+
     <!-- CIRCLE + AREA CARDS -->
     <div class="circle-layout">
       <div class="circle-layout-inner">
         <div class="circle-wrapper">
-          <img src="workbalance_circle.png" alt="Work Balance Model">
+          <img src="workbalance_circle.png" alt="Work Balance Model" class="turquoise-circle">
           <div class="area-overlay-box" id="overlay-Manageability"><div class="overlay-icons"></div></div>
           <div class="area-overlay-box" id="overlay-Comprehensibility"><div class="overlay-icons"></div></div>
           <div class="area-overlay-box" id="overlay-Meaningfulness"><div class="overlay-icons"></div></div>
@@ -635,6 +713,9 @@
         <button onclick="exportToExcel()">Export to Excel</button>
       </div>
     </div>
+
+    <!-- HISTORY CIRCLES (last 4 weeks) -->
+    <div id="historyCirclesContainer" class="history-circles"></div>
   </div>
 
   <!-- MODAL -->
@@ -645,6 +726,8 @@
     </div>
   </div>
 
+  <!-- Confetti library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <!-- SheetJS -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
@@ -719,10 +802,12 @@
           <strong>4. Import old weeks</strong><br/>
           Import an Excel file exported from this page to restore names and all previous weeks.
           After import, the week selector is automatically moved to the next week so you can add a new measurement.
+          At the bottom of the page you see up to four latest weeks as mini-circles with combined status.
         </section>
         <section>
           <strong>5. Export and keep building history</strong><br/>
           “Export to Excel” saves the current week plus all earlier weeks in one file.
+          A sheet called “CircleSnapshot” contains an emoji snapshot of the circle.
           You can reuse the same file every time to keep the Workbalance history growing.
         </section>
       `
@@ -743,15 +828,16 @@
           • Team is set from the last row, and the year/week selector is advanced one week compared to the last code (YYWW).<br/>
           • The team member list is created from the selected team, but current statuses and emojis are cleared
             so you can enter new values for the next week.<br/>
-          • For each person you see the latest two weeks, with all four areas, in the history column.
+          • For each person you see the latest two weeks, with all four areas, in the history column.<br/>
+          • At the bottom you see up to four latest weeks combined as mini-circles.
         </section>
         <section>
           <strong>New week & export</strong><br/>
           • Make sure the Year and Week combination produces the YYWW code you want.<br/>
           • You cannot export if that week code already exists for this team in the history file.<br/>
           • Enter statuses and optional emojis per member.<br/>
-          • “Export to Excel” writes a <em>Summary</em> sheet for the current week and a <em>Members</em> sheet
-            with all history plus the new week added. Older weeks remain unchanged.<br/>
+          • “Export to Excel” writes a <em>Summary</em> sheet, a <em>Members</em> sheet with history,
+            and a <em>CircleSnapshot</em> sheet with an emoji snapshot of the circle.<br/>
           • The downloaded file uses the same filename as the imported file, so you can overwrite it easily.
         </section>
       `
@@ -834,6 +920,15 @@
       if (d.red   > 0) icons.push("🔴".repeat(Math.min(d.red,10))    + (d.red   >10?"+":""));
       if (!icons.length) return '<span style="font-size:11px;color:#666;">–</span>';
       return icons.map(r => `<span>${r}</span>`).join("");
+    }
+
+    function snapshotString(d) {
+      const parts = [];
+      if (d.blue  > 0) parts.push("🔵 x" + d.blue);
+      if (d.green > 0) parts.push("🟢 x" + d.green);
+      if (d.yellow> 0) parts.push("🟡 x" + d.yellow);
+      if (d.red   > 0) parts.push("🔴 x" + d.red);
+      return parts.join("  ");
     }
 
     function updateOverlayAreas() {
@@ -980,7 +1075,8 @@
 
       for (let i = rows.length - 1; i >= 0; i--) {
         const r = rows[i];
-        const w = r.Week || "?";
+        const w = (r.Week || "").toString();
+        if (!w) continue;
         if (!seenWeeks.has(w)) {
           seenWeeks.add(w);
           picked.push(r);
@@ -991,7 +1087,7 @@
       picked.reverse(); // äldst av de 2 först
 
       return picked.map(r => {
-        const w = r.Week || "?";
+        const w = (r.Week || "").toString();
         return `
           <span class="prev-week-chip">
             <strong>${w}</strong>
@@ -1115,6 +1211,77 @@
       return yyStr + wwStr;
     }
 
+    /* ---------- HISTORY CIRCLES (last 4 weeks per team) ---------- */
+
+    function renderHistoryCirclesForTeam(team) {
+      const container = document.getElementById("historyCirclesContainer");
+      container.innerHTML = "";
+      if (!team || !historyRows.length) return;
+
+      const rows = historyRows.filter(r => (r.Team || "") === team);
+      if (!rows.length) return;
+
+      const weekOrder = [];
+      rows.forEach(r => {
+        const w = (r.Week || "").toString();
+        if (!w) return;
+        if (!weekOrder.includes(w)) weekOrder.push(w);
+      });
+      if (!weekOrder.length) return;
+
+      // last 4 distinct weeks
+      const selectedWeeks = weekOrder.slice(-4);
+
+      // build area counts per week
+      const weekData = {};
+      selectedWeeks.forEach(w => {
+        weekData[w] = {};
+        areas.forEach(a => weekData[w][a] = { blue:0, green:0, yellow:0, red:0 });
+      });
+
+      rows.forEach(r => {
+        const w = (r.Week || "").toString();
+        if (!selectedWeeks.includes(w)) return;
+        areas.forEach(a => {
+          const val = r[a] || "";
+          const c = val.toLowerCase();
+          if (weekData[w][a][c] !== undefined) weekData[w][a][c]++;
+        });
+      });
+
+      selectedWeeks.forEach(w => {
+        const block = document.createElement("div");
+        block.className = "history-circle-block";
+
+        const label = document.createElement("div");
+        label.className = "history-circle-week";
+        label.textContent = "Week " + w;
+        block.appendChild(label);
+
+        const wrap = document.createElement("div");
+        wrap.className = "history-circle-wrapper";
+
+        const img = document.createElement("img");
+        img.src = "workbalance_circle.png";
+        img.alt = "Workbalance " + w;
+        img.className = "history-circle-img turquoise-circle";
+        wrap.appendChild(img);
+
+        const aList = areas;
+        const posClasses = ["history-overlay-manage","history-overlay-comp","history-overlay-mean","history-overlay-recov"];
+
+        aList.forEach((a,i) => {
+          const ov = document.createElement("div");
+          ov.className = "history-overlay " + posClasses[i];
+          ov.innerHTML = makeStatusIcons(weekData[w][a]);
+          wrap.appendChild(ov);
+        });
+
+        block.appendChild(wrap);
+        container.appendChild(block);
+      });
+    }
+
     /* ---------- IMPORT XLSX HISTORY ---------- */
 
     function handleMemberFileImport(file) {
@@ -1147,7 +1314,6 @@
           const nextCode = incrementWeekCode(lastWeekCode);
           setYearWeekFromCode(nextCode);
         } else {
-          // annars låt selektorerna vara som de redan är, men uppdatera display
           updateWeekCodeDisplay();
         }
 
@@ -1176,6 +1342,9 @@
         overall.blue = overall.green = overall.yellow = overall.red = 0;
         areas.forEach(updateAreaCounts);
         updateOverlayAreas();
+
+        // render last 4 week circles at bottom
+        renderHistoryCirclesForTeam(lastTeam);
 
         alert("History imported. Team members loaded and statuses cleared. Week has been advanced by one step (YYWW).");
       };
@@ -1222,6 +1391,17 @@
       summaryData.push(["Total", overall.blue, overall.green, overall.yellow, overall.red]);
       const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
       XLSX.utils.book_append_sheet(wb, wsSummary, "Summary");
+
+      // Circle snapshot sheet (emoji snapshot of current circle)
+      const snapData = [
+        ["Area","Snapshot (icons)"]
+      ];
+      areas.forEach(a => {
+        snapData.push([a, snapshotString(areaData[a])]);
+      });
+      snapData.push(["Total", snapshotString(overall)]);
+      const wsSnap = XLSX.utils.aoa_to_sheet(snapData);
+      XLSX.utils.book_append_sheet(wb, wsSnap, "CircleSnapshot");
 
       // Members sheet
       const header = ["Week","Team","Member","Manageability","Comprehensibility","Meaningfulness","Recovery","Emojis"];
@@ -1271,6 +1451,27 @@
       }
 
       XLSX.writeFile(wb, fileName);
+    }
+
+    /* ---------- Celebrate button ---------- */
+    function runCelebration() {
+      if (typeof confetti === "undefined") {
+        alert("Celebration effect is not available.");
+        return;
+      }
+      const duration = 2500;
+      const end = Date.now() + duration;
+
+      (function frame() {
+        confetti({
+          particleCount: 10,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      })();
     }
 
     /* --------- INIT --------- */
