@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Workbalance – TRATON (history + import/export v2)</title>
+  <title>Workbalance – TRATON (history + import/export v3)</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -540,7 +540,11 @@
       <h2>Team member view (optional)</h2>
       <p>
         Enter one row per team member for the selected week and team.
-        Importing a file exported from this page restores all previous weeks and lets you continue building history.
+        Importing a file exported from this page restores names and all previous weeks.
+        You can see up to four latest weeks per person in the history column.
+        <span class="member-help-link" onclick="openMemberFileInfo()">
+          How does import / export work?
+        </span>
       </p>
 
       <!-- TABLE FIRST so you can see the circle while typing -->
@@ -554,7 +558,7 @@
               <th>Meaningfulness</th>
               <th>Recovery</th>
               <th>Support emojis<br/>(🙏 ❤️ 👍)</th>
-              <th>Previous week<br/>(all 4 areas)</th>
+              <th>Recent weeks<br/>(4 latest, all areas)</th>
               <th></th>
             </tr>
           </thead>
@@ -573,9 +577,6 @@
         </button>
         <span class="member-file-hint">
           Use an .xlsx file exported from this page to bring back names and all earlier weeks.
-        </span>
-        <span class="member-help-link" onclick="openMemberFileInfo()">
-          How does import / export work?
         </span>
         <input type="file" id="memberFileInput" accept=".xlsx" style="display:none"
                onchange="handleMemberFileImport(this.files[0])">
@@ -704,16 +705,17 @@
           • Click “Import from Excel (history file)” and select an .xlsx that was exported from this page.<br/>
           • All historical rows are loaded into memory.<br/>
           • Team and week fields are set from the last row in the file.<br/>
-          • The team member list is created from the selected team, but all statuses and emojis are cleared
+          • The team member list is created from the selected team, but current statuses and emojis are cleared
             so you can enter new values for the next week.<br/>
-          • For each person you see a separate column with their four statuses from the previous week.
+          • For each person you see up to four latest weeks, with all four areas, in the history column.
         </section>
         <section>
           <strong>New week & export</strong><br/>
           • Change the week field to a new value (you cannot export with a week that already exists for this team).<br/>
           • Enter statuses and optional emojis per member.<br/>
           • “Export to Excel” writes a <em>Summary</em> sheet for the current week and a <em>Members</em> sheet
-            with all history plus the new week added. Older weeks remain unchanged.
+            with all history plus the new week added. Older weeks remain unchanged.<br/>
+          • The downloaded file uses the same filename as the imported file, so you can overwrite it easily.
         </section>
       `
     };
@@ -721,8 +723,9 @@
     const areaData = {};
     const overall = { blue:0, green:0, yellow:0, red:0 };
 
-    const members = []; // current week/team [{name, ratings:{}, emojis:{gratitude, heart, thumb}}]
+    const members = []; // current week/team
     let historyRows = []; // all imported rows
+    let lastImportedFilename = null; // used to export with the same name
 
     function openModal(html) {
       document.getElementById("modalContent").innerHTML = html;
@@ -837,7 +840,6 @@
       const tbody = document.querySelector("#membersTable tbody");
       tbody.innerHTML = "";
       const team = document.getElementById("teamInput").value.trim();
-      const currentWeek = document.getElementById("weekInput").value.trim();
 
       members.forEach((m, idx) => {
         const tr = document.createElement("tr");
@@ -901,10 +903,10 @@
         emojisTd.appendChild(wrapper);
         tr.appendChild(emojisTd);
 
-        // previous week 4 statuses
+        // recent weeks (up to 4)
         const prevTd = document.createElement("td");
         prevTd.className = "prev-week-cell";
-        prevTd.innerHTML = buildPreviousWeekStatus(m.name, team, currentWeek);
+        prevTd.innerHTML = buildRecentWeeksStatus(m.name, team);
         tr.appendChild(prevTd);
 
         // remove
@@ -921,35 +923,47 @@
       });
     }
 
-    function buildPreviousWeekStatus(name, team, currentWeek) {
+    function mapDot(c) {
+      c = (c || "").toLowerCase();
+      if (c === "blue") return "🔵";
+      if (c === "green") return "🟢";
+      if (c === "yellow") return "🟡";
+      if (c === "red") return "🔴";
+      return "⚪";
+    }
+
+    // 4 senaste veckorna per person (alla 4 områden)
+    function buildRecentWeeksStatus(name, team) {
       if (!historyRows.length) return "";
       const rows = historyRows.filter(r => r.Member === name && r.Team === team);
       if (!rows.length) return "";
-      // last row that is NOT current week
-      let lastPrev = null;
+
+      // gå bakifrån, samla upp till 4 olika veckor
+      const seenWeeks = new Set();
+      const picked = [];
+
       for (let i = rows.length - 1; i >= 0; i--) {
-        if (rows[i].Week !== currentWeek) {
-          lastPrev = rows[i];
-          break;
+        const r = rows[i];
+        const w = r.Week || "?";
+        if (!seenWeeks.has(w)) {
+          seenWeeks.add(w);
+          picked.push(r);
+          if (picked.length === 4) break;
         }
       }
-      if (!lastPrev) return "";
-      const mapDot = c => {
-        c = (c || "").toLowerCase();
-        if (c === "blue") return "🔵";
-        if (c === "green") return "🟢";
-        if (c === "yellow") return "🟡";
-        if (c === "red") return "🔴";
-        return "⚪";
-      };
-      const w = lastPrev.Week || "?";
-      return `
-        <strong>${w}</strong><br/>
-        M: ${mapDot(lastPrev.Manageability)}<br/>
-        C: ${mapDot(lastPrev.Comprehensibility)}<br/>
-        Me: ${mapDot(lastPrev.Meaningfulness)}<br/>
-        R: ${mapDot(lastPrev.Recovery)}
-      `;
+
+      picked.reverse(); // äldst av de 4 först
+
+      return picked.map(r => {
+        const w = r.Week || "?";
+        return `
+          <strong>${w}</strong><br/>
+          M: ${mapDot(r.Manageability)}<br/>
+          C: ${mapDot(r.Comprehensibility)}<br/>
+          Me: ${mapDot(r.Meaningfulness)}<br/>
+          R: ${mapDot(r.Recovery)}<br/><br/>
+        `;
+      }).join("");
     }
 
     function recalcFromMembers() {
@@ -975,6 +989,8 @@
 
     function handleMemberFileImport(file) {
       if (!file) return;
+      lastImportedFilename = file.name || null;
+
       const reader = new FileReader();
       reader.onload = e => {
         const data = new Uint8Array(e.target.result);
@@ -1001,14 +1017,14 @@
         const latestByName = {};
         historyRows.forEach(r => {
           if (!r.Member || r.Team !== lastTeam) return;
-          latestByName[r.Member] = r; // last wins
+          latestByName[r.Member] = r; // last wins per member
         });
 
         members.length = 0;
         Object.keys(latestByName).forEach(name => {
           members.push({
             name,
-            ratings: {}, // reset
+            ratings: {}, // reset for new week
             emojis: { gratitude:false, heart:false, thumb:false } // reset
           });
         });
@@ -1017,13 +1033,13 @@
         document.getElementById("membersSection").style.display = "block";
 
         renderMembersTable();
-        // also reset the circle when importing (no new week yet)
+        // also reset the circle when importing (no new week input yet)
         areas.forEach(a => areaData[a] = { blue:0, green:0, yellow:0, red:0 });
         overall.blue = overall.green = overall.yellow = overall.red = 0;
         areas.forEach(updateAreaCounts);
         updateOverlayAreas();
 
-        alert("History imported. Team members loaded and statuses cleared. Previous week is shown per person.");
+        alert("History imported. Team members loaded and statuses cleared. Up to four latest weeks are shown per person.");
       };
       reader.readAsArrayBuffer(file);
     }
@@ -1107,12 +1123,17 @@
       // update in-memory history for next time
       historyRows = XLSX.utils.sheet_to_json(wsMembers, { defval: "" });
 
-      const safeTeam = team.replace(/\s+/g,"_");
-      const fileName = (safeTeam || "team") + "_workbalance.xlsx";
+      // filnamn – använd importerat om det finns, annars team_workbalance
+      let fileName;
+      if (lastImportedFilename) {
+        fileName = lastImportedFilename;
+      } else {
+        const safeTeam = team.replace(/\s+/g,"_");
+        fileName = (safeTeam || "team") + "_workbalance.xlsx";
+      }
+
       XLSX.writeFile(wb, fileName);
     }
-
-    /* --------- Helpers --------- */
 
     window.addEventListener("DOMContentLoaded", () => {
       initAreas();
