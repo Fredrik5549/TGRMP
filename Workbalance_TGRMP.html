@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Workbalance – TRATON PMO</title>
+  <title>Workbalance – TRATON (icon overlays)</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -85,21 +85,29 @@
       display: block;
     }
 
-    /* overlays on circle with B/G/Y/R per area */
+    /* overlays on circle with icons per area */
     .area-overlay-box {
       position: absolute;
       background: rgba(255,255,255,0.92);
-      border-radius: 6px;
+      border-radius: 10px;
       padding: 4px 6px;
-      font-size: 11px;
-      text-align: left;
+      font-size: 16px;
+      text-align: center;
       box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-      min-width: 95px;
+      min-width: 80px;
+      min-height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.2;
     }
 
     .overlay-title {
-      font-weight: bold;
-      font-size: 11px;
+      display: none; /* we only show icons now */
+    }
+
+    .overlay-icons span {
+      margin: 0 1px;
     }
 
     /* positions approx for bigger circle */
@@ -464,11 +472,11 @@
 <body>
   <header>
     <div class="logo-wrapper">
-      <img src="Traton_logo.png"
-           alt="TRATON Group logo">
+      <!-- Adjust src if needed (for GitHub Pages: put Traton_logo.png in same folder) -->
+      <img src="Traton_logo.png" alt="TRATON Group logo">
     </div>
     <div class="header-text">
-      <h1>Workbalance TRATON PMO</h1>
+      <h1>Workbalance</h1>
       <div class="traton-label">TRATON GROUP – WORK BALANCE DIALOGUE</div>
     </div>
   </header>
@@ -484,24 +492,24 @@
   <div class="circle-layout">
     <div class="circle-layout-inner">
       <div class="circle-wrapper">
-        <img src="workbalance_circle.png"
-             alt="Work Balance Model">
-        <!-- overlays on circle -->
+        <!-- Adjust src if needed -->
+        <img src="workbalance_circle.png" alt="Work Balance Model">
+        <!-- overlays on circle with ICONS -->
         <div class="area-overlay-box" id="overlay-Manageability">
           <div class="overlay-title">Manageability</div>
-          <div class="overlay-counts"></div>
+          <div class="overlay-icons"></div>
         </div>
         <div class="area-overlay-box" id="overlay-Comprehensibility">
           <div class="overlay-title">Comprehensibility</div>
-          <div class="overlay-counts"></div>
+          <div class="overlay-icons"></div>
         </div>
         <div class="area-overlay-box" id="overlay-Meaningfulness">
           <div class="overlay-title">Meaningfulness</div>
-          <div class="overlay-counts"></div>
+          <div class="overlay-icons"></div>
         </div>
         <div class="area-overlay-box" id="overlay-Recovery">
           <div class="overlay-title">Recovery</div>
-          <div class="overlay-counts"></div>
+          <div class="overlay-icons"></div>
         </div>
       </div>
 
@@ -597,8 +605,7 @@
 
     <!-- small circle here so you still see the model -->
     <div class="mini-circle">
-      <img src= "workbalance_circle.png"
-           alt="Work Balance Model (mini)">
+      <img src="workbalance_circle.png" alt="Work Balance Model (mini)">
     </div>
 
     <div class="member-controls">
@@ -775,16 +782,34 @@
       `;
     }
 
+    /* NEW: icons overlay instead of raw numbers */
+    function makeStatusIcons(d) {
+      const icons = [];
+      if (d.blue > 0) {
+        icons.push("🔵".repeat(Math.min(d.blue, 10)) + (d.blue > 10 ? "+" : ""));
+      }
+      if (d.green > 0) {
+        icons.push("🟢".repeat(Math.min(d.green, 10)) + (d.green > 10 ? "+" : ""));
+      }
+      if (d.yellow > 0) {
+        icons.push("🟡".repeat(Math.min(d.yellow, 10)) + (d.yellow > 10 ? "+" : ""));
+      }
+      if (d.red > 0) {
+        icons.push("🔴".repeat(Math.min(d.red, 10)) + (d.red > 10 ? "+" : ""));
+      }
+      if (icons.length === 0) {
+        return '<span style="font-size:11px;color:#666;">–</span>';
+      }
+      return icons.map(row => `<span>${row}</span>`).join("");
+    }
+
     function updateOverlayAreas() {
       areas.forEach(area => {
         const overlay = document.getElementById("overlay-" + area);
         if (!overlay) return;
-        const countsDiv = overlay.querySelector(".overlay-counts");
+        const iconsDiv = overlay.querySelector(".overlay-icons");
         const d = areaData[area] || { blue: 0, green: 0, yellow: 0, red: 0 };
-        countsDiv.innerHTML = `
-          B:${d.blue} G:${d.green}<br/>
-          Y:${d.yellow} R:${d.red}
-        `;
+        iconsDiv.innerHTML = makeStatusIcons(d);
       });
     }
 
