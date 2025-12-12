@@ -74,27 +74,24 @@
 
     /* CIRCLE + AREA CARDS */
 
-    .counts {
-      display: none;
-    }
     .circle-layout {
       display: flex;
       justify-content: center;
       margin-top: 10px;
-      margin-bottom: 4px;
+      margin-bottom: 10px; /* mindre gap mot team-vyn */
     }
 
     .circle-layout-inner {
       position: relative;
       max-width: 820px;
       width: 100%;
-      min-height: 420px;
+      min-height: 420px; /* något lägre för mer plats till teamvyn */
       margin: 0 auto;
     }
 
     .circle-wrapper {
       position: absolute;
-      top: 46%;
+      top: 46%; /* lite högre upp */
       left: 50%;
       transform: translate(-50%, -50%);
       display: inline-block;
@@ -167,7 +164,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 4px;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
     .color-btn {
@@ -185,24 +182,103 @@
     .yellow{ background: #ecc94b; color: #000; }
     .red   { background: #e53e3e; }
 
+    /* Räknare dolt (borttagen visuellt) */
     .counts {
+      display: none;
+    }
+
+    #card-Manageability {
+      top: -10px;
+      left: 6%;
+    }
+
+    #card-Comprehensibility {
+      top: -10px;
+      right: 6%;
+    }
+
+    #card-Meaningfulness {
+      bottom: 40px; /* flyttad upp */
+      left: 6%;
+    }
+
+    #card-Recovery {
+      bottom: 40px; /* flyttad upp */
+      right: 6%;
+    }
+
+    /* Workload overlay on circle */
+
+    .workload-avg-box {
+      position: absolute;
+      top: 10%;
+      right: 6%;
+      background: rgba(255,255,255,0.92);
+      border-radius: 10px;
+      padding: 4px 6px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+      text-align: center;
+      font-size: 10px;
+      width: 70px;
+    }
+
+    .workload-label {
+      font-weight: bold;
+      margin-bottom: 2px;
+    }
+
+    .workload-bar-outer {
+      height: 80px;
+      width: 14px;
+      margin: 0 auto;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: linear-gradient(to top, #f44336, #ffeb3b, #4caf50);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .workload-bar-inner {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(18,33,59,0.9);
+      border-radius: 8px 8px 0 0;
+      height: 0%;
+      transition: height 0.3s ease-out;
+    }
+
+    .workload-value {
+      margin-top: 2px;
       font-size: 10px;
     }
-
-    .counts span {
-      margin-right: 4px;
-    }
-
-    #card-Manageability { top: -10px; left: 0; }
-    #card-Comprehensibility { top: -10px; right: 0; }
-    #card-Meaningfulness { bottom: 25px; left: 0; }
-    #card-Recovery { bottom: 25px; right: 0; }
 
     /* Team member view */
 
     .members-toggle {
       margin-top: 20px;
       font-size: 14px;
+    }
+
+    /* Global import controls – alltid synlig */
+    .global-import-controls {
+      margin-top: 6px;
+      font-size: 11px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .global-import-controls button {
+      padding: 4px 8px;
+      font-size: 11px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background: #1a73e8;
+      color: #ffffff;
     }
 
     .members-section {
@@ -222,6 +298,12 @@
     .members-section p {
       font-size: 12px;
       margin-top: 4px;
+    }
+
+    .workload-desc {
+      font-size: 11px;
+      margin-top: 4px;
+      color: #333;
     }
 
     .member-controls {
@@ -245,25 +327,6 @@
       border: none;
       cursor: pointer;
       background: #12213b;
-      color: #ffffff;
-    }
-
-    .member-file-controls {
-      margin: 4px 0 4px 0;
-      font-size: 11px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .member-file-controls button {
-      padding: 4px 8px;
-      font-size: 11px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      background: #1a73e8;
       color: #ffffff;
     }
 
@@ -347,7 +410,7 @@
     }
 
     .members-table-container {
-      max-height: 200px;
+      max-height: 180px;
       overflow-y: auto;
       margin-top: 4px;
     }
@@ -557,6 +620,7 @@
         margin-bottom: 10px;
       }
       .area-overlay-box { display: none; }
+      .workload-avg-box { position: static; margin: 4px auto 0 auto; }
       .bottom-meta { flex-direction: column; align-items: flex-start; }
       .members-table-container { max-height: 220px; }
     }
@@ -592,10 +656,21 @@
       <div class="circle-layout-inner">
         <div class="circle-wrapper">
           <img src="workbalance_circle.png" alt="Work Balance Model">
+
+          <!-- Per-area overlays -->
           <div class="area-overlay-box" id="overlay-Manageability"><div class="overlay-icons"></div></div>
           <div class="area-overlay-box" id="overlay-Comprehensibility"><div class="overlay-icons"></div></div>
           <div class="area-overlay-box" id="overlay-Meaningfulness"><div class="overlay-icons"></div></div>
           <div class="area-overlay-box" id="overlay-Recovery"><div class="overlay-icons"></div></div>
+
+          <!-- Average workload overlay -->
+          <div class="workload-avg-box" id="workloadAvgBox">
+            <div class="workload-label">Workload</div>
+            <div class="workload-bar-outer">
+              <div class="workload-bar-inner" id="workloadBarInner"></div>
+            </div>
+            <div class="workload-value" id="workloadAvgValue">–</div>
+          </div>
         </div>
 
         <div class="area-card" id="card-Manageability">
@@ -656,7 +731,7 @@
       </div>
     </div>
 
-    <!-- TEAM MEMBER VIEW -->
+    <!-- TEAM MEMBER TOGGLE -->
     <div class="members-toggle">
       <label>
         <input type="checkbox" id="toggleMembers" onchange="toggleMembersSection()">
@@ -664,6 +739,19 @@
       </label>
     </div>
 
+    <!-- GLOBAL IMPORT (always visible) -->
+    <div class="global-import-controls">
+      <button type="button" onclick="triggerGlobalImport()">
+        Import from Excel (history file)
+      </button>
+      <span class="member-file-hint">
+        You can import a history file at any time. The team member view will open automatically.
+      </span>
+      <input type="file" id="globalMemberFileInput" accept=".xlsx" style="display:none"
+             onchange="handleGlobalImportFile(this.files[0])">
+    </div>
+
+    <!-- TEAM MEMBER VIEW -->
     <div class="members-section" id="membersSection">
       <h2>Team member view (optional)</h2>
       <p>
@@ -673,6 +761,14 @@
         <span class="member-help-link" onclick="openMemberFileInfo()">
           How does import / export work?
         </span>
+      </p>
+      <p class="workload-desc">
+        Each person can also record their <strong>perceived workload</strong> on a 4-step scale:
+        1 = “I need more to do”,
+        2 = “Quite full, but I can help a bit more if needed”,
+        3 = “Balanced load, I have time to answer colleagues’ questions”,
+        4 = “Fully loaded, I barely keep up”.
+        The team average is shown on the circle as a vertical bar.
       </p>
 
       <div class="members-table-container">
@@ -684,6 +780,7 @@
               <th>Comprehensibility</th>
               <th>Meaningfulness</th>
               <th>Recovery</th>
+              <th>Workload<br/>(1–4)</th>
               <th>Support emojis<br/>(🙏 ❤️ 👍)</th>
               <th>Recent weeks<br/>(2 latest, all areas)</th>
               <th></th>
@@ -696,17 +793,6 @@
       <div class="member-controls">
         <input type="text" id="memberNameInput" placeholder="Team member name" />
         <button type="button" onclick="addMember()">Add member</button>
-      </div>
-
-      <div class="member-file-controls">
-        <button type="button" onclick="document.getElementById('memberFileInput').click()">
-          Import from Excel (history file)
-        </button>
-        <span class="member-file-hint">
-          Use an .xlsx file exported from this page to bring back names and all earlier weeks.
-        </span>
-        <input type="file" id="memberFileInput" accept=".xlsx" style="display:none"
-               onchange="handleMemberFileImport(this.files[0])">
       </div>
     </div>
 
@@ -849,7 +935,7 @@
         <section>
           <strong>5. Export and keep building history</strong><br/>
           “Export to Excel” saves the current week plus all earlier weeks in one file.
-          A sheet called “CircleSnapshot” contains an emoji snapshot of the circle.
+          A sheet called “CircleSnapshot” contains an emoji snapshot of the circle and also stores the summary of the ratings.
           You can reuse the same file every time to keep the Workbalance history growing.
         </section>
       `
@@ -861,15 +947,15 @@
         <section>
           <strong>Excel structure</strong><br/>
           The file contains a sheet called <em>“Members”</em> with one row per member and week:
-          <br/><em>Week, Team, Member, Manageability, Comprehensibility, Meaningfulness, Recovery, Emojis</em>.
+          <br/><em>Week, Team, Member, Manageability, Comprehensibility, Meaningfulness, Recovery, Emojis, Workload</em>.
         </section>
         <section>
           <strong>Import</strong><br/>
           • Click “Import from Excel (history file)” and select an .xlsx that was exported from this page.<br/>
           • All historical rows are loaded into memory.<br/>
           • Team is set from the last row, and the year/week selector is advanced one week compared to the last code (YYWW).<br/>
-          • The team member list is created from the selected team, but current statuses and emojis are cleared
-            so you can enter new values for the next week.<br/>
+          • The team member list is created only from members who were present in the <em>latest</em> week in the file (those removed last week are not brought back).<br/>
+          • Current statuses, emojis and workload are cleared so you can enter new values for the next week.<br/>
           • For each person you see the latest two weeks, with all four areas, in the history column.<br/>
           • At the bottom you see up to four latest weeks combined as mini-circles.
         </section>
@@ -877,7 +963,7 @@
           <strong>New week & export</strong><br/>
           • Make sure the Year and Week combination produces the YYWW code you want.<br/>
           • You cannot export if that week code already exists for this team in the history file.<br/>
-          • Enter statuses and optional emojis per member.<br/>
+          • Enter statuses, perceived workload and optional emojis per member.<br/>
           • “Export to Excel” writes a <em>Summary</em> sheet, a <em>Members</em> sheet with history,
             and a <em>CircleSnapshot</em> sheet with an emoji snapshot of the circle.<br/>
           • The downloaded file uses the same filename as the imported file, so you can overwrite it easily.
@@ -934,6 +1020,7 @@
       areas.forEach(a => areaData[a] = { blue:0, green:0, yellow:0, red:0 });
       areas.forEach(updateAreaCounts);
       updateOverlayAreas();
+      updateWorkloadOverlay();
     }
 
     function increment(area, colour) {
@@ -954,54 +1041,50 @@
         `<span><strong>R:</strong> ${d.red}</span>`;
     }
 
-function makeStatusIcons(d) {
-  const total =
-    (d.blue   || 0) +
-    (d.green  || 0) +
-    (d.yellow || 0) +
-    (d.red    || 0);
+    // Ny version med radbrytning efter 5 pluppar
+    function makeStatusIcons(d) {
+      const total =
+        (d.blue   || 0) +
+        (d.green  || 0) +
+        (d.yellow || 0) +
+        (d.red    || 0);
 
-  if (!total) {
-    return '<span style="font-size:11px;color:#666;">–</span>';
-  }
+      if (!total) {
+        return '<span style="font-size:11px;color:#666;">–</span>';
+      }
 
-  // Bygg en lista med enskilda emojis, max t.ex. 15 st
-  const tokens = [];
-  const pushMany = (emoji, count) => {
-    for (let i = 0; i < count; i++) {
-      tokens.push(emoji);
+      const tokens = [];
+      const addMany = (emoji, count) => {
+        for (let i = 0; i < count; i++) tokens.push(emoji);
+      };
+
+      const maxIcons = 15; // max visuella ikoner
+      const add = (emoji, count) => {
+        const free = maxIcons - tokens.length;
+        if (free <= 0) return;
+        addMany(emoji, Math.min(count, free));
+      };
+
+      add("🔵", d.blue   || 0);
+      add("🟢", d.green  || 0);
+      add("🟡", d.yellow || 0);
+      add("🔴", d.red    || 0);
+
+      let html = "";
+      tokens.forEach((t, i) => {
+        if (i > 0 && i % 5 === 0) {
+          html += "<br>";
+        }
+        html += `<span>${t}</span>`;
+      });
+
+      const extra = total - tokens.length;
+      if (extra > 0) {
+        html += `<span>+${extra}</span>`;
+      }
+
+      return html;
     }
-  };
-
-  const maxIcons = 15; // skydd mot hur många som visas
-  const add = (emoji, count) => {
-    const free = maxIcons - tokens.length;
-    if (free <= 0) return;
-    pushMany(emoji, Math.min(count, free));
-  };
-
-  add("🔵", d.blue   || 0);
-  add("🟢", d.green  || 0);
-  add("🟡", d.yellow || 0);
-  add("🔴", d.red    || 0);
-
-  // Bygg HTML med radbrytning efter var 5:e ikon
-  let html = "";
-  tokens.forEach((t, i) => {
-    if (i > 0 && i % 5 === 0) {
-      html += "<br>";
-    }
-    html += `<span>${t}</span>`;
-  });
-
-  // Om det fanns fler röster än vi visar som pluppar → visa +antal
-  const extra = total - tokens.length;
-  if (extra > 0) {
-    html += `<span>+${extra}</span>`;
-  }
-
-  return html;
-}
 
     function snapshotString(d) {
       const parts = [];
@@ -1028,7 +1111,8 @@ function makeStatusIcons(d) {
       members.push({
         name,
         ratings: {},
-        emojis: { gratitude:false, heart:false, thumb:false }
+        emojis: { gratitude:false, heart:false, thumb:false },
+        workload: null
       });
       nameInput.value = "";
       renderMembersTable();
@@ -1089,6 +1173,32 @@ function makeStatusIcons(d) {
           td.appendChild(sel);
           tr.appendChild(td);
         });
+
+        // workload 1–4
+        const workloadTd = document.createElement("td");
+        const wlSelect = document.createElement("select");
+        wlSelect.style.fontSize = "11px";
+        const wlOptions = [
+          { value:"", label:"" },
+          { value:"1", label:"1" },
+          { value:"2", label:"2" },
+          { value:"3", label:"3" },
+          { value:"4", label:"4" }
+        ];
+        wlOptions.forEach(o => {
+          const opt = document.createElement("option");
+          opt.value = o.value;
+          opt.textContent = o.label;
+          if ((m.workload != null ? String(m.workload) : "") === o.value) opt.selected = true;
+          wlSelect.appendChild(opt);
+        });
+        wlSelect.addEventListener("change", () => {
+          const v = wlSelect.value;
+          m.workload = v ? parseInt(v,10) : null;
+          updateWorkloadOverlay();
+        });
+        workloadTd.appendChild(wlSelect);
+        tr.appendChild(workloadTd);
 
         // emojis – three toggles: gratitude, heart, thumb
         const emojisTd = document.createElement("td");
@@ -1182,7 +1292,7 @@ function makeStatusIcons(d) {
     }
 
     function recalcFromMembers() {
-      // reset
+      // reset areas
       areas.forEach(a => areaData[a] = { blue:0, green:0, yellow:0, red:0 });
       overall.blue = overall.green = overall.yellow = overall.red = 0;
 
@@ -1198,6 +1308,35 @@ function makeStatusIcons(d) {
 
       areas.forEach(updateAreaCounts);
       updateOverlayAreas();
+      updateWorkloadOverlay();
+    }
+
+    /* ---------- Workload overlay ---------- */
+
+    function updateWorkloadOverlay() {
+      const bar = document.getElementById("workloadBarInner");
+      const valueEl = document.getElementById("workloadAvgValue");
+      if (!bar || !valueEl) return;
+
+      let sum = 0;
+      let count = 0;
+      members.forEach(m => {
+        if (typeof m.workload === "number" && m.workload >= 1 && m.workload <= 4) {
+          sum += m.workload;
+          count++;
+        }
+      });
+
+      if (!count) {
+        bar.style.height = "0%";
+        valueEl.textContent = "–";
+        return;
+      }
+
+      const avg = sum / count;
+      const pct = Math.min(100, Math.max(0, (avg / 4) * 100));
+      bar.style.height = pct + "%";
+      valueEl.textContent = avg.toFixed(1) + " / 4";
     }
 
     /* ---------- WEEK SELECTORS (YYWW) ---------- */
@@ -1390,27 +1529,27 @@ function makeStatusIcons(d) {
           updateWeekCodeDisplay();
         }
 
-        // Bygg lista med de medlemmar som var med föregående vecka (senaste veckan i filen)
+        // Endast de som fanns med föregående vecka (senaste veckan i filen)
         const latestByName = {};
         historyRows.forEach(r => {
           if (!r.Member) return;
           if (r.Team !== lastTeam) return;
           const w = (r.Week || "").toString();
-          // Ta bara med de rader som är från föregående vecka (senaste veckan i filen)
           if (w !== lastWeekCode) return;
           latestByName[r.Member] = r;
         });
-        
-        // Nollställ nuvarande members och skapa nya enbart från föregående vecka
+
         members.length = 0;
         Object.keys(latestByName).forEach(name => {
           members.push({
             name,
-            ratings: {}, // ny vecka → inga statusar ännu
-            emojis: { gratitude:false, heart:false, thumb:false } // nollställ emojis
+            ratings: {},
+            emojis: { gratitude:false, heart:false, thumb:false },
+            workload: null
           });
         });
 
+        // säkerställ att vyn är synlig
         document.getElementById("toggleMembers").checked = true;
         document.getElementById("membersSection").style.display = "block";
 
@@ -1420,12 +1559,29 @@ function makeStatusIcons(d) {
         overall.blue = overall.green = overall.yellow = overall.red = 0;
         areas.forEach(updateAreaCounts);
         updateOverlayAreas();
+        updateWorkloadOverlay();
 
         renderHistoryCirclesForTeam(lastTeam);
 
-        alert("History imported. Team members loaded and statuses cleared. Week has been advanced by one step (YYWW).");
+        alert("History imported. Team members loaded from the latest week, statuses cleared and week advanced by one step (YYWW).");
       };
       reader.readAsArrayBuffer(file);
+    }
+
+    // Global import knapp – alltid synlig
+    function triggerGlobalImport() {
+      const toggle = document.getElementById("toggleMembers");
+      if (!toggle.checked) {
+        toggle.checked = true;
+        document.getElementById("membersSection").style.display = "block";
+      }
+      document.getElementById("globalMemberFileInput").click();
+    }
+
+    function handleGlobalImportFile(file) {
+      if (!file) return;
+      handleMemberFileImport(file);
+      document.getElementById("globalMemberFileInput").value = "";
     }
 
     /* ---------- EXPORT XLSX ---------- */
@@ -1451,6 +1607,17 @@ function makeStatusIcons(d) {
 
       const wb = XLSX.utils.book_new();
 
+      // beräkna avg workload
+      let wSum = 0;
+      let wCount = 0;
+      members.forEach(m => {
+        if (typeof m.workload === "number" && m.workload >= 1 && m.workload <= 4) {
+          wSum += m.workload;
+          wCount++;
+        }
+      });
+      const workloadAvg = wCount ? (wSum / wCount) : null;
+
       const summaryData = [
         ["Workbalance – TRATON"],
         [],
@@ -1464,6 +1631,12 @@ function makeStatusIcons(d) {
         summaryData.push([a, d.blue, d.green, d.yellow, d.red]);
       });
       summaryData.push(["Total", overall.blue, overall.green, overall.yellow, overall.red]);
+      summaryData.push([]);
+      summaryData.push([
+        "Average perceived workload (1–4)",
+        workloadAvg != null ? workloadAvg.toFixed(2) : "n/a"
+      ]);
+
       const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
       XLSX.utils.book_append_sheet(wb, wsSummary, "Summary");
 
@@ -1474,10 +1647,19 @@ function makeStatusIcons(d) {
         snapData.push([a, snapshotString(areaData[a])]);
       });
       snapData.push(["Total", snapshotString(overall)]);
+      snapData.push([]);
+      snapData.push([
+        "Average perceived workload (1–4)",
+        workloadAvg != null ? workloadAvg.toFixed(2) : "n/a"
+      ]);
       const wsSnap = XLSX.utils.aoa_to_sheet(snapData);
       XLSX.utils.book_append_sheet(wb, wsSnap, "CircleSnapshot");
 
-      const header = ["Week","Team","Member","Manageability","Comprehensibility","Meaningfulness","Recovery","Emojis"];
+      const header = [
+        "Week","Team","Member",
+        "Manageability","Comprehensibility","Meaningfulness","Recovery",
+        "Emojis","Workload"
+      ];
       const rows = [header];
 
       (historyRows || []).forEach(r => {
@@ -1489,7 +1671,8 @@ function makeStatusIcons(d) {
           r.Comprehensibility || "",
           r.Meaningfulness || "",
           r.Recovery || "",
-          r.Emojis || ""
+          r.Emojis || "",
+          r.Workload || ""
         ]);
       });
 
@@ -1502,7 +1685,8 @@ function makeStatusIcons(d) {
           m.ratings["Comprehensibility"] || "",
           m.ratings["Meaningfulness"] || "",
           m.ratings["Recovery"] || "",
-          emojiSetString(m.emojis)
+          emojiSetString(m.emojis),
+          m.workload != null ? m.workload : ""
         ]);
       });
 
