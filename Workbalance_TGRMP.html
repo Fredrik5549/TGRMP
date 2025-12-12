@@ -731,6 +731,23 @@
         </div>
       </div>
     </div>
+
+    <!-- FUN BUTTONS (under member view) -->
+    <div class="fun-row">
+      <button type="button" class="fun-celebrate" onclick="runCelebration()">
+        🎉 Celebrate!
+      </button>
+      <button type="button" class="fun-hug" onclick="runWarmHug()">
+        🤗 Warm hug
+      </button>
+      <button type="button" class="fun-truck" onclick="runTruckBoost()">
+        🚚 Truck boost
+      </button>
+      <button type="button" class="fun-leader" onclick="runLeaderBoost()">
+        🧑‍💼 Leader boost
+      </button>
+    </div>
+    
     <!-- TEAM MEMBER VIEW -->
     <div class="members-section" id="membersSection">
       <h2>Team member view (optional)</h2>
@@ -793,22 +810,6 @@
       </span>
       <input type="file" id="globalMemberFileInput" accept=".xlsx" style="display:none"
              onchange="handleGlobalImportFile(this.files[0])">
-    </div>
-
-    <!-- FUN BUTTONS (under member view) -->
-    <div class="fun-row">
-      <button type="button" class="fun-celebrate" onclick="runCelebration()">
-        🎉 Celebrate!
-      </button>
-      <button type="button" class="fun-hug" onclick="runWarmHug()">
-        🤗 Warm hug
-      </button>
-      <button type="button" class="fun-truck" onclick="runTruckBoost()">
-        🚚 Truck boost
-      </button>
-      <button type="button" class="fun-leader" onclick="runLeaderBoost()">
-        🧑‍💼 Leader boost
-      </button>
     </div>
 
     <!-- WEEK + TEAM + EXPORT -->
