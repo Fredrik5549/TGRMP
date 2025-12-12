@@ -189,30 +189,31 @@
 
     #card-Manageability {
       top: -10px;
-      left: 6%;
+      left: -4%;
     }
 
     #card-Comprehensibility {
       top: -10px;
-      right: 6%;
+      right: -4%;
     }
 
     #card-Meaningfulness {
       bottom: 40px; /* flyttad upp */
-      left: 6%;
+      left: -4%;
     }
 
     #card-Recovery {
       bottom: 40px; /* flyttad upp */
-      right: 6%;
+      right: -4%;
     }
 
     /* Workload overlay on circle */
 
     .workload-avg-box {
       position: absolute;
-      top: 10%;
-      right: 6%;
+      top: 50%;              /* mitt emellan över- och underkorten */
+      right: -10%;           /* flyttas utanför cirkeln åt höger */
+      transform: translateY(-50%);
       background: rgba(255,255,255,0.92);
       border-radius: 10px;
       padding: 4px 6px;
