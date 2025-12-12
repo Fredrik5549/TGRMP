@@ -954,15 +954,54 @@
         `<span><strong>R:</strong> ${d.red}</span>`;
     }
 
-    function makeStatusIcons(d) {
-      const icons = [];
-      if (d.blue  > 0) icons.push("🔵".repeat(Math.min(d.blue,10))   + (d.blue  >10?"+":""));
-      if (d.green > 0) icons.push("🟢".repeat(Math.min(d.green,10))  + (d.green >10?"+":""));
-      if (d.yellow> 0) icons.push("🟡".repeat(Math.min(d.yellow,10)) + (d.yellow>10?"+":""));
-      if (d.red   > 0) icons.push("🔴".repeat(Math.min(d.red,10))    + (d.red   >10?"+":""));
-      if (!icons.length) return '<span style="font-size:11px;color:#666;">–</span>';
-      return icons.map(r => `<span>${r}</span>`).join("");
+function makeStatusIcons(d) {
+  const total =
+    (d.blue   || 0) +
+    (d.green  || 0) +
+    (d.yellow || 0) +
+    (d.red    || 0);
+
+  if (!total) {
+    return '<span style="font-size:11px;color:#666;">–</span>';
+  }
+
+  // Bygg en lista med enskilda emojis, max t.ex. 15 st
+  const tokens = [];
+  const pushMany = (emoji, count) => {
+    for (let i = 0; i < count; i++) {
+      tokens.push(emoji);
     }
+  };
+
+  const maxIcons = 15; // skydd mot hur många som visas
+  const add = (emoji, count) => {
+    const free = maxIcons - tokens.length;
+    if (free <= 0) return;
+    pushMany(emoji, Math.min(count, free));
+  };
+
+  add("🔵", d.blue   || 0);
+  add("🟢", d.green  || 0);
+  add("🟡", d.yellow || 0);
+  add("🔴", d.red    || 0);
+
+  // Bygg HTML med radbrytning efter var 5:e ikon
+  let html = "";
+  tokens.forEach((t, i) => {
+    if (i > 0 && i % 5 === 0) {
+      html += "<br>";
+    }
+    html += `<span>${t}</span>`;
+  });
+
+  // Om det fanns fler röster än vi visar som pluppar → visa +antal
+  const extra = total - tokens.length;
+  if (extra > 0) {
+    html += `<span>+${extra}</span>`;
+  }
+
+  return html;
+}
 
     function snapshotString(d) {
       const parts = [];
