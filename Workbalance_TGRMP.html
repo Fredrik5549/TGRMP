@@ -731,27 +731,6 @@
         </div>
       </div>
     </div>
-
-    <!-- TEAM MEMBER TOGGLE -->
-    <div class="members-toggle">
-      <label>
-        <input type="checkbox" id="toggleMembers" onchange="toggleMembersSection()">
-        Add status per team member (optional – with weekly history)
-      </label>
-    </div>
-
-    <!-- GLOBAL IMPORT (always visible) -->
-    <div class="global-import-controls">
-      <button type="button" onclick="triggerGlobalImport()">
-        Import from Excel (history file)
-      </button>
-      <span class="member-file-hint">
-        You can import a history file at any time. The team member view will open automatically.
-      </span>
-      <input type="file" id="globalMemberFileInput" accept=".xlsx" style="display:none"
-             onchange="handleGlobalImportFile(this.files[0])">
-    </div>
-
     <!-- TEAM MEMBER VIEW -->
     <div class="members-section" id="membersSection">
       <h2>Team member view (optional)</h2>
@@ -795,6 +774,25 @@
         <input type="text" id="memberNameInput" placeholder="Team member name" />
         <button type="button" onclick="addMember()">Add member</button>
       </div>
+    </div>
+    <!-- TEAM MEMBER TOGGLE -->
+    <div class="members-toggle">
+      <label>
+        <input type="checkbox" id="toggleMembers" onchange="toggleMembersSection()">
+        Add status per team member (optional – with weekly history)
+      </label>
+    </div>
+
+    <!-- GLOBAL IMPORT (always visible) -->
+    <div class="global-import-controls">
+      <button type="button" onclick="triggerGlobalImport()">
+        Import from Excel (history file)
+      </button>
+      <span class="member-file-hint">
+        You can import a history file at any time. The team member view will open automatically.
+      </span>
+      <input type="file" id="globalMemberFileInput" accept=".xlsx" style="display:none"
+             onchange="handleGlobalImportFile(this.files[0])">
     </div>
 
     <!-- FUN BUTTONS (under member view) -->
