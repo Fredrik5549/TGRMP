@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Workbalance – TRATON (history + snapshots + celebrate)</title>
+  <title>Workbalance – TRATON (history + snapshots + fun)</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -70,22 +70,6 @@
       color: #1a73e8;
       text-decoration: underline;
       cursor: pointer;
-    }
-
-    .celebrate-row {
-      text-align: right;
-      margin: 4px 0 4px 0;
-    }
-
-    .celebrate-row button {
-      padding: 6px 12px;
-      border-radius: 18px;
-      border: none;
-      cursor: pointer;
-      font-size: 13px;
-      background: linear-gradient(135deg,#ff9800,#f44336);
-      color: #fff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
     }
 
     /* CIRCLE + AREA CARDS */
@@ -359,11 +343,60 @@
       margin-right: 8px;
     }
 
-    /* container för tabellen – lägre höjd så cirkeln syns mer */
     .members-table-container {
       max-height: 200px;
       overflow-y: auto;
       margin-top: 4px;
+    }
+
+    /* FUN BUTTON ROW */
+
+    .fun-row {
+      margin-top: 16px;
+      margin-bottom: 6px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .fun-row button {
+      padding: 6px 10px;
+      border-radius: 16px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .fun-celebrate { background: linear-gradient(135deg,#ff9800,#f44336); }
+    .fun-hug       { background: linear-gradient(135deg,#e91e63,#ff80ab); }
+    .fun-truck     { background: linear-gradient(135deg,#1565c0,#26c6da); }
+    .fun-leader    { background: linear-gradient(135deg,#4caf50,#8bc34a); }
+
+    /* Emoji overlay for fun effects */
+
+    .emoji-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 1500;
+    }
+
+    .emoji-float {
+      position: absolute;
+      top: 100%;
+      animation: emojiFloat 3.5s linear forwards;
+    }
+
+    @keyframes emojiFloat {
+      0%   { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-120vh); opacity: 0; }
     }
 
     /* History circles at bottom */
@@ -422,7 +455,7 @@
     /* Bottom – Week + Team + Export */
 
     .bottom-meta {
-      margin-top: 20px;
+      margin-top: 12px;
       padding: 10px 12px;
       background: #ffffff;
       border-radius: 10px;
@@ -551,10 +584,6 @@
       </span>
     </div>
 
-    <div class="celebrate-row">
-      <button type="button" onclick="runCelebration()">Celebrate!</button>
-    </div>
-
     <!-- CIRCLE + AREA CARDS -->
     <div class="circle-layout">
       <div class="circle-layout-inner">
@@ -643,7 +672,6 @@
         </span>
       </p>
 
-      <!-- TABLE FIRST so you can see the circle while typing -->
       <div class="members-table-container">
         <table class="members-table" id="membersTable">
           <thead>
@@ -677,6 +705,22 @@
         <input type="file" id="memberFileInput" accept=".xlsx" style="display:none"
                onchange="handleMemberFileImport(this.files[0])">
       </div>
+    </div>
+
+    <!-- FUN BUTTONS (under member view) -->
+    <div class="fun-row">
+      <button type="button" class="fun-celebrate" onclick="runCelebration()">
+        🎉 Celebrate!
+      </button>
+      <button type="button" class="fun-hug" onclick="runWarmHug()">
+        🤗 Warm hug
+      </button>
+      <button type="button" class="fun-truck" onclick="runTruckBoost()">
+        🚚 Truck boost
+      </button>
+      <button type="button" class="fun-leader" onclick="runLeaderBoost()">
+        🧑‍💼 Leader boost
+      </button>
     </div>
 
     <!-- WEEK + TEAM + EXPORT -->
@@ -1123,7 +1167,6 @@
       const now = new Date();
       const currentYear = now.getFullYear();
 
-      // years: current year -1, current, +1
       [currentYear - 1, currentYear, currentYear + 1].forEach(y => {
         const opt = document.createElement("option");
         opt.value = y;
@@ -1132,7 +1175,6 @@
         yearSelect.appendChild(opt);
       });
 
-      // weeks 1..53
       for (let w = 1; w <= 53; w++) {
         const opt = document.createElement("option");
         opt.value = w;
@@ -1140,7 +1182,7 @@
         weekSelect.appendChild(opt);
       }
 
-      weekSelect.value = getISOWeek(now); // start on current ISO week
+      weekSelect.value = getISOWeek(now);
       updateWeekCodeDisplay();
 
       yearSelect.addEventListener("change", updateWeekCodeDisplay);
@@ -1160,7 +1202,6 @@
       document.getElementById("weekCodeDisplay").value = getYearWeekCode();
     }
 
-    // simple ISO week of date
     function getISOWeek(date) {
       const tmp = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
       const dayNum = tmp.getUTCDay() || 7;
@@ -1171,15 +1212,13 @@
     }
 
     function setYearWeekFromCode(code) {
-      // code format: YYWW
       if (!/^\d{4}$/.test(code)) return;
       const yy = parseInt(code.slice(0,2),10);
       const ww = parseInt(code.slice(2,4),10);
-      const year = 2000 + yy; // simple mapping
+      const year = 2000 + yy;
       const yearSelect = document.getElementById("yearSelect");
       const weekSelect = document.getElementById("weekSelect");
 
-      // if year not in list, add it
       if (![...yearSelect.options].some(o => parseInt(o.value,10) === year)) {
         const opt = document.createElement("option");
         opt.value = year;
@@ -1224,10 +1263,8 @@
       });
       if (!weekOrder.length) return;
 
-      // last 4 distinct weeks
       const selectedWeeks = weekOrder.slice(-4);
 
-      // build area counts per week
       const weekData = {};
       selectedWeeks.forEach(w => {
         weekData[w] = {};
@@ -1304,7 +1341,6 @@
 
         document.getElementById("teamInput").value = lastTeam;
 
-        // om senaste veckan ser ut som YYWW → öka med 1
         if (/^\d{4}$/.test(lastWeekCode)) {
           const nextCode = incrementWeekCode(lastWeekCode);
           setYearWeekFromCode(nextCode);
@@ -1312,19 +1348,18 @@
           updateWeekCodeDisplay();
         }
 
-        // Build member list for this team from history, CLEAR ratings/emojis
         const latestByName = {};
         historyRows.forEach(r => {
           if (!r.Member || r.Team !== lastTeam) return;
-          latestByName[r.Member] = r; // last wins per member
+          latestByName[r.Member] = r;
         });
 
         members.length = 0;
         Object.keys(latestByName).forEach(name => {
           members.push({
             name,
-            ratings: {}, // reset for new week
-            emojis: { gratitude:false, heart:false, thumb:false } // reset
+            ratings: {},
+            emojis: { gratitude:false, heart:false, thumb:false }
           });
         });
 
@@ -1332,13 +1367,12 @@
         document.getElementById("membersSection").style.display = "block";
 
         renderMembersTable();
-        // reset the circle when importing (no new input yet)
+
         areas.forEach(a => areaData[a] = { blue:0, green:0, yellow:0, red:0 });
         overall.blue = overall.green = overall.yellow = overall.red = 0;
         areas.forEach(updateAreaCounts);
         updateOverlayAreas();
 
-        // render last 4 week circles at bottom
         renderHistoryCirclesForTeam(lastTeam);
 
         alert("History imported. Team members loaded and statuses cleared. Week has been advanced by one step (YYWW).");
@@ -1361,7 +1395,6 @@
         return;
       }
 
-      // Enforce that this week does not already exist for this team in history
       const exists = historyRows.some(r => (r.Team || "") === team && (r.Week || "") === weekCode);
       if (exists) {
         alert("This week code (YYWW) already exists for this team in the history file. Please choose a new week so history can grow.");
@@ -1370,7 +1403,6 @@
 
       const wb = XLSX.utils.book_new();
 
-      // Summary sheet
       const summaryData = [
         ["Workbalance – TRATON"],
         [],
@@ -1387,7 +1419,6 @@
       const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
       XLSX.utils.book_append_sheet(wb, wsSummary, "Summary");
 
-      // Circle snapshot sheet (emoji snapshot of current circle)
       const snapData = [
         ["Area","Snapshot (icons)"]
       ];
@@ -1398,11 +1429,9 @@
       const wsSnap = XLSX.utils.aoa_to_sheet(snapData);
       XLSX.utils.book_append_sheet(wb, wsSnap, "CircleSnapshot");
 
-      // Members sheet
       const header = ["Week","Team","Member","Manageability","Comprehensibility","Meaningfulness","Recovery","Emojis"];
       const rows = [header];
 
-      // keep old rows
       (historyRows || []).forEach(r => {
         rows.push([
           r.Week || "",
@@ -1416,7 +1445,6 @@
         ]);
       });
 
-      // add current week rows
       members.forEach(m => {
         rows.push([
           weekCode,
@@ -1433,10 +1461,8 @@
       const wsMembers = XLSX.utils.aoa_to_sheet(rows);
       XLSX.utils.book_append_sheet(wb, wsMembers, "Members");
 
-      // update in-memory history for next time
       historyRows = XLSX.utils.sheet_to_json(wsMembers, { defval: "" });
 
-      // filnamn – använd importerat om det finns, annars team_workbalance
       let fileName;
       if (lastImportedFilename) {
         fileName = lastImportedFilename;
@@ -1467,6 +1493,46 @@
           requestAnimationFrame(frame);
         }
       })();
+    }
+
+    /* ---------- Emoji fun effects ---------- */
+
+    function spawnEmojiRain(emojis, durationMs = 3800, count = 40) {
+      const overlay = document.createElement("div");
+      overlay.className = "emoji-overlay";
+      document.body.appendChild(overlay);
+
+      for (let i = 0; i < count; i++) {
+        const span = document.createElement("span");
+        span.className = "emoji-float";
+        span.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        span.style.left = Math.random() * 100 + "%";
+        span.style.fontSize = (24 + Math.random() * 18) + "px";
+        span.style.animationDelay = (Math.random() * 0.7) + "s";
+        overlay.appendChild(span);
+      }
+
+      setTimeout(() => {
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      }, durationMs);
+    }
+
+    // ❤️ Styrkekram / hjärtligt
+    function runWarmHug() {
+      const set = ["🤗","❤️","💙","💚","💛","💜","✨","🤝"];
+      spawnEmojiRain(set, 3800, 45);
+    }
+
+    // 🚚 Lastbil – neutral truck / transport vibe
+    function runTruckBoost() {
+      const set = ["🚚","🚛","🚚","🚛","🛣️","✨","⭐"];
+      spawnEmojiRain(set, 3800, 45);
+    }
+
+    // 🧑‍💼 Projektledare leder folk till framgång
+    function runLeaderBoost() {
+      const set = ["🧑‍💼","👩‍💼","👨‍💼","📈","🚀","🏆","⭐","🤝"];
+      spawnEmojiRain(set, 3800, 45);
     }
 
     /* --------- INIT --------- */
