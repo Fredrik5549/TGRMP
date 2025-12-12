@@ -1348,18 +1348,24 @@
           updateWeekCodeDisplay();
         }
 
+        // Bygg lista med de medlemmar som var med föregående vecka (senaste veckan i filen)
         const latestByName = {};
         historyRows.forEach(r => {
-          if (!r.Member || r.Team !== lastTeam) return;
+          if (!r.Member) return;
+          if (r.Team !== lastTeam) return;
+          const w = (r.Week || "").toString();
+          // Ta bara med de rader som är från föregående vecka (senaste veckan i filen)
+          if (w !== lastWeekCode) return;
           latestByName[r.Member] = r;
         });
-
+        
+        // Nollställ nuvarande members och skapa nya enbart från föregående vecka
         members.length = 0;
         Object.keys(latestByName).forEach(name => {
           members.push({
             name,
-            ratings: {},
-            emojis: { gratitude:false, heart:false, thumb:false }
+            ratings: {}, // ny vecka → inga statusar ännu
+            emojis: { gratitude:false, heart:false, thumb:false } // nollställ emojis
           });
         });
 
