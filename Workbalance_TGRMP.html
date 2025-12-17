@@ -78,20 +78,20 @@
       display: flex;
       justify-content: center;
       margin-top: 10px;
-      margin-bottom: 10px; /* mindre gap mot team-vyn */
+      margin-bottom: 10px; /* less gap towards team view */
     }
 
     .circle-layout-inner {
       position: relative;
       max-width: 820px;
       width: 100%;
-      min-height: 420px; /* något lägre för mer plats till teamvyn */
+      min-height: 420px;
       margin: 0 auto;
     }
 
     .circle-wrapper {
       position: absolute;
-      top: 46%; /* lite högre upp */
+      top: 46%;
       left: 50%;
       transform: translate(-50%, -50%);
       display: inline-block;
@@ -177,7 +177,6 @@
     .yellow{ background: #ecc94b; color: #000; }
     .red   { background: #e53e3e; }
 
-    /* Räknare dolt (borttagen visuellt) */
     .counts { display: none; }
 
     #card-Manageability { top: -10px; left: -4%; }
@@ -185,7 +184,7 @@
     #card-Meaningfulness { bottom: 40px; left: -4%; }
     #card-Recovery { bottom: 40px; right: -4%; }
 
-    /* Workload overlay on circle */
+    /* Workload overlay */
 
     .workload-avg-box {
       position: absolute;
@@ -231,7 +230,6 @@
 
     .members-toggle { margin-top: 20px; font-size: 14px; }
 
-    /* Global import controls – alltid synlig */
     .global-import-controls {
       margin-top: 6px;
       font-size: 11px;
@@ -401,7 +399,7 @@
       100% { transform: translateY(-120vh); opacity: 0; }
     }
 
-    /* History circles at bottom */
+    /* History circles */
 
     .history-circles {
       margin-top: 20px;
@@ -441,7 +439,7 @@
     .history-overlay-mean   { bottom: 13%; left: 10%; }
     .history-overlay-recov  { bottom: 13%; right: 10%; }
 
-    /* Bottom – Week + Team + Export */
+    /* Bottom */
 
     .bottom-meta {
       margin-top: 12px;
@@ -562,9 +560,7 @@
         shared responsibility: everyone contributes with experiences, the team identifies patterns, and
         you agree on concrete actions to strengthen a healthy balance over time.
       </div>
-      <span class="helper-link" onclick="openUsageInfo()">
-        How do we use this page?
-      </span>
+      <span class="helper-link" onclick="openUsageInfo()">How do we use this page?</span>
     </div>
 
     <!-- CIRCLE + AREA CARDS -->
@@ -573,13 +569,11 @@
         <div class="circle-wrapper">
           <img id="mainCircleImg" src="workbalance_circle.png" alt="Work Balance Model">
 
-          <!-- Per-area overlays -->
           <div class="area-overlay-box" id="overlay-Manageability"><div class="overlay-icons"></div></div>
           <div class="area-overlay-box" id="overlay-Comprehensibility"><div class="overlay-icons"></div></div>
           <div class="area-overlay-box" id="overlay-Meaningfulness"><div class="overlay-icons"></div></div>
           <div class="area-overlay-box" id="overlay-Recovery"><div class="overlay-icons"></div></div>
 
-          <!-- Average workload overlay -->
           <div class="workload-avg-box" id="workloadAvgBox">
             <div class="workload-label">Workload</div>
             <div class="workload-bar-outer">
@@ -595,10 +589,10 @@
             <span class="info-link" onclick="openAreaInfo('Manageability')">What does this mean?</span>
           </div>
           <div class="buttons-row">
-            <button class="color-btn blue"   onclick="increment('Manageability','blue')">Blue +1</button>
-            <button class="color-btn green"  onclick="increment('Manageability','green')">Green +1</button>
-            <button class="color-btn yellow" onclick="increment('Manageability','yellow')">Yellow +1</button>
-            <button class="color-btn red"    onclick="increment('Manageability','red')">Red +1</button>
+            <button class="color-btn blue"   type="button" onclick="increment('Manageability','blue')">Blue +1</button>
+            <button class="color-btn green"  type="button" onclick="increment('Manageability','green')">Green +1</button>
+            <button class="color-btn yellow" type="button" onclick="increment('Manageability','yellow')">Yellow +1</button>
+            <button class="color-btn red"    type="button" onclick="increment('Manageability','red')">Red +1</button>
           </div>
           <div class="counts" id="counts-Manageability"></div>
         </div>
@@ -609,10 +603,10 @@
             <span class="info-link" onclick="openAreaInfo('Comprehensibility')">What does this mean?</span>
           </div>
           <div class="buttons-row">
-            <button class="color-btn blue"   onclick="increment('Comprehensibility','blue')">Blue +1</button>
-            <button class="color-btn green"  onclick="increment('Comprehensibility','green')">Green +1</button>
-            <button class="color-btn yellow" onclick="increment('Comprehensibility','yellow')">Yellow +1</button>
-            <button class="color-btn red"    onclick="increment('Comprehensibility','red')">Red +1</button>
+            <button class="color-btn blue"   type="button" onclick="increment('Comprehensibility','blue')">Blue +1</button>
+            <button class="color-btn green"  type="button" onclick="increment('Comprehensibility','green')">Green +1</button>
+            <button class="color-btn yellow" type="button" onclick="increment('Comprehensibility','yellow')">Yellow +1</button>
+            <button class="color-btn red"    type="button" onclick="increment('Comprehensibility','red')">Red +1</button>
           </div>
           <div class="counts" id="counts-Comprehensibility"></div>
         </div>
@@ -623,10 +617,10 @@
             <span class="info-link" onclick="openAreaInfo('Meaningfulness')">What does this mean?</span>
           </div>
           <div class="buttons-row">
-            <button class="color-btn blue"   onclick="increment('Meaningfulness','blue')">Blue +1</button>
-            <button class="color-btn green"  onclick="increment('Meaningfulness','green')">Green +1</button>
-            <button class="color-btn yellow" onclick="increment('Meaningfulness','yellow')">Yellow +1</button>
-            <button class="color-btn red"    onclick="increment('Meaningfulness','red')">Red +1</button>
+            <button class="color-btn blue"   type="button" onclick="increment('Meaningfulness','blue')">Blue +1</button>
+            <button class="color-btn green"  type="button" onclick="increment('Meaningfulness','green')">Green +1</button>
+            <button class="color-btn yellow" type="button" onclick="increment('Meaningfulness','yellow')">Yellow +1</button>
+            <button class="color-btn red"    type="button" onclick="increment('Meaningfulness','red')">Red +1</button>
           </div>
           <div class="counts" id="counts-Meaningfulness"></div>
         </div>
@@ -637,30 +631,22 @@
             <span class="info-link" onclick="openAreaInfo('Recovery')">What does this mean?</span>
           </div>
           <div class="buttons-row">
-            <button class="color-btn blue"   onclick="increment('Recovery','blue')">Blue +1</button>
-            <button class="color-btn green"  onclick="increment('Recovery','green')">Green +1</button>
-            <button class="color-btn yellow" onclick="increment('Recovery','yellow')">Yellow +1</button>
-            <button class="color-btn red"    onclick="increment('Recovery','red')">Red +1</button>
+            <button class="color-btn blue"   type="button" onclick="increment('Recovery','blue')">Blue +1</button>
+            <button class="color-btn green"  type="button" onclick="increment('Recovery','green')">Green +1</button>
+            <button class="color-btn yellow" type="button" onclick="increment('Recovery','yellow')">Yellow +1</button>
+            <button class="color-btn red"    type="button" onclick="increment('Recovery','red')">Red +1</button>
           </div>
           <div class="counts" id="counts-Recovery"></div>
         </div>
       </div>
     </div>
 
-    <!-- FUN BUTTONS (under member view) -->
+    <!-- FUN BUTTONS -->
     <div class="fun-row">
-      <button type="button" class="fun-celebrate" onclick="runCelebration()">
-        🎉 Celebrate!
-      </button>
-      <button type="button" class="fun-hug" onclick="runWarmHug()">
-        🤗 Warm hug
-      </button>
-      <button type="button" class="fun-truck" onclick="runTruckBoost()">
-        🚚 Truck boost
-      </button>
-      <button type="button" class="fun-leader" onclick="runLeaderBoost()">
-        🧑‍💼 Leader boost
-      </button>
+      <button type="button" class="fun-celebrate" onclick="runCelebration()">🎉 Celebrate!</button>
+      <button type="button" class="fun-hug" onclick="runWarmHug()">🤗 Warm hug</button>
+      <button type="button" class="fun-truck" onclick="runTruckBoost()">🚚 Truck boost</button>
+      <button type="button" class="fun-leader" onclick="runLeaderBoost()">🧑‍💼 Leader boost</button>
     </div>
 
     <!-- TEAM MEMBER VIEW -->
@@ -668,11 +654,8 @@
       <h2>Team member view (optional)</h2>
       <p>
         Enter one row per team member for the selected week and team.
-        When you import an Excel file exported from this page, you restore names and all previous weeks.
-        The history column shows the latest two weeks per person, horizontally.
-        <span class="member-help-link" onclick="openMemberFileInfo()">
-          How does import / export work?
-        </span>
+        When you import an Excel file exported from this page, you can choose which week to load into the tool.
+        <span class="member-help-link" onclick="openMemberFileInfo()">How does import / export work?</span>
       </p>
       <p class="workload-desc">
         Each person can also record their <strong>perceived workload</strong> on a 4-step scale:
@@ -708,7 +691,7 @@
       </div>
     </div>
 
-    <!-- HISTORY CIRCLES (last 4 weeks) -->
+    <!-- HISTORY CIRCLES -->
     <div id="historyCirclesContainer" class="history-circles"></div>
 
     <!-- TEAM MEMBER TOGGLE -->
@@ -721,12 +704,8 @@
 
     <!-- GLOBAL IMPORT (always visible) -->
     <div class="global-import-controls">
-      <button type="button" onclick="triggerGlobalImport()">
-        Import from Excel (history file)
-      </button>
-      <span class="member-file-hint">
-        You can import a history file at any time. The team member view will open automatically.
-      </span>
+      <button type="button" onclick="triggerGlobalImport()">Import from Excel (history file)</button>
+      <span class="member-file-hint">Import at any time. The team member view will open automatically.</span>
       <input type="file" id="globalMemberFileInput" accept=".xlsx" style="display:none"
              onchange="handleGlobalImportFile(this.files[0])">
     </div>
@@ -757,16 +736,36 @@
         </div>
       </div>
       <div class="export-container">
-        <button onclick="exportToExcel()">Export to Excel</button>
+        <button type="button" onclick="exportToExcel()">Export to Excel</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL -->
+  <!-- INFO MODAL -->
   <div class="modal-backdrop" id="modalBackdrop">
     <div class="modal" id="modal">
       <span class="modal-close" onclick="closeModal()">&times;</span>
       <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- WEEK PICKER MODAL (IMPORT) -->
+  <div class="modal-backdrop" id="weekPickerBackdrop">
+    <div class="modal">
+      <span class="modal-close" onclick="closeWeekPicker()">&times;</span>
+      <h3>Select which week to load from the imported file</h3>
+      <p style="font-size:12px;color:#333;max-width:560px;">
+        The Excel file can contain multiple weeks (YYWW). Choose the week you want to load into the tool now.
+        (All weeks remain stored in the history and can be exported again.)
+      </p>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px;">
+        <label style="font-size:12px;">Week (YYWW)</label>
+        <select id="importWeekSelect" style="padding:6px 8px;font-size:14px;"></select>
+        <button type="button" style="padding:6px 10px;border-radius:8px;border:none;cursor:pointer;background:#12213b;color:#fff;"
+                onclick="confirmWeekImport()">
+          Load selected week
+        </button>
+      </div>
     </div>
   </div>
 
@@ -775,73 +774,6 @@
   <!-- SheetJS -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-let _importWeeks = [];
-let _importTeam = "";
-
-function showWeekPicker(weeks, team) {
-  _importWeeks = weeks.slice();
-  _importTeam = team;
-
-  const sel = document.getElementById("importWeekSelect");
-  sel.innerHTML = "";
-  weeks.forEach(w => {
-    const opt = document.createElement("option");
-    opt.value = w;
-    opt.textContent = w;
-    sel.appendChild(opt);
-  });
-
-  // default to latest week in file
-  sel.value = weeks[weeks.length - 1];
-
-  document.getElementById("weekPickerBackdrop").style.display = "flex";
-}
-
-function closeWeekPicker() {
-  document.getElementById("weekPickerBackdrop").style.display = "none";
-}
-
-function confirmWeekImport() {
-  const week = document.getElementById("importWeekSelect").value;
-  closeWeekPicker();
-  loadImportedWeekIntoTool(_importTeam, week);
-}
-
-function loadImportedWeekIntoTool(team, weekCode) {
-  // Set team + selectors to selected week
-  document.getElementById("teamInput").value = team;
-  setYearWeekFromCode(weekCode);
-
-  // Build member list from selected week
-  const rows = historyRows.filter(r => r.Team === team && String(r.Week) === String(weekCode));
-  const memberNames = Array.from(new Set(rows.map(r => r.Member))).sort();
-
-  members.length = 0;
-  memberNames.forEach(name => {
-    const r = rows.find(x => x.Member === name) || {};
-    members.push({
-      name,
-      ratings: {
-        Manageability: (r.Manageability || ""),
-        Comprehensibility: (r.Comprehensibility || ""),
-        Meaningfulness: (r.Meaningfulness || ""),
-        Recovery: (r.Recovery || "")
-      },
-      emojis: { gratitude:false, heart:false, thumb:false }, // unchanged
-      workload: r.Workload ? parseInt(r.Workload, 10) : null
-    });
-  });
-
-  renderMembersTable();
-
-  // Update the big circle based on selected week (members)
-  recalcFromMembers();
-
-  // Update bottom history circles (still last 4 weeks for the team)
-  renderHistoryCirclesForTeam(team);
-
-  alert(`Imported and loaded week ${weekCode}.`);
-}
   <script>
     const areas = ["Manageability","Comprehensibility","Meaningfulness","Recovery"];
 
@@ -897,26 +829,20 @@ function loadImportedWeekIntoTool(team, weekCode) {
       html: `
         <section>
           <strong>1. Decide team and week</strong><br/>
-          At the bottom of the page, enter the team name and use the Year/Week selectors to create a week code (YYWW).
+          Enter the team name and use the Year/Week selectors to create a week code (YYWW).
         </section>
         <section>
           <strong>2. Rate each area together</strong><br/>
-          Click the colour buttons for each area to represent the voices in the team.
-          The icons on the circle show how many blue, green, yellow and red you have in that area.
+          Click the colour buttons to represent the voices in the team. The circle overlays show the distribution per area.
         </section>
         <section>
           <strong>3. Team member view (optional)</strong><br/>
-          Turn on “Add status per team member” to rate per person.
-          The upper circle is then calculated from the team member statuses for the selected week.
+          Turn on team member view to rate per person. The circle is calculated from those selections.
         </section>
         <section>
           <strong>4. Import & edit in Excel</strong><br/>
-          The exported Excel file contains a first sheet called <em>Members</em> where each person has four rows (one per area) and weeks are columns.
-          You can fill in future weeks directly in Excel; when you import again, those pre-filled values are included.
-        </section>
-        <section>
-          <strong>5. Export and keep building history</strong><br/>
-          “Export to Excel” saves current week plus earlier weeks, and also includes upcoming weeks so planning can be done in Excel.
+          The exported Excel file includes a first sheet called <em>Members</em> where each person has four rows and weeks are columns.
+          You can pre-fill future weeks in Excel; importing again will include those values.
         </section>
       `
     };
@@ -938,8 +864,8 @@ function loadImportedWeekIntoTool(team, weekCode) {
         <section>
           <strong>Import behaviour</strong><br/>
           • All filled cells (including future weeks) are imported.<br/>
-          • Members list is created from the latest week found in the file (members removed last week stay removed).<br/>
-          • The week selector is automatically moved to the next week after the latest week in the file.
+          • You will choose which week to load into the tool after import.<br/>
+          • History remains in memory and is exported again when you export.
         </section>
       `
     };
@@ -947,10 +873,11 @@ function loadImportedWeekIntoTool(team, weekCode) {
     const areaData = {};
     const overall = { blue:0, green:0, yellow:0, red:0 };
 
-    const members = []; // current week/team
-    let historyRows = []; // all imported rows (long format internally)
-    let lastImportedFilename = null; // used to export with the same name
+    const members = [];
+    let historyRows = [];
+    let lastImportedFilename = null;
 
+    /* ----- Modal helpers ----- */
     function openModal(html) {
       document.getElementById("modalContent").innerHTML = html;
       document.getElementById("modalBackdrop").style.display = "flex";
@@ -958,7 +885,6 @@ function loadImportedWeekIntoTool(team, weekCode) {
     function closeModal() {
       document.getElementById("modalBackdrop").style.display = "none";
     }
-
     function openUsageInfo() { openModal(`<h3>${usageInfo.title}</h3>${usageInfo.html}`); }
     function openMemberFileInfo() { openModal(`<h3>${memberFileInfo.title}</h3>${memberFileInfo.html}`); }
 
@@ -985,6 +911,7 @@ function loadImportedWeekIntoTool(team, weekCode) {
       document.getElementById("membersSection").style.display = checked ? "block" : "none";
     }
 
+    /* ----- Core circle counting ----- */
     function initAreas() {
       areas.forEach(a => areaData[a] = { blue:0, green:0, yellow:0, red:0 });
       areas.forEach(updateAreaCounts);
@@ -1011,20 +938,11 @@ function loadImportedWeekIntoTool(team, weekCode) {
     }
 
     function makeStatusIcons(d) {
-      const total =
-        (d.blue   || 0) +
-        (d.green  || 0) +
-        (d.yellow || 0) +
-        (d.red    || 0);
-
-      if (!total) {
-        return '<span style="font-size:11px;color:#666;">–</span>';
-      }
+      const total = (d.blue||0)+(d.green||0)+(d.yellow||0)+(d.red||0);
+      if (!total) return '<span style="font-size:11px;color:#666;">–</span>';
 
       const tokens = [];
-      const addMany = (emoji, count) => {
-        for (let i = 0; i < count; i++) tokens.push(emoji);
-      };
+      const addMany = (emoji, count) => { for (let i=0;i<count;i++) tokens.push(emoji); };
 
       const maxIcons = 15;
       const add = (emoji, count) => {
@@ -1033,28 +951,28 @@ function loadImportedWeekIntoTool(team, weekCode) {
         addMany(emoji, Math.min(count, free));
       };
 
-      add("🔵", d.blue   || 0);
-      add("🟢", d.green  || 0);
-      add("🟡", d.yellow || 0);
-      add("🔴", d.red    || 0);
+      add("🔵", d.blue||0);
+      add("🟢", d.green||0);
+      add("🟡", d.yellow||0);
+      add("🔴", d.red||0);
 
       let html = "";
-      tokens.forEach((t, i) => {
-        if (i > 0 && i % 5 === 0) html += "<br>";
+      tokens.forEach((t,i) => {
+        if (i>0 && i%5===0) html += "<br>";
         html += `<span>${t}</span>`;
       });
 
       const extra = total - tokens.length;
-      if (extra > 0) html += `<span>+${extra}</span>`;
+      if (extra>0) html += `<span>+${extra}</span>`;
       return html;
     }
 
     function snapshotString(d) {
       const parts = [];
-      if (d.blue  > 0) parts.push("🔵 x" + d.blue);
-      if (d.green > 0) parts.push("🟢 x" + d.green);
-      if (d.yellow> 0) parts.push("🟡 x" + d.yellow);
-      if (d.red   > 0) parts.push("🔴 x" + d.red);
+      if ((d.blue||0) > 0) parts.push("🔵 x" + d.blue);
+      if ((d.green||0) > 0) parts.push("🟢 x" + d.green);
+      if ((d.yellow||0) > 0) parts.push("🟡 x" + d.yellow);
+      if ((d.red||0) > 0) parts.push("🔴 x" + d.red);
       return parts.join("  ");
     }
 
@@ -1067,6 +985,7 @@ function loadImportedWeekIntoTool(team, weekCode) {
       });
     }
 
+    /* ----- Members table ----- */
     function addMember() {
       const nameInput = document.getElementById("memberNameInput");
       const name = nameInput.value.trim();
@@ -1088,14 +1007,6 @@ function loadImportedWeekIntoTool(team, weekCode) {
       recalcFromMembers();
     }
 
-    function emojiSetString(emojis) {
-      let s = "";
-      if (emojis.gratitude) s += "🙏";
-      if (emojis.heart)     s += "❤️";
-      if (emojis.thumb)     s += "👍";
-      return s;
-    }
-
     function renderMembersTable() {
       const tbody = document.querySelector("#membersTable tbody");
       tbody.innerHTML = "";
@@ -1114,11 +1025,11 @@ function loadImportedWeekIntoTool(team, weekCode) {
           sel.style.fontSize = "14px";
           sel.style.textAlign = "center";
           const options = [
-            { value:"",   label:""   },
-            { value:"blue",   label:"🔵" },
-            { value:"green",  label:"🟢" },
+            { value:"", label:"" },
+            { value:"blue", label:"🔵" },
+            { value:"green", label:"🟢" },
             { value:"yellow", label:"🟡" },
-            { value:"red",    label:"🔴" }
+            { value:"red", label:"🔴" }
           ];
           options.forEach(o => {
             const opt = document.createElement("option");
@@ -1138,14 +1049,13 @@ function loadImportedWeekIntoTool(team, weekCode) {
         const workloadTd = document.createElement("td");
         const wlSelect = document.createElement("select");
         wlSelect.style.fontSize = "11px";
-        const wlOptions = [
+        [
           { value:"", label:"" },
           { value:"1", label:"1" },
           { value:"2", label:"2" },
           { value:"3", label:"3" },
           { value:"4", label:"4" }
-        ];
-        wlOptions.forEach(o => {
+        ].forEach(o => {
           const opt = document.createElement("option");
           opt.value = o.value;
           opt.textContent = o.label;
@@ -1172,8 +1082,7 @@ function loadImportedWeekIntoTool(team, weekCode) {
           btn.title = title;
           btn.addEventListener("click", () => {
             m.emojis[key] = !m.emojis[key];
-            if (m.emojis[key]) btn.classList.add("active");
-            else btn.classList.remove("active");
+            btn.classList.toggle("active", m.emojis[key]);
           });
           return btn;
         };
@@ -1266,13 +1175,13 @@ function loadImportedWeekIntoTool(team, weekCode) {
       updateWorkloadOverlay();
     }
 
+    /* ----- Workload overlay ----- */
     function updateWorkloadOverlay() {
       const bar = document.getElementById("workloadBarInner");
       const valueEl = document.getElementById("workloadAvgValue");
       if (!bar || !valueEl) return;
 
-      let sum = 0;
-      let count = 0;
+      let sum = 0, count = 0;
       members.forEach(m => {
         if (typeof m.workload === "number" && m.workload >= 1 && m.workload <= 4) {
           sum += m.workload;
@@ -1292,8 +1201,7 @@ function loadImportedWeekIntoTool(team, weekCode) {
       valueEl.textContent = avg.toFixed(1) + " / 4";
     }
 
-    /* ---------- WEEK SELECTORS (YYWW) ---------- */
-
+    /* ----- Year/Week selectors (YYWW) ----- */
     function initYearWeekSelectors() {
       const yearSelect = document.getElementById("yearSelect");
       const weekSelect = document.getElementById("weekSelect");
@@ -1364,23 +1272,7 @@ function loadImportedWeekIntoTool(team, weekCode) {
       updateWeekCodeDisplay();
     }
 
-    function incrementWeekCode(code) {
-      if (!/^\d{4}$/.test(code)) return code;
-      let yy = parseInt(code.slice(0,2),10);
-      let ww = parseInt(code.slice(2,4),10);
-      ww += 1;
-      if (ww > 53) {
-        ww = 1;
-        yy += 1;
-        if (yy > 99) yy = 0;
-      }
-      const yyStr = yy.toString().padStart(2,"0");
-      const wwStr = ww.toString().padStart(2,"0");
-      return yyStr + wwStr;
-    }
-
-    /* ---------- HISTORY CIRCLES (last 4 weeks per team) ---------- */
-
+    /* ----- History circles (last 4 weeks) ----- */
     function renderHistoryCirclesForTeam(team) {
       const container = document.getElementById("historyCirclesContainer");
       container.innerHTML = "";
@@ -1410,7 +1302,7 @@ function loadImportedWeekIntoTool(team, weekCode) {
         if (!selectedWeeks.includes(w)) return;
         areas.forEach(a => {
           const val = r[a] || "";
-          const c = val.toLowerCase();
+          const c = String(val).toLowerCase();
           if (weekData[w][a][c] !== undefined) weekData[w][a][c]++;
         });
       });
@@ -1433,10 +1325,8 @@ function loadImportedWeekIntoTool(team, weekCode) {
         img.className = "history-circle-img";
         wrap.appendChild(img);
 
-        const aList = areas;
         const posClasses = ["history-overlay-manage","history-overlay-comp","history-overlay-mean","history-overlay-recov"];
-
-        aList.forEach((a,i) => {
+        areas.forEach((a,i) => {
           const ov = document.createElement("div");
           ov.className = "history-overlay " + posClasses[i];
           ov.innerHTML = makeStatusIcons(weekData[w][a]);
@@ -1449,14 +1339,8 @@ function loadImportedWeekIntoTool(team, weekCode) {
     }
 
     /* =========================================================
-       NEW EXCEL FORMAT (ONLY IMPORT/EXPORT CHANGED)
-       Members sheet layout:
-         Member | Area | 2552 | 2601 | ...
-       Each person has 4 rows: Manageability, Comprehensibility, Meaningfulness, Recovery
-       Cells contain: blue/green/yellow/red (or empty)
-       Workload sheet layout:
-         Member | 2552 | 2601 | ...
-       Each cell: 1–4 (or empty)
+       NEW EXCEL FORMAT (Members sheet: Member|Area|YYWW...)
+       Import lets you choose which week to load into the tool.
        ========================================================= */
 
     function normalizeColor(v) {
@@ -1498,84 +1382,47 @@ function loadImportedWeekIntoTool(team, weekCode) {
       return out;
     }
 
-    /* ---------- IMPORT: read Members/Workload ---------- */
+    /* ----- Import (read Members/Workload) ----- */
     function handleMemberFileImport(file) {
-  if (!file) return;
-  lastImportedFilename = file.name || null;
+      if (!file) return;
+      lastImportedFilename = file.name || null;
 
-  const reader = new FileReader();
-  reader.onload = e => {
-    const data = new Uint8Array(e.target.result);
-    const wb = XLSX.read(data, { type: "array" });
+      const reader = new FileReader();
+      reader.onload = e => {
+        const data = new Uint8Array(e.target.result);
+        const wb = XLSX.read(data, { type: "array" });
 
-    const team = document.getElementById("teamInput").value.trim() || "Team";
+        const team = document.getElementById("teamInput").value.trim() || "Team";
 
-    const wsMembers = wb.Sheets["Members"] || wb.Sheets[wb.SheetNames[0]];
-    if (!wsMembers) { alert("No sheet found."); return; }
+        const wsMembers = wb.Sheets["Members"] || wb.Sheets[wb.SheetNames[0]];
+        if (!wsMembers) { alert("No sheet found."); return; }
 
-    const aoa = XLSX.utils.sheet_to_json(wsMembers, { header: 1, defval: "" });
-    if (!aoa.length || aoa.length < 2) { alert("Members sheet is empty."); return; }
+        const aoa = XLSX.utils.sheet_to_json(wsMembers, { header: 1, defval: "" });
+        if (!aoa.length || aoa.length < 2) { alert("Members sheet is empty."); return; }
 
-    const header = aoa[0].map(x => String(x || "").trim());
-    const weekCols = [];
-    for (let c = 2; c < header.length; c++) {
-      const h = header[c];
-      if (/^\d{4}$/.test(h)) weekCols.push({ c, code: h });
-    }
-    if (!weekCols.length) {
-      alert("Members sheet must have week columns in YYWW format (e.g. 2552, 2601...).");
-      return;
-    }
-
-    // Build long-format map: Team||Week||Member
-    const map = new Map();
-
-    for (let r = 1; r < aoa.length; r++) {
-      const row = aoa[r] || [];
-      const member = String(row[0] || "").trim();
-      const areaLabel = String(row[1] || "").trim();
-      const area = areaKeyFromLabel(areaLabel);
-      if (!member || !area) continue;
-
-      weekCols.forEach(wc => {
-        const color = normalizeColor(row[wc.c]);
-        if (!color) return;
-        const key = `${team}||${wc.code}||${member}`;
-        if (!map.has(key)) {
-          map.set(key, {
-            Week: wc.code,
-            Team: team,
-            Member: member,
-            Manageability: "",
-            Comprehensibility: "",
-            Meaningfulness: "",
-            Recovery: "",
-            Workload: ""
-          });
+        const header = aoa[0].map(x => String(x || "").trim());
+        const weekCols = [];
+        for (let c = 2; c < header.length; c++) {
+          const h = header[c];
+          if (/^\d{4}$/.test(h)) weekCols.push({ c, code: h });
         }
-        map.get(key)[area] = color;
-      });
-    }
-
-    // Optional Workload sheet
-    const wsWL = wb.Sheets["Workload"];
-    if (wsWL) {
-      const wlAoa = XLSX.utils.sheet_to_json(wsWL, { header: 1, defval: "" });
-      if (wlAoa && wlAoa.length > 1) {
-        const wlHeader = wlAoa[0].map(x => String(x || "").trim());
-        const wlWeekCols = [];
-        for (let c = 1; c < wlHeader.length; c++) {
-          if (/^\d{4}$/.test(wlHeader[c])) wlWeekCols.push({ c, code: wlHeader[c] });
+        if (!weekCols.length) {
+          alert("Members sheet must have week columns in YYWW format (e.g. 2552, 2601...).");
+          return;
         }
-        for (let r = 1; r < wlAoa.length; r++) {
-          const row = wlAoa[r] || [];
+
+        const map = new Map();
+
+        for (let r = 1; r < aoa.length; r++) {
+          const row = aoa[r] || [];
           const member = String(row[0] || "").trim();
-          if (!member) continue;
-          wlWeekCols.forEach(wc => {
-            const v = String(row[wc.c] || "").trim();
-            if (!v) return;
-            const num = parseInt(v, 10);
-            if (!(num >= 1 && num <= 4)) return;
+          const areaLabel = String(row[1] || "").trim();
+          const area = areaKeyFromLabel(areaLabel);
+          if (!member || !area) continue;
+
+          weekCols.forEach(wc => {
+            const color = normalizeColor(row[wc.c]);
+            if (!color) return;
             const key = `${team}||${wc.code}||${member}`;
             if (!map.has(key)) {
               map.set(key, {
@@ -1589,32 +1436,9 @@ function loadImportedWeekIntoTool(team, weekCode) {
                 Workload: ""
               });
             }
-            map.get(key).Workload = String(num);
+            map.get(key)[area] = color;
           });
         }
-      }
-    }
-
-    historyRows = Array.from(map.values()).sort((a,b) => {
-      if (String(a.Week) === String(b.Week)) return String(a.Member).localeCompare(String(b.Member));
-      return String(a.Week).localeCompare(String(b.Week));
-    });
-
-    // Open member view automatically
-    document.getElementById("toggleMembers").checked = true;
-    document.getElementById("membersSection").style.display = "block";
-
-    // Show week picker (instead of auto advancing)
-    const weeksInFile = Array.from(new Set(historyRows.map(r => String(r.Week || "")).filter(w => /^\d{4}$/.test(w)))).sort();
-    if (!weeksInFile.length) {
-      alert("No YYWW weeks found in the imported file.");
-      return;
-    }
-
-    showWeekPicker(weeksInFile, team);
-  };
-  reader.readAsArrayBuffer(file);
-}
 
         // Optional Workload sheet
         const wsWL = wb.Sheets["Workload"];
@@ -1659,34 +1483,17 @@ function loadImportedWeekIntoTool(team, weekCode) {
           return String(a.Week).localeCompare(String(b.Week));
         });
 
-        // Determine max week & set next week
-        const maxWeek = findMaxWeek(historyRows.map(r => String(r.Week||"")));
-        if (maxWeek) setYearWeekFromCode(incrementWeekCode(maxWeek));
-
-        // Members list from latest week only (as requested earlier)
-        const latestMembers = new Set(
-          historyRows.filter(r => String(r.Week||"") === String(maxWeek||"")).map(r => r.Member)
-        );
-        members.length = 0;
-        Array.from(latestMembers).sort().forEach(name => {
-          members.push({
-            name,
-            ratings: {},
-            emojis: { gratitude:false, heart:false, thumb:false },
-            workload: null
-          });
-        });
-
-        // Show member view automatically
+        // Ensure member view is visible
         document.getElementById("toggleMembers").checked = true;
         document.getElementById("membersSection").style.display = "block";
 
-        // Clear current week inputs (you enter new week now)
-        renderMembersTable();
-        recalcFromMembers();
-        renderHistoryCirclesForTeam(team);
-
-        alert("Imported. Prefilled future weeks from Excel are included.");
+        // Show week picker
+        const weeksInFile = Array.from(new Set(historyRows.map(r => String(r.Week||"")).filter(w => /^\d{4}$/.test(w)))).sort();
+        if (!weeksInFile.length) {
+          alert("No YYWW weeks found in the imported file.");
+          return;
+        }
+        showWeekPicker(weeksInFile, team);
       };
       reader.readAsArrayBuffer(file);
     }
@@ -1706,7 +1513,68 @@ function loadImportedWeekIntoTool(team, weekCode) {
       document.getElementById("globalMemberFileInput").value = "";
     }
 
-    /* ---------- EXPORT: create Members (rows) + Workload (rows) + Summary + CircleSnapshot ---------- */
+    /* ----- Week picker modal logic ----- */
+    let _importWeeks = [];
+    let _importTeam = "";
+
+    function showWeekPicker(weeks, team) {
+      _importWeeks = weeks.slice();
+      _importTeam = team;
+
+      const sel = document.getElementById("importWeekSelect");
+      sel.innerHTML = "";
+      weeks.forEach(w => {
+        const opt = document.createElement("option");
+        opt.value = w;
+        opt.textContent = w;
+        sel.appendChild(opt);
+      });
+
+      sel.value = weeks[weeks.length - 1]; // default to latest
+      document.getElementById("weekPickerBackdrop").style.display = "flex";
+    }
+
+    function closeWeekPicker() {
+      document.getElementById("weekPickerBackdrop").style.display = "none";
+    }
+
+    function confirmWeekImport() {
+      const week = document.getElementById("importWeekSelect").value;
+      closeWeekPicker();
+      loadImportedWeekIntoTool(_importTeam, week);
+    }
+
+    function loadImportedWeekIntoTool(team, weekCode) {
+      document.getElementById("teamInput").value = team;
+      setYearWeekFromCode(weekCode);
+
+      const rows = historyRows.filter(r => r.Team === team && String(r.Week) === String(weekCode));
+      const memberNames = Array.from(new Set(rows.map(r => r.Member))).sort();
+
+      members.length = 0;
+      memberNames.forEach(name => {
+        const r = rows.find(x => x.Member === name) || {};
+        members.push({
+          name,
+          ratings: {
+            Manageability: (r.Manageability || ""),
+            Comprehensibility: (r.Comprehensibility || ""),
+            Meaningfulness: (r.Meaningfulness || ""),
+            Recovery: (r.Recovery || "")
+          },
+          emojis: { gratitude:false, heart:false, thumb:false },
+          workload: r.Workload ? parseInt(r.Workload, 10) : null
+        });
+      });
+
+      renderMembersTable();
+      recalcFromMembers();
+      renderHistoryCirclesForTeam(team);
+
+      alert(`Imported and loaded week ${weekCode}.`);
+    }
+
+    /* ----- Export (Members + Workload + Summary + CircleSnapshot) ----- */
     function exportToExcel() {
       const team = document.getElementById("teamInput").value.trim();
       const weekCode = getYearWeekCode();
@@ -1717,14 +1585,12 @@ function loadImportedWeekIntoTool(team, weekCode) {
         return;
       }
 
-      // Block duplicate week export
       const exists = historyRows.some(r => (r.Team || "") === team && (r.Week || "") === weekCode);
       if (exists) {
-        alert("This week code (YYWW) already exists for this team in the history file. Please choose a new week so history can grow.");
+        alert("This week (YYWW) already exists for this team in the history file. Choose a new week so history can grow.");
         return;
       }
 
-      // Merge history + current week (from members table)
       const merged = (historyRows || []).slice();
       members.forEach(m => {
         merged.push({
@@ -1739,26 +1605,22 @@ function loadImportedWeekIntoTool(team, weekCode) {
         });
       });
 
-      // Determine weeks: all existing + next 52 weeks
-      const existingWeeks = Array.from(new Set(
-        merged.map(r => String(r.Week||"")).filter(w => /^\d{4}$/.test(w))
-      )).sort();
+      const existingWeeks = Array.from(new Set(merged.map(r => String(r.Week||"")).filter(w => /^\d{4}$/.test(w)))).sort();
       const base = existingWeeks.length ? existingWeeks[existingWeeks.length - 1] : weekCode;
       const allWeeks = Array.from(new Set(existingWeeks.concat(generateNextWeeksFrom(base, 52)))).sort();
 
-      // Members list based on latest week in merged (keeps file clean & matches import rule)
+      // Keep members list based on latest week in merged
       const maxWeek = existingWeeks.length ? existingWeeks[existingWeeks.length - 1] : weekCode;
       const latestMembers = Array.from(new Set(
         merged.filter(r => String(r.Week||"") === String(maxWeek)).map(r => r.Member)
       )).sort();
 
-      // Build lookup
       const byKey = new Map();
       merged.forEach(r => byKey.set(`${r.Team}||${r.Week}||${r.Member}`, r));
 
       const wb = XLSX.utils.book_new();
 
-      // ---- Members sheet (FIRST) ----
+      // Members (FIRST sheet)
       const membersAOA = [];
       membersAOA.push(["Member","Area", ...allWeeks]);
 
@@ -1773,10 +1635,9 @@ function loadImportedWeekIntoTool(team, weekCode) {
         });
       });
 
-      const wsMembers = XLSX.utils.aoa_to_sheet(membersAOA);
-      XLSX.utils.book_append_sheet(wb, wsMembers, "Members");
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(membersAOA), "Members");
 
-      // ---- Workload sheet ----
+      // Workload
       const wlAOA = [];
       wlAOA.push(["Member", ...allWeeks]);
       latestMembers.forEach(member => {
@@ -1787,10 +1648,9 @@ function loadImportedWeekIntoTool(team, weekCode) {
         });
         wlAOA.push(row);
       });
-      const wsWL = XLSX.utils.aoa_to_sheet(wlAOA);
-      XLSX.utils.book_append_sheet(wb, wsWL, "Workload");
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(wlAOA), "Workload");
 
-      // ---- Summary sheet ----
+      // Summary
       const summaryData = [
         ["Workbalance – TRATON"],
         [],
@@ -1804,11 +1664,9 @@ function loadImportedWeekIntoTool(team, weekCode) {
         summaryData.push([a, d.blue, d.green, d.yellow, d.red]);
       });
       summaryData.push(["Total", overall.blue, overall.green, overall.yellow, overall.red]);
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summaryData), "Summary");
 
-      const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
-      XLSX.utils.book_append_sheet(wb, wsSummary, "Summary");
-
-      // ---- CircleSnapshot sheet (text + icons + explanations) ----
+      // CircleSnapshot (text + icon snapshot)
       const snapAOA = [
         ["Circle snapshot (icons)"],
         ["(Embedding an actual image is often blocked by browser security (CORS) when files are hosted on SharePoint.)"],
@@ -1822,20 +1680,17 @@ function loadImportedWeekIntoTool(team, weekCode) {
       snapAOA.push(["Comprehensibility", areaInfo.Comprehensibility.definition]);
       snapAOA.push(["Meaningfulness", areaInfo.Meaningfulness.definition]);
       snapAOA.push(["Recovery", areaInfo.Recovery.definition]);
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(snapAOA), "CircleSnapshot");
 
-      const wsSnap = XLSX.utils.aoa_to_sheet(snapAOA);
-      XLSX.utils.book_append_sheet(wb, wsSnap, "CircleSnapshot");
-
-      // Update in-memory history for session
+      // Update in-memory history
       historyRows = merged;
 
-      // Filename: keep same if imported, else team_workbalance.xlsx
       const safeTeam = team.replace(/\s+/g,"_");
       const fileName = lastImportedFilename || ((safeTeam || "team") + "_workbalance.xlsx");
       XLSX.writeFile(wb, fileName);
     }
 
-    /* ---------- Celebrate button ---------- */
+    /* ----- Fun effects ----- */
     function runCelebration() {
       if (typeof confetti === "undefined") {
         alert("Celebration effect is not available.");
@@ -1843,16 +1698,9 @@ function loadImportedWeekIntoTool(team, weekCode) {
       }
       const duration = 2500;
       const end = Date.now() + duration;
-
       (function frame() {
-        confetti({
-          particleCount: 10,
-          spread: 70,
-          origin: { y: 0.6 }
-        });
-        if (Date.now() < end) {
-          requestAnimationFrame(frame);
-        }
+        confetti({ particleCount: 10, spread: 70, origin: { y: 0.6 } });
+        if (Date.now() < end) requestAnimationFrame(frame);
       })();
     }
 
@@ -1871,39 +1719,18 @@ function loadImportedWeekIntoTool(team, weekCode) {
         overlay.appendChild(span);
       }
 
-      setTimeout(() => {
-        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-      }, durationMs);
+      setTimeout(() => overlay.remove(), durationMs);
     }
 
     function runWarmHug() { spawnEmojiRain(["🤗","❤️","💙","💚","💛","💜","✨","🤝"], 3800, 45); }
     function runTruckBoost() { spawnEmojiRain(["🚚","🚛","🛣️","✨","⭐"], 3800, 45); }
     function runLeaderBoost() { spawnEmojiRain(["🧑‍💼","👩‍💼","👨‍💼","📈","🚀","🏆","⭐","🤝"], 3800, 45); }
 
-    /* --------- INIT --------- */
+    /* ----- Init ----- */
     window.addEventListener("DOMContentLoaded", () => {
       initAreas();
       initYearWeekSelectors();
     });
   </script>
-  <!-- WEEK PICKER MODAL (for import) -->
-<div class="modal-backdrop" id="weekPickerBackdrop" style="display:none;">
-  <div class="modal">
-    <span class="modal-close" onclick="closeWeekPicker()">&times;</span>
-    <h3>Select which week to load from the imported file</h3>
-    <p style="font-size:12px;color:#333;max-width:560px;">
-      The Excel file can contain multiple weeks (YYWW). Choose the week you want to load into the tool now.
-      (All weeks remain stored in the history and can be exported again.)
-    </p>
-    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px;">
-      <label style="font-size:12px;">Week (YYWW)</label>
-      <select id="importWeekSelect" style="padding:6px 8px;font-size:14px;"></select>
-      <button type="button" style="padding:6px 10px;border-radius:8px;border:none;cursor:pointer;background:#12213b;color:#fff;"
-              onclick="confirmWeekImport()">
-        Load selected week
-      </button>
-    </div>
-  </div>
-</div>
 </body>
 </html>
