@@ -775,6 +775,73 @@
   <!-- SheetJS -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
+let _importWeeks = [];
+let _importTeam = "";
+
+function showWeekPicker(weeks, team) {
+  _importWeeks = weeks.slice();
+  _importTeam = team;
+
+  const sel = document.getElementById("importWeekSelect");
+  sel.innerHTML = "";
+  weeks.forEach(w => {
+    const opt = document.createElement("option");
+    opt.value = w;
+    opt.textContent = w;
+    sel.appendChild(opt);
+  });
+
+  // default to latest week in file
+  sel.value = weeks[weeks.length - 1];
+
+  document.getElementById("weekPickerBackdrop").style.display = "flex";
+}
+
+function closeWeekPicker() {
+  document.getElementById("weekPickerBackdrop").style.display = "none";
+}
+
+function confirmWeekImport() {
+  const week = document.getElementById("importWeekSelect").value;
+  closeWeekPicker();
+  loadImportedWeekIntoTool(_importTeam, week);
+}
+
+function loadImportedWeekIntoTool(team, weekCode) {
+  // Set team + selectors to selected week
+  document.getElementById("teamInput").value = team;
+  setYearWeekFromCode(weekCode);
+
+  // Build member list from selected week
+  const rows = historyRows.filter(r => r.Team === team && String(r.Week) === String(weekCode));
+  const memberNames = Array.from(new Set(rows.map(r => r.Member))).sort();
+
+  members.length = 0;
+  memberNames.forEach(name => {
+    const r = rows.find(x => x.Member === name) || {};
+    members.push({
+      name,
+      ratings: {
+        Manageability: (r.Manageability || ""),
+        Comprehensibility: (r.Comprehensibility || ""),
+        Meaningfulness: (r.Meaningfulness || ""),
+        Recovery: (r.Recovery || "")
+      },
+      emojis: { gratitude:false, heart:false, thumb:false }, // unchanged
+      workload: r.Workload ? parseInt(r.Workload, 10) : null
+    });
+  });
+
+  renderMembersTable();
+
+  // Update the big circle based on selected week (members)
+  recalcFromMembers();
+
+  // Update bottom history circles (still last 4 weeks for the team)
+  renderHistoryCirclesForTeam(team);
+
+  alert(`Imported and loaded week ${weekCode}.`);
+}
   <script>
     const areas = ["Manageability","Comprehensibility","Meaningfulness","Recovery"];
 
@@ -1433,46 +1500,82 @@
 
     /* ---------- IMPORT: read Members/Workload ---------- */
     function handleMemberFileImport(file) {
-      if (!file) return;
-      lastImportedFilename = file.name || null;
+  if (!file) return;
+  lastImportedFilename = file.name || null;
 
-      const reader = new FileReader();
-      reader.onload = e => {
-        const data = new Uint8Array(e.target.result);
-        const wb = XLSX.read(data, { type: "array" });
+  const reader = new FileReader();
+  reader.onload = e => {
+    const data = new Uint8Array(e.target.result);
+    const wb = XLSX.read(data, { type: "array" });
 
-        const team = document.getElementById("teamInput").value.trim() || "Team";
+    const team = document.getElementById("teamInput").value.trim() || "Team";
 
-        const wsMembers = wb.Sheets["Members"] || wb.Sheets[wb.SheetNames[0]];
-        if (!wsMembers) { alert("No sheet found."); return; }
+    const wsMembers = wb.Sheets["Members"] || wb.Sheets[wb.SheetNames[0]];
+    if (!wsMembers) { alert("No sheet found."); return; }
 
-        const aoa = XLSX.utils.sheet_to_json(wsMembers, { header: 1, defval: "" });
-        if (!aoa.length || aoa.length < 2) { alert("Members sheet is empty."); return; }
+    const aoa = XLSX.utils.sheet_to_json(wsMembers, { header: 1, defval: "" });
+    if (!aoa.length || aoa.length < 2) { alert("Members sheet is empty."); return; }
 
-        const header = aoa[0].map(x => String(x || "").trim());
-        const weekCols = [];
-        for (let c = 2; c < header.length; c++) {
-          const h = header[c];
-          if (/^\d{4}$/.test(h)) weekCols.push({ c, code: h });
+    const header = aoa[0].map(x => String(x || "").trim());
+    const weekCols = [];
+    for (let c = 2; c < header.length; c++) {
+      const h = header[c];
+      if (/^\d{4}$/.test(h)) weekCols.push({ c, code: h });
+    }
+    if (!weekCols.length) {
+      alert("Members sheet must have week columns in YYWW format (e.g. 2552, 2601...).");
+      return;
+    }
+
+    // Build long-format map: Team||Week||Member
+    const map = new Map();
+
+    for (let r = 1; r < aoa.length; r++) {
+      const row = aoa[r] || [];
+      const member = String(row[0] || "").trim();
+      const areaLabel = String(row[1] || "").trim();
+      const area = areaKeyFromLabel(areaLabel);
+      if (!member || !area) continue;
+
+      weekCols.forEach(wc => {
+        const color = normalizeColor(row[wc.c]);
+        if (!color) return;
+        const key = `${team}||${wc.code}||${member}`;
+        if (!map.has(key)) {
+          map.set(key, {
+            Week: wc.code,
+            Team: team,
+            Member: member,
+            Manageability: "",
+            Comprehensibility: "",
+            Meaningfulness: "",
+            Recovery: "",
+            Workload: ""
+          });
         }
-        if (!weekCols.length) {
-          alert("Members sheet must have week columns in YYWW format (e.g. 2552, 2601...).");
-          return;
+        map.get(key)[area] = color;
+      });
+    }
+
+    // Optional Workload sheet
+    const wsWL = wb.Sheets["Workload"];
+    if (wsWL) {
+      const wlAoa = XLSX.utils.sheet_to_json(wsWL, { header: 1, defval: "" });
+      if (wlAoa && wlAoa.length > 1) {
+        const wlHeader = wlAoa[0].map(x => String(x || "").trim());
+        const wlWeekCols = [];
+        for (let c = 1; c < wlHeader.length; c++) {
+          if (/^\d{4}$/.test(wlHeader[c])) wlWeekCols.push({ c, code: wlHeader[c] });
         }
-
-        // Build long-format map: Team||Week||Member
-        const map = new Map();
-
-        for (let r = 1; r < aoa.length; r++) {
-          const row = aoa[r] || [];
+        for (let r = 1; r < wlAoa.length; r++) {
+          const row = wlAoa[r] || [];
           const member = String(row[0] || "").trim();
-          const areaLabel = String(row[1] || "").trim();
-          const area = areaKeyFromLabel(areaLabel);
-          if (!member || !area) continue;
-
-          weekCols.forEach(wc => {
-            const color = normalizeColor(row[wc.c]);
-            if (!color) return;
+          if (!member) continue;
+          wlWeekCols.forEach(wc => {
+            const v = String(row[wc.c] || "").trim();
+            if (!v) return;
+            const num = parseInt(v, 10);
+            if (!(num >= 1 && num <= 4)) return;
             const key = `${team}||${wc.code}||${member}`;
             if (!map.has(key)) {
               map.set(key, {
@@ -1486,9 +1589,32 @@
                 Workload: ""
               });
             }
-            map.get(key)[area] = color;
+            map.get(key).Workload = String(num);
           });
         }
+      }
+    }
+
+    historyRows = Array.from(map.values()).sort((a,b) => {
+      if (String(a.Week) === String(b.Week)) return String(a.Member).localeCompare(String(b.Member));
+      return String(a.Week).localeCompare(String(b.Week));
+    });
+
+    // Open member view automatically
+    document.getElementById("toggleMembers").checked = true;
+    document.getElementById("membersSection").style.display = "block";
+
+    // Show week picker (instead of auto advancing)
+    const weeksInFile = Array.from(new Set(historyRows.map(r => String(r.Week || "")).filter(w => /^\d{4}$/.test(w)))).sort();
+    if (!weeksInFile.length) {
+      alert("No YYWW weeks found in the imported file.");
+      return;
+    }
+
+    showWeekPicker(weeksInFile, team);
+  };
+  reader.readAsArrayBuffer(file);
+}
 
         // Optional Workload sheet
         const wsWL = wb.Sheets["Workload"];
@@ -1760,5 +1886,24 @@
       initYearWeekSelectors();
     });
   </script>
+  <!-- WEEK PICKER MODAL (for import) -->
+<div class="modal-backdrop" id="weekPickerBackdrop" style="display:none;">
+  <div class="modal">
+    <span class="modal-close" onclick="closeWeekPicker()">&times;</span>
+    <h3>Select which week to load from the imported file</h3>
+    <p style="font-size:12px;color:#333;max-width:560px;">
+      The Excel file can contain multiple weeks (YYWW). Choose the week you want to load into the tool now.
+      (All weeks remain stored in the history and can be exported again.)
+    </p>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px;">
+      <label style="font-size:12px;">Week (YYWW)</label>
+      <select id="importWeekSelect" style="padding:6px 8px;font-size:14px;"></select>
+      <button type="button" style="padding:6px 10px;border-radius:8px;border:none;cursor:pointer;background:#12213b;color:#fff;"
+              onclick="confirmWeekImport()">
+        Load selected week
+      </button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
