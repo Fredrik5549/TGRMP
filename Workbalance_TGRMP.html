@@ -1,78 +1,651 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<title>Workbalance – TRATON (fixed)</title>
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<!-- ExcelJS for export (dataValidation support), FileSaver for download -->
-<script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
-<!-- SheetJS for import (robust parsing) -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<!-- confetti for celebration -->
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <meta charset="UTF-8" />
+  <title>Workbalance – TRATON (history + snapshots + fun)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    /* -------------------------
+       VISUAL/CSS (kept as before)
+       ------------------------- */
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f5f7 url("PMO_mission.png") center/cover fixed no-repeat;
+      margin: 0;
+      padding: 20px;
+      color: #12213b;
+    }
 
-<style>
-  /* (kept most of your styles, slightly trimmed) */
-  body{font-family:Arial, sans-serif;background:#f4f5f7 url("PMO_mission.png") center/cover fixed no-repeat;margin:0;padding:20px;color:#12213b}
-  .page-shell{max-width:1200px;margin:0 auto;background:rgba(255,255,255,0.92);border-radius:16px;box-shadow:0 4px 18px rgba(0,0,0,.18);padding:18px}
-  header{display:flex;align-items:center;gap:16px;margin-bottom:8px;flex-wrap:wrap}
-  .logo-wrapper img{height:40px}
-  h1{margin:0;font-size:28px}
-  .traton-label{font-size:12px;color:#555;margin-top:2px;letter-spacing:2px;text-transform:uppercase}
-  .intro-block{margin:8px 0 6px 0;max-width:900px;font-size:14px}
-  .helper-link{font-size:13px;color:#1a73e8;text-decoration:underline;cursor:pointer}
-  .circle-layout{display:flex;justify-content:center;margin-top:10px;margin-bottom:10px}
-  .circle-layout-inner{position:relative;max-width:820px;width:100%;min-height:420px;margin:0 auto}
-  .circle-wrapper{position:absolute;top:42%;left:50%;transform:translate(-50%,-50%);display:inline-block}
-  .circle-wrapper img{max-width:560px;width:100%;height:auto;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.16);display:block}
-  .area-overlay-box{position:absolute;background:rgba(255,255,255,0.95);border-radius:10px;padding:4px 6px;font-size:14px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.18);min-width:80px;min-height:28px;display:flex;align-items:center;justify-content:center;line-height:1.2}
-  #overlay-Manageability{top:12%;left:12%}
-  #overlay-Comprehensibility{top:12%;right:12%}
-  #overlay-Meaningfulness{bottom:12%;left:12%}
-  #overlay-Recovery{bottom:12%;right:12%}
-  .area-card{position:absolute;width:190px;background:#fff;border-radius:10px;padding:6px 8px;box-shadow:0 2px 6px rgba(0,0,0,0.1);font-size:11px}
-  .area-title-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
-  .area-title{font-weight:bold;font-size:12px}
-  .info-link{font-size:10px;text-decoration:underline;color:#1a73e8;cursor:pointer}
-  .buttons-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:2px}
-  .color-btn{border:none;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:11px;color:#fff}
-  .blue{background:#2b6cb0}.green{background:#38a169}.yellow{background:#ecc94b;color:#000}.red{background:#e53e3e}
-  .counts{display:none}
-  #card-Manageability{top:-10px;left:-4%}
-  #card-Comprehensibility{top:-10px;right:-4%}
-  #card-Meaningfulness{bottom:40px;left:-4%}
-  #card-Recovery{bottom:40px;right:-4%}
-  .workload-avg-box{position:absolute;top:50%;right:-10%;transform:translateY(-50%);background:rgba(255,255,255,0.95);border-radius:10px;padding:6px 8px;box-shadow:0 1px 4px rgba(0,0,0,0.18);text-align:center;font-size:11px;width:82px}
-  .workload-bar-outer{height:80px;width:18px;margin:6px auto;border-radius:8px;border:1px solid #ccc;background:linear-gradient(to top,#f44336,#ffeb3b,#4caf50);position:relative;overflow:hidden}
-  .workload-bar-inner{position:absolute;bottom:0;left:0;right:0;background:rgba(18,33,59,0.9);height:0%;border-radius:8px 8px 0 0;transition:height .25s}
-  .workload-value{margin-top:2px;font-size:11px}
-  .fun-row{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
-  .fun-row button{padding:6px 10px;border-radius:16px;border:none;cursor:pointer;font-size:13px;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.18);display:flex;align-items:center;gap:6px}
-  .fun-celebrate{background:linear-gradient(135deg,#ff9800,#f44336)}.fun-hug{background:linear-gradient(135deg,#e91e63,#ff80ab)}.fun-truck{background:linear-gradient(135deg,#1565c0,#26c6da)}.fun-leader{background:linear-gradient(135deg,#4caf50,#8bc34a)}
-  .members-section{margin-top:10px;padding:10px 12px;background:#fff;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);display:none}
-  .members-table-container{max-height:180px;overflow:auto;margin-top:4px}
-  table.members-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:4px}
-  table.members-table th,table.members-table td{border:1px solid #ccc;padding:2px 4px;text-align:center;line-height:1.2}
-  table.members-table th{background:#12213b;color:#fff;position:sticky;top:0;z-index:1;font-size:11px;padding:2px 4px}
-  .remove-btn{border:none;background:#e53e3e;color:#fff;border-radius:3px;padding:1px 4px;cursor:pointer;font-size:10px}
-  .prev-week-cell{font-size:10px;line-height:1.2;white-space:nowrap}
-  .prev-week-chip{display:inline-block;margin-right:8px}
-  .history-circles{margin-top:20px;display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
-  .bottom-meta{margin-top:12px;padding:10px 12px;background:#fff;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13px}
-  .meta-fields{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-  .meta-group{display:flex;flex-direction:column;gap:2px}
-  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:1000}
-  .modal{background:#fff;max-width:650px;max-height:80vh;overflow-y:auto;border-radius:10px;padding:18px 20px;box-shadow:0 4px 12px rgba(0,0,0,0.3)}
-  .modal-close{float:right;cursor:pointer;font-weight:bold;font-size:18px}
-  @media(max-width:800px){body{padding:8px}.page-shell{padding:14px}header{flex-direction:column;align-items:flex-start}.circle-wrapper{position:static;transform:none;display:flex;justify-content:center;margin-bottom:10px}.area-overlay-box{display:none}.workload-avg-box{position:static;margin:4px auto 0 auto}.bottom-meta{flex-direction:column;align-items:flex-start}.members-table-container{max-height:220px}}
-</style>
+    .page-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 16px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+      padding: 20px 24px 24px 24px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .logo-wrapper img {
+      height: 40px;
+      width: auto;
+    }
+
+    .header-text {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: 0.5px;
+    }
+
+    .traton-label {
+      margin-top: 2px;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #555;
+    }
+
+    .intro-block {
+      margin: 8px 0 6px 0;
+      max-width: 900px;
+      font-size: 14px;
+    }
+
+    .intro-text {
+      margin-bottom: 4px;
+    }
+
+    .helper-link {
+      font-size: 13px;
+      color: #1a73e8;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    /* CIRCLE + AREA CARDS */
+
+    .circle-layout {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+
+    .circle-layout-inner {
+      position: relative;
+      max-width: 820px;
+      width: 100%;
+      min-height: 420px;
+      margin: 0 auto;
+    }
+
+    .circle-wrapper {
+      position: absolute;
+      top: 46%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: inline-block;
+    }
+
+    .circle-wrapper img {
+      max-width: 560px;
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.16);
+      display: block;
+    }
+
+    .area-overlay-box {
+      position: absolute;
+      background: rgba(255,255,255,0.9);
+      border-radius: 10px;
+      padding: 4px 6px;
+      font-size: 16px;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      min-width: 80px;
+      min-height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.2;
+    }
+
+    .overlay-icons span {
+      margin: 0 1px;
+    }
+
+    #overlay-Manageability { top: 13%; left: 12%; }
+    #overlay-Comprehensibility { top: 13%; right: 12%; }
+    #overlay-Meaningfulness { bottom: 11%; left: 12%; }
+    #overlay-Recovery { bottom: 11%; right: 12%; }
+
+    .area-card {
+      position: absolute;
+      width: 190px;
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 6px 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      font-size: 11px;
+    }
+
+    .area-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .area-title {
+      font-weight: bold;
+      font-size: 12px;
+    }
+
+    .info-link {
+      font-size: 10px;
+      text-decoration: underline;
+      color: #1a73e8;
+      cursor: pointer;
+    }
+
+    .buttons-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 2px;
+    }
+
+    .color-btn {
+      border: none;
+      padding: 3px 6px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 10px;
+      color: #fff;
+      min-width: 52px;
+    }
+
+    .blue  { background: #2b6cb0; }
+    .green { background: #38a169; }
+    .yellow{ background: #ecc94b; color: #000; }
+    .red   { background: #e53e3e; }
+
+    /* Räknare dolt (borttagen visuellt) */
+    .counts {
+      display: none;
+    }
+
+    #card-Manageability {
+      top: -10px;
+      left: -4%;
+    }
+
+    #card-Comprehensibility {
+      top: -10px;
+      right: -4%;
+    }
+
+    #card-Meaningfulness {
+      bottom: 40px;
+      left: -4%;
+    }
+
+    #card-Recovery {
+      bottom: 40px;
+      right: -4%;
+    }
+
+    /* Workload overlay on circle */
+
+    .workload-avg-box {
+      position: absolute;
+      top: 50%;
+      right: -10%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.92);
+      border-radius: 10px;
+      padding: 4px 6px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+      text-align: center;
+      font-size: 10px;
+      width: 70px;
+    }
+
+    .workload-label {
+      font-weight: bold;
+      margin-bottom: 2px;
+    }
+
+    .workload-bar-outer {
+      height: 80px;
+      width: 14px;
+      margin: 0 auto;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: linear-gradient(to top, #f44336, #ffeb3b, #4caf50);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .workload-bar-inner {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(18,33,59,0.9);
+      border-radius: 8px 8px 0 0;
+      height: 0%;
+      transition: height 0.3s ease-out;
+    }
+
+    .workload-value {
+      margin-top: 2px;
+      font-size: 10px;
+    }
+
+    /* Team member view */
+
+    .members-toggle {
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    /* Global import controls – alltid synlig */
+    .global-import-controls {
+      margin-top: 6px;
+      font-size: 11px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .global-import-controls button {
+      padding: 4px 8px;
+      font-size: 11px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background: #1a73e8;
+      color: #ffffff;
+    }
+
+    .members-section {
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      display: none;
+    }
+
+    .members-section h2 {
+      margin-top: 0;
+      font-size: 16px;
+    }
+
+    .members-section p {
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .workload-desc {
+      font-size: 11px;
+      margin-top: 4px;
+      color: #333;
+    }
+
+    .member-controls {
+      margin-top: 6px;
+      margin-bottom: 6px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .member-controls input {
+      padding: 4px 6px;
+      font-size: 12px;
+    }
+
+    .member-controls button {
+      padding: 4px 8px;
+      font-size: 12px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background: #12213b;
+      color: #ffffff;
+    }
+
+    .member-file-hint {
+      font-size: 11px;
+      color: #555;
+    }
+
+    .member-help-link {
+      font-size: 11px;
+      color: #1a73e8;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    table.members-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      margin-top: 4px;
+    }
+
+    table.members-table th,
+    table.members-table td {
+      border: 1px solid #ccc;
+      padding: 2px 4px;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    table.members-table th {
+      background: #12213b;
+      color: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      font-size: 11px;
+      padding: 2px 4px;
+    }
+
+    .remove-btn {
+      border: none;
+      background: #e53e3e;
+      color: #fff;
+      border-radius: 3px;
+      padding: 1px 4px;
+      cursor: pointer;
+      font-size: 10px;
+    }
+
+    .emoji-toggles {
+      display: flex;
+      gap: 2px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .emoji-toggle {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 1px 4px;
+      cursor: pointer;
+      background: #f9f9f9;
+      font-size: 14px;
+    }
+
+    .emoji-toggle.active {
+      background: #12213b;
+      color: #fff;
+    }
+
+    .prev-week-cell {
+      font-size: 10px;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .prev-week-chip {
+      display: inline-block;
+      margin-right: 8px;
+    }
+
+    .members-table-container {
+      max-height: 180px;
+      overflow-y: auto;
+      margin-top: 4px;
+    }
+
+    /* FUN BUTTON ROW */
+
+    .fun-row {
+      margin-top: 16px;
+      margin-bottom: 6px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .fun-row button {
+      padding: 6px 10px;
+      border-radius: 16px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .fun-celebrate { background: linear-gradient(135deg,#ff9800,#f44336); }
+    .fun-hug       { background: linear-gradient(135deg,#e91e63,#ff80ab); }
+    .fun-truck     { background: linear-gradient(135deg,#1565c0,#26c6da); }
+    .fun-leader    { background: linear-gradient(135deg,#4caf50,#8bc34a); }
+
+    /* Emoji overlay for fun effects */
+
+    .emoji-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 1500;
+    }
+
+    .emoji-float {
+      position: absolute;
+      top: 100%;
+      animation: emojiFloat 3.5s linear forwards;
+    }
+
+    @keyframes emojiFloat {
+      0%   { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-120vh); opacity: 0; }
+    }
+
+    /* History circles at bottom */
+
+    .history-circles {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: center;
+    }
+
+    .history-circle-block {
+      text-align: center;
+      font-size: 11px;
+    }
+
+    .history-circle-week {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .history-circle-wrapper {
+      position: relative;
+      display: inline-block;
+      max-width: 220px;
+    }
+
+    .history-circle-img {
+      width: 100%;
+      max-width: 220px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .history-overlay {
+      position: absolute;
+      background: rgba(255,255,255,0.9);
+      border-radius: 8px;
+      padding: 2px 4px;
+      font-size: 13px;
+      min-width: 50px;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .history-overlay span {
+      margin: 0 1px;
+    }
+
+    .history-overlay-manage { top: 15%; left: 10%; }
+    .history-overlay-comp   { top: 15%; right: 10%; }
+    .history-overlay-mean   { bottom: 13%; left: 10%; }
+    .history-overlay-recov  { bottom: 13%; right: 10%; }
+
+    /* Bottom – Week + Team + Export */
+
+    .bottom-meta {
+      margin-top: 12px;
+      padding: 10px 12px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 13px;
+    }
+
+    .meta-fields {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .meta-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .meta-fields label {
+      font-size: 12px;
+    }
+
+    .meta-fields input,
+    .meta-fields select {
+      padding: 4px 6px;
+      font-size: 12px;
+      min-width: 80px;
+    }
+
+    .export-container button {
+      padding: 6px 12px;
+      font-size: 12px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background: #12213b;
+      color: #ffffff;
+    }
+
+    /* Modal */
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal {
+      background: #ffffff;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      border-radius: 10px;
+      padding: 18px 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .modal h3 {
+      margin-top: 0;
+    }
+
+    .modal section {
+      margin-bottom: 10px;
+    }
+
+    .modal-close {
+      float: right;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    @media (max-width: 800px) {
+      body { padding: 8px; }
+      .page-shell { padding: 14px; }
+      header { flex-direction: column; align-items: flex-start; }
+      .logo-wrapper img { height: 32px; }
+      .circle-layout-inner { min-height: auto; }
+      .area-card { position: static; width: 100%; margin-top: 8px; }
+      .circle-wrapper {
+        position: static;
+        transform: none;
+        display: flex;
+        justify-content: center;
+        margin-bottom: 10px;
+      }
+      .area-overlay-box { display: none; }
+      .workload-avg-box { position: static; margin: 4px auto 0 auto; }
+      .bottom-meta { flex-direction: column; align-items: flex-start; }
+      .members-table-container { max-height: 220px; }
+    }
+  </style>
+
+  <!-- ExcelJS + FileSaver for export/import with validation/snapshot -->
+  <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+  <!-- Keep SheetJS for backwards compatibility (not required but harmless) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
   <div class="page-shell">
     <header>
-      <div class="logo-wrapper"><img src="Traton_logo.png" alt="TRATON Group logo"></div>
-      <div>
+      <div class="logo-wrapper">
+        <img src="Traton_logo.png" alt="TRATON Group logo">
+      </div>
+      <div class="header-text">
         <h1>Workbalance</h1>
         <div class="traton-label">TRATON GROUP – WORK BALANCE DIALOGUE</div>
       </div>
@@ -80,81 +653,133 @@
 
     <div class="intro-block">
       <div class="intro-text">
-        Workbalance supports team dialogue about sustainable work. Rate four areas (Manageability, Comprehensibility, Meaningfulness, Recovery) using colours blue / green / yellow / red. Use the member view for per-person inputs. Export includes history and a circle snapshot.
+        Workbalance is a support for dialogue in the team about how sustainable the work situation is.
+        You rate four areas together – Manageability, Comprehensibility, Meaningfulness and Recovery –
+        using the colours blue, green, yellow and red. The model is based on structured reflection and
+        shared responsibility: everyone contributes with experiences, the team identifies patterns, and
+        you agree on concrete actions to strengthen a healthy balance over time.
       </div>
-      <div><span class="helper-link" onclick="openUsageInfo()">How do we use this page?</span></div>
+      <span class="helper-link" onclick="openUsageInfo()">
+        How do we use this page?
+      </span>
     </div>
 
+    <!-- CIRCLE + AREA CARDS -->
     <div class="circle-layout">
       <div class="circle-layout-inner">
         <div class="circle-wrapper">
-          <canvas id="circleCanvas" width="560" height="560" style="border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.16);background:white"></canvas>
+          <!-- Keep original image element for visual parity -->
+          <img id="mainCircleImg" src="workbalance_circle.png" alt="Work Balance Model">
 
-          <div class="area-overlay-box" id="overlay-Manageability"></div>
-          <div class="area-overlay-box" id="overlay-Comprehensibility"></div>
-          <div class="area-overlay-box" id="overlay-Meaningfulness"></div>
-          <div class="area-overlay-box" id="overlay-Recovery"></div>
+          <!-- Per-area overlays -->
+          <div class="area-overlay-box" id="overlay-Manageability"><div class="overlay-icons"></div></div>
+          <div class="area-overlay-box" id="overlay-Comprehensibility"><div class="overlay-icons"></div></div>
+          <div class="area-overlay-box" id="overlay-Meaningfulness"><div class="overlay-icons"></div></div>
+          <div class="area-overlay-box" id="overlay-Recovery"><div class="overlay-icons"></div></div>
 
+          <!-- Average workload overlay -->
           <div class="workload-avg-box" id="workloadAvgBox">
-            <div style="font-weight:bold;font-size:12px">Workload</div>
-            <div class="workload-bar-outer"><div class="workload-bar-inner" id="workloadBarInner"></div></div>
+            <div class="workload-label">Workload</div>
+            <div class="workload-bar-outer">
+              <div class="workload-bar-inner" id="workloadBarInner"></div>
+            </div>
             <div class="workload-value" id="workloadAvgValue">–</div>
           </div>
         </div>
 
         <div class="area-card" id="card-Manageability">
-          <div class="area-title-row"><div class="area-title">Manageability</div><span class="info-link" onclick="openAreaInfo('Manageability')">What does this mean?</span></div>
-          <div class="buttons-row">
-            <button class="color-btn blue" onclick="increment('Manageability','blue')">Blue +1</button>
-            <button class="color-btn green" onclick="increment('Manageability','green')">Green +1</button>
-            <button class="color-btn yellow" onclick="increment('Manageability','yellow')">Yellow +1</button>
-            <button class="color-btn red" onclick="increment('Manageability','red')">Red +1</button>
+          <div class="area-title-row">
+            <div class="area-title">Manageability</div>
+            <span class="info-link" onclick="openAreaInfo('Manageability')">What does this mean?</span>
           </div>
+          <div class="buttons-row">
+            <button class="color-btn blue"   onclick="increment('Manageability','blue')">Blue +1</button>
+            <button class="color-btn green"  onclick="increment('Manageability','green')">Green +1</button>
+            <button class="color-btn yellow" onclick="increment('Manageability','yellow')">Yellow +1</button>
+            <button class="color-btn red"    onclick="increment('Manageability','red')">Red +1</button>
+          </div>
+          <div class="counts" id="counts-Manageability"></div>
         </div>
 
         <div class="area-card" id="card-Comprehensibility">
-          <div class="area-title-row"><div class="area-title">Comprehensibility</div><span class="info-link" onclick="openAreaInfo('Comprehensibility')">What does this mean?</span></div>
-          <div class="buttons-row">
-            <button class="color-btn blue" onclick="increment('Comprehensibility','blue')">Blue +1</button>
-            <button class="color-btn green" onclick="increment('Comprehensibility','green')">Green +1</button>
-            <button class="color-btn yellow" onclick="increment('Comprehensibility','yellow')">Yellow +1</button>
-            <button class="color-btn red" onclick="increment('Comprehensibility','red')">Red +1</button>
+          <div class="area-title-row">
+            <div class="area-title">Comprehensibility</div>
+            <span class="info-link" onclick="openAreaInfo('Comprehensibility')">What does this mean?</span>
           </div>
+          <div class="buttons-row">
+            <button class="color-btn blue"   onclick="increment('Comprehensibility','blue')">Blue +1</button>
+            <button class="color-btn green"  onclick="increment('Comprehensibility','green')">Green +1</button>
+            <button class="color-btn yellow" onclick="increment('Comprehensibility','yellow')">Yellow +1</button>
+            <button class="color-btn red"    onclick="increment('Comprehensibility','red')">Red +1</button>
+          </div>
+          <div class="counts" id="counts-Comprehensibility"></div>
         </div>
 
         <div class="area-card" id="card-Meaningfulness">
-          <div class="area-title-row"><div class="area-title">Meaningfulness</div><span class="info-link" onclick="openAreaInfo('Meaningfulness')">What does this mean?</span></div>
-          <div class="buttons-row">
-            <button class="color-btn blue" onclick="increment('Meaningfulness','blue')">Blue +1</button>
-            <button class="color-btn green" onclick="increment('Meaningfulness','green')">Green +1</button>
-            <button class="color-btn yellow" onclick="increment('Meaningfulness','yellow')">Yellow +1</button>
-            <button class="color-btn red" onclick="increment('Meaningfulness','red')">Red +1</button>
+          <div class="area-title-row">
+            <div class="area-title">Meaningfulness</div>
+            <span class="info-link" onclick="openAreaInfo('Meaningfulness')">What does this mean?</span>
           </div>
+          <div class="buttons-row">
+            <button class="color-btn blue"   onclick="increment('Meaningfulness','blue')">Blue +1</button>
+            <button class="color-btn green"  onclick="increment('Meaningfulness','green')">Green +1</button>
+            <button class="color-btn yellow" onclick="increment('Meaningfulness','yellow')">Yellow +1</button>
+            <button class="color-btn red"    onclick="increment('Meaningfulness','red')">Red +1</button>
+          </div>
+          <div class="counts" id="counts-Meaningfulness"></div>
         </div>
 
         <div class="area-card" id="card-Recovery">
-          <div class="area-title-row"><div class="area-title">Recovery</div><span class="info-link" onclick="openAreaInfo('Recovery')">What does this mean?</span></div>
-          <div class="buttons-row">
-            <button class="color-btn blue" onclick="increment('Recovery','blue')">Blue +1</button>
-            <button class="color-btn green" onclick="increment('Recovery','green')">Green +1</button>
-            <button class="color-btn yellow" onclick="increment('Recovery','yellow')">Yellow +1</button>
-            <button class="color-btn red" onclick="increment('Recovery','red')">Red +1</button>
+          <div class="area-title-row">
+            <div class="area-title">Recovery</div>
+            <span class="info-link" onclick="openAreaInfo('Recovery')">What does this mean?</span>
           </div>
+          <div class="buttons-row">
+            <button class="color-btn blue"   onclick="increment('Recovery','blue')">Blue +1</button>
+            <button class="color-btn green"  onclick="increment('Recovery','green')">Green +1</button>
+            <button class="color-btn yellow" onclick="increment('Recovery','yellow')">Yellow +1</button>
+            <button class="color-btn red"    onclick="increment('Recovery','red')">Red +1</button>
+          </div>
+          <div class="counts" id="counts-Recovery"></div>
         </div>
       </div>
     </div>
 
+    <!-- FUN BUTTONS (under member view) -->
     <div class="fun-row">
-      <button class="fun-celebrate" onclick="runCelebration()">🎉 Celebrate</button>
-      <button class="fun-hug" onclick="runWarmHug()">🤗 Warm hug</button>
-      <button class="fun-truck" onclick="runTruckBoost()">🚚 Truck boost</button>
-      <button class="fun-leader" onclick="runLeaderBoost()">🧑‍💼 Leader boost</button>
+      <button type="button" class="fun-celebrate" onclick="runCelebration()">
+        🎉 Celebrate!
+      </button>
+      <button type="button" class="fun-hug" onclick="runWarmHug()">
+        🤗 Warm hug
+      </button>
+      <button type="button" class="fun-truck" onclick="runTruckBoost()">
+        🚚 Truck boost
+      </button>
+      <button type="button" class="fun-leader" onclick="runLeaderBoost()">
+        🧑‍💼 Leader boost
+      </button>
     </div>
-
+    
+    <!-- TEAM MEMBER VIEW -->
     <div class="members-section" id="membersSection">
       <h2>Team member view (optional)</h2>
-      <p>Enter one row per team member for the selected week and team. The history column shows the latest two weeks per person (horizontally).</p>
-      <div class="workload-desc">Perceived workload (1=need more, 4=fully loaded). Average shows on the circle.</div>
+      <p>
+        Enter one row per team member for the selected week and team.
+        When you import an Excel file exported from this page, you restore names and all previous weeks.
+        The history column shows the latest two weeks per person, horizontally.
+        <span class="member-help-link" onclick="openMemberFileInfo()">
+          How does import / export work?
+        </span>
+      </p>
+      <p class="workload-desc">
+        Each person can also record their <strong>perceived workload</strong> on a 4-step scale:
+        1 = “I need more to do”,
+        2 = “Quite full, but I can help a bit more if needed”,
+        3 = “Balanced load, I have time to answer colleagues’ questions”,
+        4 = “Fully loaded, I barely keep up”.
+        The team average is shown on the circle as a vertical bar.
+      </p>
 
       <div class="members-table-container">
         <table class="members-table" id="membersTable">
@@ -166,7 +791,7 @@
               <th>Meaningfulness</th>
               <th>Recovery</th>
               <th>Workload<br/>(1–4)</th>
-              <th>Recent weeks<br/>(2 latest)</th>
+              <th>Recent weeks<br/>(2 latest, all areas)</th>
               <th></th>
             </tr>
           </thead>
@@ -174,453 +799,1147 @@
         </table>
       </div>
 
-      <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
-        <input id="memberNameInput" type="text" placeholder="Team member name" />
-        <button onclick="addMember()">Add member</button>
+      <div class="member-controls">
+        <input type="text" id="memberNameInput" placeholder="Team member name" />
+        <button type="button" onclick="addMember()">Add member</button>
       </div>
     </div>
-
+   
+    <!-- HISTORY CIRCLES (last 4 weeks) -->
     <div id="historyCirclesContainer" class="history-circles"></div>
-
-    <div style="margin-top:10px">
-      <label><input type="checkbox" id="toggleMembers" onchange="toggleMembersSection()" /> Add status per team member (optional – with weekly history)</label>
+    
+    <!-- TEAM MEMBER TOGGLE -->
+    <div class="members-toggle">
+      <label>
+        <input type="checkbox" id="toggleMembers" onchange="toggleMembersSection()">
+        Add status per team member (optional – with weekly history)
+      </label>
     </div>
 
-    <div style="margin-top:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-      <div>
-        <button onclick="triggerGlobalImport()">Import from Excel (history file)</button>
-        <input id="globalMemberFileInput" type="file" accept=".xlsx" style="display:none" onchange="handleGlobalImportFile(this.files[0])" />
-      </div>
-      <div style="margin-left:auto"></div>
+    <!-- GLOBAL IMPORT (always visible) -->
+    <div class="global-import-controls">
+      <button type="button" onclick="triggerGlobalImport()">
+        Import from Excel (history file)
+      </button>
+      <span class="member-file-hint">
+        You can import a history file at any time. The team member view will open automatically.
+      </span>
+      <input type="file" id="globalMemberFileInput" accept=".xlsx" style="display:none"
+             onchange="handleGlobalImportFile(this.files[0])">
     </div>
 
+    <!-- WEEK + TEAM + EXPORT -->
     <div class="bottom-meta">
       <div class="meta-fields">
-        <div class="meta-group"><label for="teamInput">Team name</label><input id="teamInput" type="text" placeholder="e.g. XTRM Platform" /></div>
-        <div class="meta-group"><label>Year / Week (YYWW)</label>
-          <div style="display:flex;gap:8px;align-items:center">
-            <select id="yearSelect"></select>
-            <select id="weekSelect"></select>
-            <input id="weekCodeDisplay" readonly style="background:#f3f3f3;padding:4px 6px" />
+        <div class="meta-group">
+          <label for="teamInput">Team name</label>
+          <input id="teamInput" type="text" placeholder="e.g. XTRM Platform" />
+        </div>
+        <div class="meta-group">
+          <label>Year / Week (YYWW)</label>
+          <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+            <div>
+              <span style="font-size:11px;">Year</span><br/>
+              <select id="yearSelect"></select>
+            </div>
+            <div>
+              <span style="font-size:11px;">Week</span><br/>
+              <select id="weekSelect"></select>
+            </div>
+            <div>
+              <span style="font-size:11px;">Code</span><br/>
+              <input id="weekCodeDisplay" type="text" readonly style="background:#f3f3f3;"/>
+            </div>
           </div>
         </div>
-        <div class="meta-group"><label>Export filename (optional)</label><input id="exportFileName" type="text" placeholder="team_workbalance.xlsx" /></div>
       </div>
-
       <div class="export-container">
+        <input id="exportFileName" placeholder="optional filename.xlsx" style="padding:6px;border-radius:6px;border:1px solid #ddd;margin-right:8px"/>
         <button onclick="exportToExcel()">Export to Excel</button>
       </div>
     </div>
 
+
   </div>
 
-  <div class="modal-backdrop" id="modalBackdrop"><div class="modal" id="modal"><span class="modal-close" onclick="closeModal()">&times;</span><div id="modalContent"></div></div></div>
+  <!-- MODAL -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal" id="modal">
+      <span class="modal-close" onclick="closeModal()">&times;</span>
+      <div id="modalContent"></div>
+    </div>
+  </div>
 
-<script>
-/* ========= Data & config ========= */
-const AREAS = ["Manageability","Comprehensibility","Meaningfulness","Recovery"];
-const COLORS = { blue:"#0b3b66", green:"#0f9d58", yellow:"#f0ad4e", red:"#d64545" };
-let areaData = {}, overall = {blue:0,green:0,yellow:0,red:0};
-let members = []; // {name, ratings:{area:color}, workload:int}
-let historyRows = []; // imported full history (array of objects)
-let lastImportedFilename = null;
+  <script>
+    /* ===========================================================
+       Logic: keep UI exactly as in your file, but replace import/export
+       Uses ExcelJS + FileSaver for robust .xlsx read/write + validation
+       =========================================================== */
 
-/* ======= UI helpers (modal) ======= */
-function openModal(html){ document.getElementById("modalContent").innerHTML = html; document.getElementById("modalBackdrop").style.display = "flex"; }
-function closeModal(){ document.getElementById("modalBackdrop").style.display = "none"; }
+    const AREAS = ["Manageability","Comprehensibility","Meaningfulness","Recovery"];
 
-/* ======= Info texts (kept from your original) ======= */
-function openUsageInfo(){ openModal(`<h3>How to use this page</h3><p>Use import to load history, select team & week, fill statuses and export. The exported file contains Members, Summary and CircleSnapshot sheets. The Members sheet contains data validation (dropdown) for statuses.</p>`); }
-function openAreaInfo(area){
-  // short info (same as before)
-  const defs = {
-    Manageability: "Balance between demands & resources…",
-    Comprehensibility: "Understanding of organisation & roles…",
-    Meaningfulness: "Feeling of value & inclusion…",
-    Recovery: "Ability to rest and recharge…"
-  };
-  openModal(`<h3>${area}</h3><p>${defs[area]}</p>`);
-}
-
-/* ======= Init ======= */
-function initAreas(){ AREAS.forEach(a=>areaData[a]={blue:0,green:0,yellow:0,red:0}); updateAllDisplays(); }
-function updateAllDisplays(){ renderMembersTable(); updateOverlayAreas(); updateWorkloadOverlay(); renderHistoryCirclesForTeam(document.getElementById('teamInput').value.trim()); }
-
-/* ======= Canvas circle & overlay rendering ======= */
-const canvas = document.getElementById('circleCanvas');
-const ctx = canvas.getContext('2d');
-let circleImg = new Image();
-circleImg.crossOrigin = "anonymous";
-circleImg.onload = ()=> drawCircle();
-circleImg.onerror = ()=> drawPlaceholder();
-circleImg.src = "workbalance_circle.png";
-
-function drawPlaceholder(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle="#fff"; ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle="#12213b"; ctx.beginPath(); ctx.arc(canvas.width/2,canvas.height/2,200,0,Math.PI*2); ctx.fill();
-}
-
-function drawCircle(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  const cw=canvas.width,ch=canvas.height,iw=circleImg.naturalWidth,ih=circleImg.naturalHeight;
-  const scale=Math.min(cw/iw,ch/ih)*0.98; const iw2=iw*scale,ih2=ih*scale;
-  ctx.drawImage(circleImg,(cw-iw2)/2,(ch-ih2)/2,iw2,ih2);
-  // overlay dots
-  drawOverlayDots();
-}
-
-function drawOverlayDots(){
-  // compute counts from members for currently selected week (we treat members array as current-week)
-  const counts = {};
-  AREAS.forEach(a=>counts[a]={blue:0,green:0,yellow:0,red:0});
-  members.forEach(m=>{
-    AREAS.forEach(a=>{
-      const c=(m.ratings[a]||"").toLowerCase();
-      if(c && counts[a][c]!==undefined) counts[a][c]++;
-    });
-  });
-  // positions near quadrants
-  const center={x:canvas.width/2,y:canvas.height/2};
-  const pos = {
-    Manageability:{x:center.x-120,y:center.y-120},
-    Comprehensibility:{x:center.x+120,y:center.y-120},
-    Meaningfulness:{x:center.x-120,y:center.y+120},
-    Recovery:{x:center.x+120,y:center.y+120}
-  };
-  // draw rows per color; break into new row after 5
-  Object.keys(pos).forEach(area=>{
-    const d=counts[area];
-    let baseY = 0;
-    ['blue','green','yellow','red'].forEach((color,ci)=>{
-      const n=d[color]||0;
-      for(let i=0;i<n;i++){
-        const row=Math.floor(i/5), col=i%5;
-        const spacing=14;
-        const x=pos[area].x + col*(spacing+4);
-        const y=pos[area].y + baseY + row*(spacing+4);
-        ctx.beginPath(); ctx.fillStyle=COLORS[color]; ctx.arc(x,y,6,0,Math.PI*2); ctx.fill();
+    const areaInfo = {
+      "Manageability": {
+        definition:
+          "Manageability is about your overall conditions at work – the balance between demands and resources, support, clarity and the possibility to influence.",
+        questions: [
+          "Do you have sufficient time and resources to complete your duties?",
+          "Are the right demands being made of you?",
+          "Are you able to influence your work situation?",
+          "Can you raise and escalate issues – and do you get support when you do?",
+          "Do you know what is expected of you and are there working methods that make things easier?"
+        ]
+      },
+      "Comprehensibility": {
+        definition:
+          "Comprehensibility is the feeling of understanding the organisation’s goals and how your work contributes. It requires openness and a clear overall picture.",
+        questions: [
+          "Do you understand what is going on in the organisation?",
+          "Do you feel coherence with the organisational goals?",
+          "If you have different roles, do they fit together?",
+          "Do you feel safe and treated with respect at work?",
+          "Do you receive continuous feedback that helps you progress?"
+        ]
+      },
+      "Meaningfulness": {
+        definition:
+          "Meaningfulness is about being appreciated and included in a fair and stimulating social climate. A high sense of meaningfulness generates motivation and creativity.",
+        questions: [
+          "Do you feel fairly treated in relation to your colleagues?",
+          "Do you feel included in what is going on and encouraged to participate?",
+          "Do you receive sufficient acknowledgement and do you celebrate success?",
+          "Do you find your work tasks motivating?",
+          "Do you follow your personal development plan?"
+        ]
+      },
+      "Recovery": {
+        definition:
+          "Recovery is about variation in work, the ability to use breaks for movement or rest, and having time for focus and reflection so that energy can be restored.",
+        questions: [
+          "Can you put work thoughts aside outside working hours?",
+          "Can you use breaks at work to relax and recover?",
+          "Are you able to move around during breaks?",
+          "Do you feel energised coming to work and have energy left when you go home?",
+          "Do you have time for reflection and conditions for focused work?"
+        ]
       }
-      baseY += 22;
-    });
-  });
-}
+    };
 
-/* ======= Area increment (team-level) ======= */
-function increment(area, color){
-  if(!areaData[area]) areaData[area]={blue:0,green:0,yellow:0,red:0};
-  areaData[area][color] = (areaData[area][color]||0) + 1;
-  // apply as synthetic team-level "member" named (Team overall) - easier to show dots and export
-  const teamRowName="(Team overall)";
-  let row = members.find(m=>m.name===teamRowName && !m.isSynthetic);
-  if(!row){
-    // create a synthetic member per area? simpler: push one pseudo-member with ratings aggregated (keeps member table compact)
-    row = { name: teamRowName, ratings: {}, workload: null, isSynthetic: true };
-    members.push(row);
-  }
-  // set the area's color as the last clicked color (affects overlay)
-  row.ratings[area] = color;
-  updateAllDisplays();
-}
+    const usageInfo = {
+      title: "How to use this page",
+      html: `
+        <section>
+          <strong>1. Decide team and week</strong><br/>
+          At the bottom of the page, enter the team name and use the Year/Week selectors to create a week code (YYWW).
+        </section>
+        <section>
+          <strong>2. Rate each area together</strong><br/>
+          Click the colour buttons for each area to represent the voices in the team.
+          The icons on the circle show how many blue, green, yellow and red you have in that area.
+        </section>
+        <section>
+          <strong>3. Use the team member view when needed</strong><br/>
+          Turn on “Add status per team member” to rate per person.
+          The upper circle is then calculated from the team member statuses for the selected week.
+        </section>
+        <section>
+          <strong>4. Import old weeks</strong><br/>
+          Import an Excel file exported from this page to restore names and all previous weeks.
+          After import, the week selector is automatically moved to the next week so you can add a new measurement.
+          At the bottom of the page you see up to four latest weeks as mini-circles with combined status.
+        </section>
+        <section>
+          <strong>5. Export and keep building history</strong><br/>
+          “Export to Excel” saves the current week plus all earlier weeks in one file.
+          A sheet called “CircleSnapshot” contains a snapshot image of the circle and also stores the summary of the ratings.
+          You can reuse the same file every time to keep the Workbalance history growing.
+        </section>
+      `
+    };
 
-/* ======= Members table (no emojis per person) ======= */
-function addMember(){
-  const name = document.getElementById('memberNameInput').value.trim();
-  if(!name) return alert('Enter a member name');
-  members.push({ name, ratings:{}, workload:null });
-  document.getElementById('memberNameInput').value='';
-  renderMembersTable(); updateAllDisplays();
-}
+    const memberFileInfo = {
+      title: "Import / export for team members",
+      html: `
+        <section>
+          <strong>Excel structure</strong><br/>
+          The file contains:
+          <ul>
+            <li><strong>Members</strong> sheet: members as rows and week-columns; each week cell encodes area values.</li>
+            <li><strong>MembersDetails</strong> sheet: row-per-member-week (Week, Team, Member, Manageability, Comprehensibility, Meaningfulness, Recovery, Workload) — used for imports/compatibility.</li>
+            <li><strong>Lists</strong> sheet: contains status options (blue, green, yellow, red) used for dropdown validation.</li>
+            <li><strong>CircleSnapshot</strong> sheet: optional PNG snapshot inserted if allowed by browser CORS/security.</li>
+          </ul>
+        </section>
+        <section>
+          <strong>Import</strong><br/>
+          • Click “Import from Excel (history file)” and select an .xlsx exported from this page.<br/>
+          • The system will load history and set team from the latest row; week will advance one step (YYWW).<br/>
+          • Only members who were present in the <em>latest</em> week are loaded to the team view (members removed last week are not re-added).<br/>
+          • Current-week statuses are cleared so you can enter new values for the next week.
+        </section>
+        <section>
+          <strong>Export</strong><br/>
+          • Export writes both Members (members-as-rows/weeks-as-columns) and MembersDetails (row-per-member-week) for compatibility.<br/>
+          • Data validation is added for area columns in MembersDetails so Excel users get dropdowns.<br/>
+          • The CircleSnapshot sheet will include a PNG of the circle where possible.
+        </section>
+      `
+    };
 
-function removeMember(idx){ members.splice(idx,1); renderMembersTable(); updateAllDisplays(); }
+    /* ---------------------------
+       In-memory state (same shape as before)
+       --------------------------- */
+    const areaData = {};
+    const overall = { blue:0, green:0, yellow:0, red:0 };
 
-function renderMembersTable(){
-  const tbody = document.querySelector('#membersTable tbody');
-  tbody.innerHTML='';
-  const team = document.getElementById('teamInput').value.trim();
-  members.forEach((m, idx)=>{
-    const tr=document.createElement('tr');
-    const tdName=document.createElement('td'); tdName.textContent=m.name; tr.appendChild(tdName);
-    AREAS.forEach(a=>{
-      const td=document.createElement('td');
-      const sel=document.createElement('select'); sel.style.fontSize='13px'; ['','blue','green','yellow','red'].forEach(v=>{
-        const opt=document.createElement('option'); opt.value=v; opt.textContent = v? mapDot(v): '';
-        if((m.ratings[a]||'')===v) opt.selected=true; sel.appendChild(opt);
-      });
-      sel.addEventListener('change', ()=>{ m.ratings[a]=sel.value; drawCircle(); updateWorkloadOverlay(); });
-      td.appendChild(sel); tr.appendChild(td);
-    });
-    const tdWL=document.createElement('td');
-    const wlSel=document.createElement('select'); ['','1','2','3','4'].forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; if(String(m.workload||'')===v) o.selected=true; wlSel.appendChild(o);});
-    wlSel.addEventListener('change', ()=>{ m.workload = wlSel.value? parseInt(wlSel.value,10): null; updateWorkloadOverlay(); });
-    tdWL.appendChild(wlSel); tr.appendChild(tdWL);
+    let members = []; // current week/team {name, ratings:{}, emojis:{}, workload}
+    let historyRows = []; // array of {Week, Team, Member, Manageability,...}
+    let lastImportedFilename = null;
 
-    const tdRecent=document.createElement('td'); tdRecent.className='prev-week-cell'; tdRecent.innerHTML = buildRecentTwoWeeksStatus(m.name, team); tr.appendChild(tdRecent);
-    const tdRem=document.createElement('td'); const btn=document.createElement('button'); btn.className='remove-btn'; btn.textContent='X'; btn.onclick=()=>removeMember(idx); tdRem.appendChild(btn); tr.appendChild(tdRem);
-
-    tbody.appendChild(tr);
-  });
-}
-
-/* ======= Recent two weeks builder (from historyRows) ======= */
-function buildRecentTwoWeeksStatus(name, team){
-  if(!historyRows.length) return '';
-  const rows = historyRows.filter(r => r.Member===name && r.Team===team);
-  if(!rows.length) return '';
-  const seen=new Set(); const picked=[];
-  for(let i=rows.length-1;i>=0;i--){
-    const r=rows[i]; const w=(r.Week||'').toString(); if(!w) continue; if(!seen.has(w)){ seen.add(w); picked.push(r); if(picked.length===2) break; }
-  }
-  picked.reverse();
-  return picked.map(r=>{
-    const w=(r.Week||'').toString();
-    return `<span class="prev-week-chip"><strong>${w}</strong> M:${mapDot(r.Manageability)} C:${mapDot(r.Comprehensibility)} Me:${mapDot(r.Meaningfulness)} R:${mapDot(r.Recovery)}</span>`;
-  }).join('');
-}
-function mapDot(c){ c=(c||'').toLowerCase(); if(c==='blue') return '🔵'; if(c==='green') return '🟢'; if(c==='yellow') return '🟡'; if(c==='red') return '🔴'; return '⚪'; }
-
-/* ======= Recalc from members -> areaData, overlay, workload ======= */
-function recalcFromMembers(){
-  areaData = {}; overall = {blue:0,green:0,yellow:0,red:0};
-  AREAS.forEach(a=>areaData[a]={blue:0,green:0,yellow:0,red:0});
-  members.forEach(m=>{
-    AREAS.forEach(a=>{
-      const c=(m.ratings[a]||'').toLowerCase();
-      if(c && areaData[a] && areaData[a][c]!==undefined){ areaData[a][c]++; overall[c]++; }
-    });
-  });
-  updateOverlayAreas(); updateWorkloadOverlay(); drawCircle();
-}
-
-function updateOverlayAreas(){
-  // update small overlay boxes (HTML) as well as canvas
-  AREAS.forEach(a=>{
-    const el=document.getElementById('overlay-'+a);
-    if(!el) return;
-    const d = areaData[a] || {blue:0,green:0,yellow:0,red:0};
-    el.innerHTML = makeStatusIcons(d);
-  });
-}
-
-/* create icons with linebreak after 5 */
-function makeStatusIcons(d){
-  const total=(d.blue||0)+(d.green||0)+(d.yellow||0)+(d.red||0);
-  if(!total) return '<span style="font-size:12px;color:#666">–</span>';
-  const tokens=[];
-  const add=(sym,cnt)=>{ for(let i=0;i<cnt;i++){ if(tokens.length<15) tokens.push(sym); } };
-  add('🔵', d.blue||0); add('🟢', d.green||0); add('🟡', d.yellow||0); add('🔴', d.red||0);
-  let html=''; tokens.forEach((t,i)=>{ if(i>0 && i%5===0) html+='<br>'; html+=`<span>${t}</span>`; });
-  const extra = total - tokens.length; if(extra>0) html+=`<span>+${extra}</span>`;
-  return html;
-}
-
-/* ======= Workload overlay (avg) ======= */
-function updateWorkloadOverlay(){
-  const bar=document.getElementById('workloadBarInner'), val=document.getElementById('workloadAvgValue');
-  let sum=0, count=0; members.forEach(m=>{ if(typeof m.workload==='number'){ sum+=m.workload; count++; }});
-  if(!count){ bar.style.height='0%'; val.textContent='–'; return; }
-  const avg=sum/count; const pct=Math.min(100,Math.max(0,(avg/4)*100));
-  bar.style.height = pct + '%'; val.textContent = avg.toFixed(2) + ' / 4';
-}
-
-/* ======= Year/week selectors ======= */
-function initYearWeekSelectors(){
-  const yearSelect=document.getElementById('yearSelect'), weekSelect=document.getElementById('weekSelect');
-  const now=new Date(), currentYear=now.getFullYear();
-  [currentYear-1,currentYear,currentYear+1].forEach(y=>{ const opt=document.createElement('option'); opt.value=y; opt.textContent=y; if(y===currentYear) opt.selected=true; yearSelect.appendChild(opt); });
-  for(let w=1; w<=53; w++){ const opt=document.createElement('option'); opt.value=w; opt.textContent = String(w).padStart(2,'0'); weekSelect.appendChild(opt); }
-  weekSelect.value = getISOWeek(now);
-  updateWeekCodeDisplay();
-  yearSelect.addEventListener('change', updateWeekCodeDisplay);
-  weekSelect.addEventListener('change', updateWeekCodeDisplay);
-}
-function getISOWeek(date){ const tmp=new Date(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate())); const dayNum=tmp.getUTCDay()||7; tmp.setUTCDate(tmp.getUTCDate()+4-dayNum); const yearStart=new Date(Date.UTC(tmp.getUTCFullYear(),0,1)); return Math.ceil((((tmp-yearStart)/86400000)+1)/7); }
-function getYearWeekCode(){ const y=document.getElementById('yearSelect').value, w=document.getElementById('weekSelect').value; if(!y||!w) return ''; const yy=(parseInt(y,10)%100).toString().padStart(2,'0'); return yy + String(w).padStart(2,'0'); }
-function updateWeekCodeDisplay(){ document.getElementById('weekCodeDisplay').value = getYearWeekCode(); }
-function incrementWeekCode(code){ if(!/^\d{4}$/.test(code)) return code; let yy=parseInt(code.slice(0,2),10), ww=parseInt(code.slice(2),10); ww++; if(ww>53){ ww=1; yy=(yy+1)%100; } return String(yy).padStart(2,'0') + String(ww).padStart(2,'0'); }
-function setYearWeekFromCode(code){ if(!/^\d{4}$/.test(code)) return; const yy=parseInt(code.slice(0,2),10), ww=parseInt(code.slice(2),10); const year=2000+yy; const yearSelect=document.getElementById('yearSelect'), weekSelect=document.getElementById('weekSelect'); // ensure option exists
-  if(![...yearSelect.options].some(o=>parseInt(o.value,10)===year)){ const opt=document.createElement('option'); opt.value=year; opt.textContent=year; yearSelect.appendChild(opt); }
-  yearSelect.value=year; weekSelect.value=ww; updateWeekCodeDisplay();
-}
-
-/* ======= Import (SheetJS) - Members sheet expected ======= */
-function triggerGlobalImport(){ document.getElementById('globalMemberFileInput').click(); }
-function handleGlobalImportFile(file){ if(!file) return handleMemberFileImport(file); }
-
-function handleMemberFileImport(file){
-  if(!file) return;
-  lastImportedFilename = file.name || null;
-  const reader = new FileReader();
-  reader.onload = e=>{
-    const data = new Uint8Array(e.target.result);
-    const wb = XLSX.read(data,{type:'array'});
-    const sheet = wb.Sheets['Members'] || wb.Sheets[wb.SheetNames[0]];
-    if(!sheet){ alert("No Members sheet found."); return; }
-    historyRows = XLSX.utils.sheet_to_json(sheet, {defval:''});
-    if(!historyRows.length){ alert("Members sheet empty."); return; }
-    const last = historyRows[historyRows.length-1];
-    const lastTeam = last.Team || '';
-    const lastWeek = (last.Week||'').toString();
-    document.getElementById('teamInput').value = lastTeam;
-    if(/^\d{4}$/.test(lastWeek)){ const next = incrementWeekCode(lastWeek); setYearWeekFromCode(next); } else updateWeekCodeDisplay();
-    // load only members present in latest week
-    const latestByName = {};
-    historyRows.forEach(r=>{ if(!r.Member) return; if(r.Team !== lastTeam) return; if((r.Week||'').toString() !== lastWeek) return; latestByName[r.Member]=r; });
-    members = [];
-    Object.keys(latestByName).forEach(name => members.push({ name, ratings:{}, workload: null }));
-    document.getElementById('toggleMembers').checked = true; document.getElementById('membersSection').style.display='block';
-    renderMembersTable(); recalcFromMembers(); renderHistoryCirclesForTeam(lastTeam);
-    alert('Imported history. Members loaded from latest week; current-week statuses cleared. Week advanced.');
-  };
-  reader.readAsArrayBuffer(file);
-}
-
-/* ======= History circles rendering (bottom) ======= */
-function renderHistoryCirclesForTeam(team){
-  const container=document.getElementById('historyCirclesContainer'); container.innerHTML='';
-  if(!team || !historyRows.length) return;
-  const rows = historyRows.filter(r=> (r.Team||'')===team );
-  if(!rows.length) return;
-  const weekOrder=[]; rows.forEach(r=>{ const w=(r.Week||'').toString(); if(w && !weekOrder.includes(w)) weekOrder.push(w); });
-  const selectedWeeks = weekOrder.slice(-4);
-  const weekData = {};
-  selectedWeeks.forEach(w=>{ weekData[w] = {}; AREAS.forEach(a=> weekData[w][a] = {blue:0,green:0,yellow:0,red:0}); });
-  rows.forEach(r=>{ const w=(r.Week||'').toString(); if(!selectedWeeks.includes(w)) return; AREAS.forEach(a=>{ const val=(r[a]||'').toString().toLowerCase(); if(weekData[w][a][val]!==undefined) weekData[w][a][val]++; }); });
-  selectedWeeks.forEach(w=>{
-    const block=document.createElement('div'); block.className='history-circle-block';
-    const lab=document.createElement('div'); lab.className='history-circle-week'; lab.textContent = w; block.appendChild(lab);
-    const wrap=document.createElement('div'); wrap.className='history-circle-wrapper';
-    const img=document.createElement('img'); img.src='workbalance_circle.png'; img.className='history-circle-img'; wrap.appendChild(img);
-    AREAS.forEach((a,i)=>{ const ov=document.createElement('div'); ov.className='history-overlay ' + ['history-overlay-manage','history-overlay-comp','history-overlay-mean','history-overlay-recov'][i]; ov.innerHTML = makeStatusIcons(weekData[w][a]); wrap.appendChild(ov); });
-    block.appendChild(wrap); container.appendChild(block);
-  });
-}
-
-/* ======= Export (ExcelJS) with data validation and snapshot image ======= */
-async function exportToExcel(){
-  const team = document.getElementById('teamInput').value.trim();
-  const weekCode = getYearWeekCode();
-  if(!team){ alert('Please enter a team name'); return; }
-  if(!/^\d{4}$/.test(weekCode)){ alert('Please select year & week (YYWW)'); return; }
-  // check if exists
-  const exists = (historyRows || []).some(r => (r.Team||'')===team && (r.Week||'')===weekCode);
-  if(exists){ alert('Week code already exists for this team in history file. Choose a different week.'); return; }
-
-  // Excel workbook via ExcelJS
-  const wb = new ExcelJS.Workbook();
-  wb.creator = 'Workbalance tool';
-  wb.created = new Date();
-
-  // Lists sheet for validation
-  const lists = wb.addWorksheet('Lists');
-  lists.getCell('A1').value = 'blue'; lists.getCell('A2').value='green'; lists.getCell('A3').value='yellow'; lists.getCell('A4').value='red';
-
-  // Summary sheet (simple)
-  const wsSummary = wb.addWorksheet('Summary');
-  wsSummary.addRow(['Workbalance – TRATON']); wsSummary.addRow([]);
-  wsSummary.addRow(['Team', team]); wsSummary.addRow(['Week (YYWW)', weekCode]); wsSummary.addRow([]);
-  wsSummary.addRow(['Area','Blue','Green','Yellow','Red']);
-  AREAS.forEach(a=>{
-    const d = areaData[a] || {blue:0,green:0,yellow:0,red:0};
-    wsSummary.addRow([a, d.blue, d.green, d.yellow, d.red]);
-  });
-  wsSummary.addRow(['Total', overall.blue, overall.green, overall.yellow, overall.red]);
-
-  // CircleSnapshot sheet: we will add image from canvas
-  const snapSheet = wb.addWorksheet('CircleSnapshot');
-  // draw snapshot from canvas
-  const dataUrl = document.getElementById('circleCanvas').toDataURL('image/png');
-  // add image (exceljs expects base64 without header)
-  const base64 = dataUrl.split(',')[1];
-  const imageId = wb.addImage({ base64: base64, extension: 'png' });
-  snapSheet.addImage(imageId, { tl: { col: 0.2, row: 0.5 }, ext: { width: 720, height: 720 } });
-  snapSheet.getCell('H2').value = 'Areas explanation';
-  snapSheet.getCell('H3').value = 'Manageability: Balance of resources & demands';
-  snapSheet.getCell('H4').value = 'Comprehensibility: Coherence & clarity';
-  snapSheet.getCell('H5').value = 'Meaningfulness: Appreciation & involvement';
-  snapSheet.getCell('H6').value = 'Recovery: Ability to rest & recover';
-  snapSheet.getCell('H8').value = 'Legend';
-  snapSheet.getCell('H9').value = 'blue = very good';
-  snapSheet.getCell('H10').value = 'green = good';
-  snapSheet.getCell('H11').value = 'yellow = watch';
-  snapSheet.getCell('H12').value = 'red = critical';
-
-  // Members sheet: include all historyRows plus current members as new rows
-  const membersSheet = wb.addWorksheet('Members');
-  const header = ["Week","Team","Member","Manageability","Comprehensibility","Meaningfulness","Recovery","Workload"];
-  membersSheet.addRow(header);
-
-  // push existing history rows first
-  (historyRows || []).forEach(r=>{
-    membersSheet.addRow([ r.Week||'', r.Team||'', r.Member||'', r.Manageability||'', r.Comprehensibility||'', r.Meaningfulness||'', r.Recovery||'', r.Workload||'' ]);
-  });
-
-  // add current members as new rows (weekCode)
-  members.forEach(m=>{
-    membersSheet.addRow([ weekCode, team, m.name, m.ratings['Manageability']||'', m.ratings['Comprehensibility']||'', m.ratings['Meaningfulness']||'', m.ratings['Recovery']||'', m.workload!=null?m.workload:'' ]);
-  });
-
-  // Data validation: for the 4 area columns (D,E,F,G) starting at row 2 -> use lists!$A$1:$A$4
-  const lastRow = membersSheet.rowCount;
-  for(let r=2;r<=lastRow;r++){
-    for(let c=4;c<=7;c++){ // D..G
-      const cell = membersSheet.getCell(r,c);
-      cell.dataValidation = {
-        type: 'list',
-        allowBlank: true,
-        showInputMessage: true,
-        formulae: ['=Lists!$A$1:$A$4']
-      };
+    /* ------------------
+       Small UI helpers
+       ------------------ */
+    function openModal(html) {
+      document.getElementById("modalContent").innerHTML = html;
+      document.getElementById("modalBackdrop").style.display = "flex";
     }
-  }
+    function closeModal() {
+      document.getElementById("modalBackdrop").style.display = "none";
+    }
+    function openUsageInfo() { openModal(`<h3>${usageInfo.title}</h3>${usageInfo.html}`); }
+    function openMemberFileInfo() { openModal(`<h3>${memberFileInfo.title}</h3>${memberFileInfo.html}`); }
 
-  // Prepare filename
-  let fileName = document.getElementById('exportFileName').value.trim();
-  if(!fileName) {
-    if(lastImportedFilename) fileName = lastImportedFilename;
-    else fileName = (team.replace(/\s+/g,'_')||'team') + '_workbalance.xlsx';
-  }
-  if(!fileName.toLowerCase().endsWith('.xlsx')) fileName += '.xlsx';
+    function openAreaInfo(area) {
+      const info = areaInfo[area];
+      if (!info) return;
+      const html = `
+        <h3>${area}</h3>
+        <section><strong>Definition:</strong><br/>${info.definition}</section>
+        <section><strong>Reflection questions:</strong>
+          <ul>${info.questions.map(q => `<li>${q}</li>`).join("")}</ul>
+        </section>
+        <section>
+          <strong>Colour hints:</strong><br/>
+          • 🔵🟢 – keep and spread what works.<br/>
+          • 🟡 – follow up and agree on improvements.<br/>
+          • 🔴 – urgent: understand causes, act and consider escalation.
+        </section>`;
+      openModal(html);
+    }
 
-  // write & save
-  const buf = await wb.xlsx.writeBuffer();
-  const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-  saveAs(blob, fileName);
+    /* --------------------------
+       Init and basic UI behaviors
+       -------------------------- */
+    function initAreas() {
+      AREAS.forEach(a => areaData[a] = { blue:0, green:0, yellow:0, red:0 });
+      updateAreaCounts();
+      updateOverlayAreas();
+      updateWorkloadOverlay();
+    }
 
-  // update historyRows in memory so next import/export uses same file behaviour
-  // regenerate historyRows from membersSheet
-  const wsOut = membersSheet;
-  const json = [];
-  for(let r=2;r<=membersSheet.rowCount;r++){
-    const row = membersSheet.getRow(r).values.slice(1);
-    json.push({
-      Week: row[0]||'',
-      Team: row[1]||'',
-      Member: row[2]||'',
-      Manageability: row[3]||'',
-      Comprehensibility: row[4]||'',
-      Meaningfulness: row[5]||'',
-      Recovery: row[6]||'',
-      Workload: row[7]||''
+    function toggleMembersSection() {
+      const checked = document.getElementById("toggleMembers").checked;
+      document.getElementById("membersSection").style.display = checked ? "block" : "none";
+    }
+
+    function updateAreaCounts() {
+      AREAS.forEach(a => {
+        const el = document.getElementById("counts-" + a.replace(/\s/g,""));
+        if (!el) return;
+        const d = areaData[a];
+        el.innerHTML =
+          `<span><strong>B:</strong> ${d.blue}</span>` +
+          `<span><strong>G:</strong> ${d.green}</span>` +
+          `<span><strong>Y:</strong> ${d.yellow}</span>` +
+          `<span><strong>R:</strong> ${d.red}</span>`;
+      });
+    }
+
+    /* --------------------------
+       Status icon helpers
+       -------------------------- */
+    function makeStatusIcons(d) {
+      const total = (d.blue||0) + (d.green||0) + (d.yellow||0) + (d.red||0);
+      if (!total) return '<span style="font-size:11px;color:#666;">–</span>';
+      const tokens = [];
+      const addMany = (emoji, count) => { for (let i=0;i<count;i++) tokens.push(emoji); };
+      const maxIcons = 15;
+      const add = (emoji,count)=>{ const free = maxIcons - tokens.length; if (free<=0) return; addMany(emoji, Math.min(count, free)); };
+      add("🔵", d.blue||0); add("🟢", d.green||0); add("🟡", d.yellow||0); add("🔴", d.red||0);
+      let html = "";
+      tokens.forEach((t,i)=>{ if (i>0 && i%5===0) html += "<br>"; html += `<span>${t}</span>`; });
+      const extra = total - tokens.length;
+      if (extra > 0) html += `<span>+${extra}</span>`;
+      return html;
+    }
+
+    function snapshotString(d) {
+      const parts=[];
+      if (d.blue>0) parts.push("🔵 x"+d.blue);
+      if (d.green>0) parts.push("🟢 x"+d.green);
+      if (d.yellow>0) parts.push("🟡 x"+d.yellow);
+      if (d.red>0) parts.push("🔴 x"+d.red);
+      return parts.join("  ");
+    }
+
+    function updateOverlayAreas() {
+      AREAS.forEach(area => {
+        const overlay = document.getElementById("overlay-" + area);
+        if (!overlay) return;
+        const iconsDiv = overlay.querySelector(".overlay-icons");
+        iconsDiv.innerHTML = makeStatusIcons(areaData[area]);
+      });
+      // draw overlay dots on the image by creating small inline icons around the image's absolute positions
+      // (we keep this simple so visual layout is stable)
+    }
+
+    /* --------------------------
+       Member management + table
+       -------------------------- */
+    function addMember() {
+      const nameInput = document.getElementById("memberNameInput");
+      const name = nameInput.value.trim();
+      if (!name) return;
+      members.push({
+        name,
+        ratings: {},
+        emojis: { gratitude:false, heart:false, thumb:false },
+        workload: null
+      });
+      nameInput.value = "";
+      renderMembersTable();
+      recalcFromMembers();
+    }
+
+    function removeMember(index) {
+      members.splice(index,1);
+      renderMembersTable();
+      recalcFromMembers();
+    }
+
+    function renderMembersTable() {
+      const tbody = document.querySelector("#membersTable tbody");
+      tbody.innerHTML = "";
+      const team = document.getElementById("teamInput").value.trim();
+
+      members.forEach((m, idx) => {
+        const tr = document.createElement("tr");
+
+        // name
+        const nameTd = document.createElement("td");
+        nameTd.textContent = m.name;
+        tr.appendChild(nameTd);
+
+        // status dropdowns (🔵🟢🟡🔴)
+        AREAS.forEach(area => {
+          const td = document.createElement("td");
+          const sel = document.createElement("select");
+          sel.style.fontSize = "14px";
+          sel.style.textAlign = "center";
+          const options = [
+            { value:"",   label:""   },
+            { value:"blue",   label:"🔵" },
+            { value:"green",  label:"🟢" },
+            { value:"yellow", label:"🟡" },
+            { value:"red",    label:"🔴" }
+          ];
+          options.forEach(o => {
+            const opt = document.createElement("option");
+            opt.value = o.value;
+            opt.textContent = o.label;
+            if ((m.ratings[area] || "") === o.value) opt.selected = true;
+            sel.appendChild(opt);
+          });
+          sel.addEventListener("change", () => {
+            m.ratings[area] = sel.value;
+            recalcFromMembers();
+          });
+          td.appendChild(sel);
+          tr.appendChild(td);
+        });
+
+        // workload 1–4
+        const workloadTd = document.createElement("td");
+        const wlSelect = document.createElement("select");
+        wlSelect.style.fontSize = "11px";
+        const wlOptions = [
+          { value:"", label:"" },
+          { value:"1", label:"1" },
+          { value:"2", label:"2" },
+          { value:"3", label:"3" },
+          { value:"4", label:"4" }
+        ];
+        wlOptions.forEach(o => {
+          const opt = document.createElement("option");
+          opt.value = o.value;
+          opt.textContent = o.label;
+          if ((m.workload != null ? String(m.workload) : "") === o.value) opt.selected = true;
+          wlSelect.appendChild(opt);
+        });
+        wlSelect.addEventListener("change", () => {
+          const v = wlSelect.value;
+          m.workload = v ? parseInt(v,10) : null;
+          updateWorkloadOverlay();
+        });
+        workloadTd.appendChild(wlSelect);
+        tr.appendChild(workloadTd);
+
+        // recent 2 weeks horizontally
+        const prevTd = document.createElement("td");
+        prevTd.className = "prev-week-cell";
+        prevTd.innerHTML = buildRecentTwoWeeksStatus(m.name, team);
+        tr.appendChild(prevTd);
+
+        // remove
+        const removeTd = document.createElement("td");
+        const rm = document.createElement("button");
+        rm.className = "remove-btn";
+        rm.textContent = "X";
+        rm.title = "Remove member";
+        rm.onclick = () => removeMember(idx);
+        removeTd.appendChild(rm);
+        tr.appendChild(removeTd);
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* 2 latest weeks */
+    function buildRecentTwoWeeksStatus(name, team) {
+      if (!historyRows.length) return "";
+      const rows = historyRows.filter(r => r.Member === name && r.Team === team);
+      if (!rows.length) return "";
+
+      const seenWeeks = new Set();
+      const picked = [];
+
+      for (let i = rows.length - 1; i >= 0; i--) {
+        const r = rows[i];
+        const w = (r.Week || "").toString();
+        if (!w) continue;
+        if (!seenWeeks.has(w)) {
+          seenWeeks.add(w);
+          picked.push(r);
+          if (picked.length === 2) break;
+        }
+      }
+
+      picked.reverse();
+
+      return picked.map(r => {
+        const w = (r.Week || "").toString();
+        return `
+          <span class="prev-week-chip">
+            <strong>${w}</strong>
+            M:${mapDot(r.Manageability)}
+            C:${mapDot(r.Comprehensibility)}
+            Me:${mapDot(r.Meaningfulness)}
+            R:${mapDot(r.Recovery)}
+          </span>
+        `;
+      }).join("");
+    }
+
+    function mapDot(c) {
+      c = (c || "").toLowerCase();
+      if (c === "blue") return "🔵";
+      if (c === "green") return "🟢";
+      if (c === "yellow") return "🟡";
+      if (c === "red") return "🔴";
+      return "⚪";
+    }
+
+    /* --------------------------
+       Recalculate totals from members
+       -------------------------- */
+    function recalcFromMembers() {
+      AREAS.forEach(a => areaData[a] = { blue:0, green:0, yellow:0, red:0 });
+      overall.blue = overall.green = overall.yellow = overall.red = 0;
+
+      members.forEach(m => {
+        AREAS.forEach(a => {
+          const c = (m.ratings[a] || "").toLowerCase();
+          if (c && areaData[a][c] !== undefined) {
+            areaData[a][c]++;
+            overall[c]++;
+          }
+        });
+      });
+
+      updateAreaCounts();
+      updateOverlayAreas();
+      updateWorkloadOverlay();
+      // update the visual overlay positions (kept simple)
+      // update history circles as well
+      renderHistoryCirclesForTeam(document.getElementById("teamInput").value.trim());
+    }
+
+    /* --------------------------
+       Workload avg overlay
+       -------------------------- */
+    function updateWorkloadOverlay() {
+      const bar = document.getElementById("workloadBarInner");
+      const valueEl = document.getElementById("workloadAvgValue");
+      if (!bar || !valueEl) return;
+
+      let sum = 0;
+      let count = 0;
+      members.forEach(m => {
+        if (typeof m.workload === "number" && m.workload >= 1 && m.workload <= 4) {
+          sum += m.workload;
+          count++;
+        }
+      });
+
+      if (!count) {
+        bar.style.height = "0%";
+        valueEl.textContent = "–";
+        return;
+      }
+
+      const avg = sum / count;
+      const pct = Math.min(100, Math.max(0, (avg / 4) * 100));
+      bar.style.height = pct + "%";
+      valueEl.textContent = avg.toFixed(1) + " / 4";
+    }
+
+    /* --------------------------
+       Year/week selectors (YYWW)
+       -------------------------- */
+    function initYearWeekSelectors() {
+      const yearSelect = document.getElementById("yearSelect");
+      const weekSelect = document.getElementById("weekSelect");
+
+      const now = new Date();
+      const currentYear = now.getFullYear();
+
+      [currentYear - 1, currentYear, currentYear + 1].forEach(y => {
+        const opt = document.createElement("option");
+        opt.value = y;
+        opt.textContent = y;
+        if (y === currentYear) opt.selected = true;
+        yearSelect.appendChild(opt);
+      });
+
+      for (let w = 1; w <= 53; w++) {
+        const opt = document.createElement("option");
+        opt.value = w;
+        opt.textContent = w.toString().padStart(2, "0");
+        weekSelect.appendChild(opt);
+      }
+
+      weekSelect.value = getISOWeek(now);
+      updateWeekCodeDisplay();
+
+      yearSelect.addEventListener("change", updateWeekCodeDisplay);
+      weekSelect.addEventListener("change", updateWeekCodeDisplay);
+    }
+
+    function getYearWeekCode() {
+      const year = parseInt(document.getElementById("yearSelect").value, 10);
+      const week = parseInt(document.getElementById("weekSelect").value, 10);
+      if (!year || !week) return "";
+      const yy = (year % 100).toString().padStart(2,"0");
+      const ww = week.toString().padStart(2,"0");
+      return yy + ww;
+    }
+
+    function updateWeekCodeDisplay() {
+      document.getElementById("weekCodeDisplay").value = getYearWeekCode();
+    }
+
+    function getISOWeek(date) {
+      const tmp = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+      const dayNum = tmp.getUTCDay() || 7;
+      tmp.setUTCDate(tmp.getUTCDate() + 4 - dayNum);
+      const yearStart = new Date(Date.UTC(tmp.getUTCFullYear(),0,1));
+      const week = Math.ceil((((tmp - yearStart) / 86400000) + 1)/7);
+      return week;
+    }
+
+    function setYearWeekFromCode(code) {
+      if (!/^\d{4}$/.test(code)) return;
+      const yy = parseInt(code.slice(0,2),10);
+      const ww = parseInt(code.slice(2,4),10);
+      const year = 2000 + yy;
+      const yearSelect = document.getElementById("yearSelect");
+      const weekSelect = document.getElementById("weekSelect");
+
+      if (![...yearSelect.options].some(o => parseInt(o.value,10) === year)) {
+        const opt = document.createElement("option");
+        opt.value = year;
+        opt.textContent = year;
+        yearSelect.appendChild(opt);
+      }
+      yearSelect.value = year;
+      weekSelect.value = ww;
+      updateWeekCodeDisplay();
+    }
+
+    function incrementWeekCode(code) {
+      if (!/^\d{4}$/.test(code)) return code;
+      let yy = parseInt(code.slice(0,2),10);
+      let ww = parseInt(code.slice(2,4),10);
+      ww += 1;
+      if (ww > 53) {
+        ww = 1;
+        yy += 1;
+        if (yy > 99) yy = 0;
+      }
+      const yyStr = yy.toString().padStart(2,"0");
+      const wwStr = ww.toString().padStart(2,"0");
+      return yyStr + wwStr;
+    }
+
+    /* --------------------------
+       History circles rendering
+       -------------------------- */
+    function renderHistoryCirclesForTeam(team) {
+      const container = document.getElementById("historyCirclesContainer");
+      container.innerHTML = "";
+      if (!team || !historyRows.length) return;
+
+      const rows = historyRows.filter(r => (r.Team || "") === team);
+      if (!rows.length) return;
+
+      const weekOrder = [];
+      rows.forEach(r => {
+        const w = (r.Week || "").toString();
+        if (!w) return;
+        if (!weekOrder.includes(w)) weekOrder.push(w);
+      });
+      if (!weekOrder.length) return;
+
+      const selectedWeeks = weekOrder.slice(-4);
+
+      const weekData = {};
+      selectedWeeks.forEach(w => {
+        weekData[w] = {};
+        AREAS.forEach(a => weekData[w][a] = { blue:0, green:0, yellow:0, red:0 });
+      });
+
+      rows.forEach(r => {
+        const w = (r.Week || "").toString();
+        if (!selectedWeeks.includes(w)) return;
+        AREAS.forEach(a => {
+          const val = r[a] || "";
+          const c = val.toLowerCase();
+          if (weekData[w][a][c] !== undefined) weekData[w][a][c]++;
+        });
+      });
+
+      selectedWeeks.forEach(w => {
+        const block = document.createElement("div");
+        block.className = "history-circle-block";
+
+        const label = document.createElement("div");
+        label.className = "history-circle-week";
+        label.textContent = "Week " + w;
+        block.appendChild(label);
+
+        const wrap = document.createElement("div");
+        wrap.className = "history-circle-wrapper";
+
+        const img = document.createElement("img");
+        img.src = "workbalance_circle.png";
+        img.alt = "Workbalance " + w;
+        img.className = "history-circle-img";
+        wrap.appendChild(img);
+
+        const aList = AREAS;
+        const posClasses = ["history-overlay-manage","history-overlay-comp","history-overlay-mean","history-overlay-recov"];
+
+        aList.forEach((a,i) => {
+          const ov = document.createElement("div");
+          ov.className = "history-overlay " + posClasses[i];
+          ov.innerHTML = makeStatusIcons(weekData[w][a]);
+          wrap.appendChild(ov);
+        });
+
+        block.appendChild(wrap);
+        container.appendChild(block);
+      });
+    }
+
+    /* --------------------------
+       IMPORT (ExcelJS) - robust
+       -------------------------- */
+    async function handleMemberFileImport(file) {
+      if (!file) return;
+      lastImportedFilename = file.name || null;
+
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const wb = new ExcelJS.Workbook();
+        await wb.xlsx.load(arrayBuffer);
+
+        // Prefer MembersDetails sheet if present (row-per-member-week)
+        let wsDetails = wb.getWorksheet('MembersDetails');
+        if (wsDetails) {
+          const rows = [];
+          wsDetails.eachRow((row, rnum) => {
+            if (rnum === 1) return;
+            const vals = row.values.slice(1);
+            rows.push({
+              Week: String(vals[0] || ''),
+              Team: String(vals[1] || ''),
+              Member: String(vals[2] || ''),
+              Manageability: String(vals[3] || ''),
+              Comprehensibility: String(vals[4] || ''),
+              Meaningfulness: String(vals[5] || ''),
+              Recovery: String(vals[6] || ''),
+              Workload: vals[7] || ''
+            });
+          });
+          if (!rows.length) {
+            alert("MembersDetails sheet found but empty.");
+            return;
+          }
+          historyRows = rows;
+          const last = historyRows[historyRows.length - 1];
+          const lastTeam = last.Team || "";
+          const lastWeekCode = (last.Week || "").toString();
+
+          document.getElementById("teamInput").value = lastTeam;
+          if (/^\d{4}$/.test(lastWeekCode)) {
+            const nextCode = incrementWeekCode(lastWeekCode);
+            setYearWeekFromCode(nextCode);
+          } else {
+            updateWeekCodeDisplay();
+          }
+
+          // Only members present in latest week
+          const latestByName = {};
+          historyRows.forEach(r => {
+            if (!r.Member) return;
+            if (r.Team !== lastTeam) return;
+            const w = (r.Week || "").toString();
+            if (w !== lastWeekCode) return;
+            latestByName[r.Member] = r;
+          });
+
+          members = [];
+          Object.keys(latestByName).forEach(name => {
+            members.push({
+              name,
+              ratings: {},
+              emojis: { gratitude:false, heart:false, thumb:false },
+              workload: null
+            });
+          });
+
+          document.getElementById("toggleMembers").checked = true;
+          document.getElementById("membersSection").style.display = "block";
+
+          renderMembersTable();
+          AREAS.forEach(a => areaData[a] = { blue:0, green:0, yellow:0, red:0 });
+          overall.blue = overall.green = overall.yellow = overall.red = 0;
+          updateAreaCounts();
+          updateOverlayAreas();
+          updateWorkloadOverlay();
+          renderHistoryCirclesForTeam(lastTeam);
+
+          alert("History imported from MembersDetails. Team members loaded from the latest week, statuses cleared and week advanced by one step (YYWW).");
+          return;
+        }
+
+        // Otherwise try to read Members sheet (members-as-rows/weeks-as-columns)
+        let ws = wb.getWorksheet('Members') || wb.worksheets[0];
+        if (!ws) {
+          alert("No usable sheet found in the imported file.");
+          return;
+        }
+
+        // Read header row
+        const headerRow = ws.getRow(1).values.slice(1);
+        const normalized = headerRow.map(h => (h || '').toString().trim());
+        let memberCol = normalized.findIndex(h => /member/i.test(h));
+        let teamCol   = normalized.findIndex(h => /team/i.test(h));
+        if (memberCol === -1) memberCol = 0;
+        if (teamCol === -1) teamCol = 1;
+
+        const weekCols = [];
+        normalized.forEach((h, idx) => {
+          if (idx === memberCol || idx === teamCol) return;
+          const v = (h || '').toString().trim();
+          if (/^\d{4}$/.test(v)) weekCols.push({ colIndex: idx + 1, code: v });
+        });
+
+        if (!weekCols.length) {
+          alert('Imported Members sheet must contain week columns in YYWW format (e.g. 2520).');
+          return;
+        }
+
+        // parse rows: each week cell expected to have encoded area values or single color
+        const rows = [];
+        ws.eachRow((row, rnum) => {
+          if (rnum === 1) return;
+          const vals = row.values.slice(1);
+          const memberName = String(vals[memberCol] || '').trim();
+          const teamName = String(vals[teamCol] || '').trim();
+          if (!memberName) return;
+          weekCols.forEach(wc => {
+            const cell = row.getCell(wc.colIndex).value;
+            if (!cell) return;
+            const s = String(cell).trim();
+            let parsed = { Manageability:'', Comprehensibility:'', Meaningfulness:'', Recovery:'', Workload:'' };
+            if (/[:,;]/.test(s)) {
+              const parts = s.split(/[,;]+/);
+              parts.forEach(p => {
+                const m = p.split(/[:=]/);
+                if (m.length >= 2) {
+                  const key = m[0].trim();
+                  const val = m[1].trim().toLowerCase();
+                  if (/manage/i.test(key)) parsed.Manageability = val;
+                  if (/comp/i.test(key)) parsed.Comprehensibility = val;
+                  if (/mean/i.test(key)) parsed.Meaningfulness = val;
+                  if (/recov/i.test(key)) parsed.Recovery = val;
+                  if (/work/i.test(key)) parsed.Workload = val;
+                }
+              });
+            } else {
+              const col = s.toLowerCase();
+              if (['blue','green','yellow','red'].includes(col)) {
+                parsed = { Manageability: col, Comprehensibility: col, Meaningfulness: col, Recovery: col, Workload: '' };
+              } else {
+                // unknown -> skip
+                return;
+              }
+            }
+            rows.push({
+              Week: wc.code,
+              Team: teamName,
+              Member: memberName,
+              Manageability: parsed.Manageability || '',
+              Comprehensibility: parsed.Comprehensibility || '',
+              Meaningfulness: parsed.Meaningfulness || '',
+              Recovery: parsed.Recovery || '',
+              Workload: parsed.Workload || ''
+            });
+          });
+        });
+
+        if (!rows.length) {
+          alert('No historical data rows could be parsed from the imported sheet.');
+          return;
+        }
+
+        historyRows = rows.slice();
+        const last = historyRows[historyRows.length - 1];
+        const lastTeam = last.Team || '';
+        const lastWeekCode = (last.Week || '').toString();
+        document.getElementById("teamInput").value = lastTeam;
+
+        if (/^\d{4}$/.test(lastWeekCode)) {
+          const nextCode = incrementWeekCode(lastWeekCode);
+          setYearWeekFromCode(nextCode);
+        } else {
+          updateWeekCodeDisplay();
+        }
+
+        // Only members present in latest week
+        const latestByName = {};
+        historyRows.forEach(r => {
+          if (!r.Member) return;
+          if (r.Team !== lastTeam) return;
+          const w = (r.Week || '').toString();
+          if (w !== lastWeekCode) return;
+          latestByName[r.Member] = r;
+        });
+
+        members = [];
+        Object.keys(latestByName).forEach(name => {
+          members.push({
+            name,
+            ratings: {},
+            emojis: { gratitude:false, heart:false, thumb:false },
+            workload: null
+          });
+        });
+
+        document.getElementById("toggleMembers").checked = true;
+        document.getElementById("membersSection").style.display = "block";
+
+        renderMembersTable();
+        AREAS.forEach(a => areaData[a] = { blue:0, green:0, yellow:0, red:0 });
+        overall.blue = overall.green = overall.yellow = overall.red = 0;
+        updateAreaCounts();
+        updateOverlayAreas();
+        updateWorkloadOverlay();
+        renderHistoryCirclesForTeam(lastTeam);
+
+        alert("History imported. Members loaded from latest week, statuses cleared and week advanced.");
+      } catch (err) {
+        console.error(err);
+        alert("Import failed: " + (err && err.message ? err.message : err));
+      }
+    }
+
+    function triggerGlobalImport() {
+      const toggle = document.getElementById("toggleMembers");
+      if (!toggle.checked) {
+        toggle.checked = true;
+        document.getElementById("membersSection").style.display = "block";
+      }
+      document.getElementById("globalMemberFileInput").click();
+    }
+
+    function handleGlobalImportFile(file) {
+      if (!file) return;
+      handleMemberFileImport(file);
+      document.getElementById("globalMemberFileInput").value = "";
+    }
+
+    /* --------------------------
+       EXPORT (ExcelJS) - robust, with validation and snapshot
+       -------------------------- */
+    async function exportToExcel() {
+      const team = document.getElementById("teamInput").value.trim();
+      const weekCode = getYearWeekCode();
+
+      if (!team) {
+        alert("Please enter a team name before exporting.");
+        return;
+      }
+      if (!weekCode || !/^\d{4}$/.test(weekCode)) {
+        alert("Please select a valid year and week so that a YYWW code can be created.");
+        return;
+      }
+
+      // Prevent duplicate week for this team
+      const exists = historyRows.some(r => (r.Team || "") === team && (r.Week || "") === weekCode);
+      if (exists) {
+        alert("This week code (YYWW) already exists for this team in the history file. Please choose a new week so history can grow.");
+        return;
+      }
+
+      // Build map of members => weeks (merge previous historyRows + current members)
+      const membersMap = {};
+      (historyRows || []).forEach(r => {
+        const name = r.Member || '';
+        if (!name) return;
+        if (!membersMap[name]) membersMap[name] = { Team: r.Team || team, weeks: {} };
+        membersMap[name].weeks[r.Week] = {
+          Manageability: r.Manageability || '',
+          Comprehensibility: r.Comprehensibility || '',
+          Meaningfulness: r.Meaningfulness || '',
+          Recovery: r.Recovery || '',
+          Workload: r.Workload || ''
+        };
+      });
+
+      members.forEach(m => {
+        if (!m.name) return;
+        if (!membersMap[m.name]) membersMap[m.name] = { Team: team, weeks: {} };
+        membersMap[m.name].weeks[weekCode] = {
+          Manageability: (m.ratings["Manageability"] || ""),
+          Comprehensibility: (m.ratings["Comprehensibility"] || ""),
+          Meaningfulness: (m.ratings["Meaningfulness"] || ""),
+          Recovery: (m.ratings["Recovery"] || ""),
+          Workload: (m.workload != null ? String(m.workload) : "")
+        };
+      });
+
+      // Determine existing weeks (sorted)
+      const existingWeeks = Array.from(new Set([].concat((historyRows||[]).map(r => r.Week || ""), [weekCode]).filter(Boolean)));
+      existingWeeks.sort();
+
+      // ExcelJS workbook
+      try {
+        const wb = new ExcelJS.Workbook();
+        wb.creator = 'Workbalance tool';
+        wb.created = new Date();
+
+        // Lists sheet for validation
+        const lists = wb.addWorksheet('Lists');
+        lists.getCell('A1').value = 'blue';
+        lists.getCell('A2').value = 'green';
+        lists.getCell('A3').value = 'yellow';
+        lists.getCell('A4').value = 'red';
+
+        // Members sheet: members as rows, week-columns encoded
+        const membersSheet = wb.addWorksheet('Members');
+        membersSheet.addRow(['Member','Team', ...existingWeeks]);
+        Object.keys(membersMap).sort().forEach(name => {
+          const mp = membersMap[name];
+          const row = [name, mp.Team || team];
+          existingWeeks.forEach(w => {
+            const wk = mp.weeks[w];
+            if (!wk) row.push('');
+            else {
+              const encoded = `Manageability:${wk.Manageability||''};Comprehensibility:${wk.Comprehensibility||''};Meaningfulness:${wk.Meaningfulness||''};Recovery:${wk.Recovery||''};Workload:${wk.Workload||''}`;
+              row.push(encoded);
+            }
+          });
+          membersSheet.addRow(row);
+        });
+
+        // MembersDetails sheet (row-per-member-week)
+        const details = wb.addWorksheet('MembersDetails');
+        details.addRow(['Week','Team','Member','Manageability','Comprehensibility','Meaningfulness','Recovery','Workload']);
+        Object.keys(membersMap).sort().forEach(name => {
+          const mp = membersMap[name];
+          Object.keys(mp.weeks).forEach(w => {
+            const wk = mp.weeks[w];
+            details.addRow([w, mp.Team || team, name, wk.Manageability || '', wk.Comprehensibility || '', wk.Meaningfulness || '', wk.Recovery || '', wk.Workload || '']);
+          });
+        });
+
+        // Summary
+        const wsSummary = wb.addWorksheet('Summary');
+        wsSummary.addRow(['Workbalance – TRATON']);
+        wsSummary.addRow([]);
+        wsSummary.addRow(['Team', team]);
+        wsSummary.addRow(['Week (YYWW)', weekCode]);
+        wsSummary.addRow([]);
+        wsSummary.addRow(['Area','Blue (excellent)','Green (good)','Yellow (insufficient)','Red (poor)']);
+        AREAS.forEach(a => {
+          const d = areaData[a] || { blue:0, green:0, yellow:0, red:0};
+          wsSummary.addRow([a, d.blue, d.green, d.yellow, d.red]);
+        });
+        wsSummary.addRow(['Total', overall.blue, overall.green, overall.yellow, overall.red]);
+
+        // CircleSnapshot: try to include image captured from the displayed image
+        const snapSheet = wb.addWorksheet('CircleSnapshot');
+
+        // Try to convert displayed image to a base64; if cross-origin block occurs we skip image.
+        let embeddedImageId = null;
+        try {
+          const imgEl = document.getElementById('mainCircleImg');
+          // create an offscreen canvas to draw the image
+          const canvas = document.createElement('canvas');
+          canvas.width = imgEl.naturalWidth || imgEl.width || 560;
+          canvas.height = imgEl.naturalHeight || imgEl.height || 560;
+          const ctx = canvas.getContext('2d');
+          // try to draw; if image is cross-origin without permissive CORS this will throw when calling toDataURL
+          ctx.drawImage(imgEl, 0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL('image/png');
+          const base64 = dataUrl.split(',')[1];
+          embeddedImageId = wb.addImage({ base64: base64, extension: 'png' });
+          snapSheet.addImage(embeddedImageId, { tl: { col: 0.2, row: 0.5 }, ext: { width: 720, height: 720 } });
+        } catch (e) {
+          // embedding image failed (likely CORS). Continue without image.
+          console.warn('Could not embed circle snapshot (CORS?):', e);
+          snapSheet.getCell('A1').value = 'Circle image could not be embedded due to CORS / security restrictions. The snapshot will still be available in browser if you download image separately.';
+        }
+
+        snapSheet.getCell('H2').value = 'Areas explanation';
+        snapSheet.getCell('H3').value = 'Manageability: Balance of resources & demands';
+        snapSheet.getCell('H4').value = 'Comprehensibility: Coherence & clarity';
+        snapSheet.getCell('H5').value = 'Meaningfulness: Appreciation & involvement';
+        snapSheet.getCell('H6').value = 'Recovery: Ability to rest & recover';
+
+        // Apply dataValidation to MembersDetails columns D..G
+        const lastRow = details.rowCount;
+        for (let r = 2; r <= lastRow; r++) {
+          for (let c = 4; c <= 7; c++) {
+            const cell = details.getRow(r).getCell(c);
+            cell.dataValidation = {
+              type: 'list',
+              allowBlank: true,
+              showErrorMessage: true,
+              formulae: ['=Lists!$A$1:$A$4']
+            };
+          }
+        }
+
+        // Save
+        let fileName;
+        const exportInput = document.getElementById('exportFileName').value.trim();
+        if (exportInput) fileName = exportInput;
+        else if (lastImportedFilename) fileName = lastImportedFilename;
+        else fileName = (team.replace(/\s+/g,"_") || "team") + "_workbalance.xlsx";
+        if (!fileName.toLowerCase().endsWith('.xlsx')) fileName += '.xlsx';
+
+        const buffer = await wb.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+        saveAs(blob, fileName);
+
+        // regenerate historyRows from details sheet for in-memory continuity
+        const exportedHistory = [];
+        details.eachRow((row, rnum) => {
+          if (rnum === 1) return;
+          const vals = row.values.slice(1);
+          exportedHistory.push({
+            Week: String(vals[0] || ''),
+            Team: String(vals[1] || ''),
+            Member: String(vals[2] || ''),
+            Manageability: String(vals[3] || ''),
+            Comprehensibility: String(vals[4] || ''),
+            Meaningfulness: String(vals[5] || ''),
+            Recovery: String(vals[6] || ''),
+            Workload: String(vals[7] || '')
+          });
+        });
+        historyRows = exportedHistory;
+        lastImportedFilename = fileName;
+        alert('Exported ' + fileName);
+      } catch (err) {
+        console.error(err);
+        alert('Export failed: ' + (err.message || err));
+      }
+    }
+
+    /* --------------------------
+       Fun effects (unchanged)
+       -------------------------- */
+    function runCelebration() {
+      if (typeof confetti === "undefined") {
+        alert("Celebration effect is not available.");
+        return;
+      }
+      const duration = 2500;
+      const end = Date.now() + duration;
+      (function frame() {
+        confetti({
+          particleCount: 10,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      })();
+    }
+
+    function spawnEmojiRain(emojis, durationMs = 3800, count = 40) {
+      const overlay = document.createElement("div");
+      overlay.className = "emoji-overlay";
+      document.body.appendChild(overlay);
+
+      for (let i = 0; i < count; i++) {
+        const span = document.createElement("span");
+        span.className = "emoji-float";
+        span.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        span.style.left = Math.random() * 100 + "%";
+        span.style.fontSize = (24 + Math.random() * 18) + "px";
+        span.style.animationDelay = (Math.random() * 0.7) + "s";
+        overlay.appendChild(span);
+      }
+
+      setTimeout(() => {
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      }, durationMs);
+    }
+
+    function runWarmHug() { spawnEmojiRain(["🤗","❤️","✨","🤝"],3800,40); }
+    function runTruckBoost() { spawnEmojiRain(["🚚","🚛","🛣️","⭐"],3800,40); }
+    function runLeaderBoost() { spawnEmojiRain(["🧑‍💼","📈","🚀","🏆"],3800,40); }
+
+    /* --------------------------
+       Utility helpers
+       -------------------------- */
+    function makeStatusIconsSmall(d) {
+      return makeStatusIcons(d);
+    }
+
+    /* --------------------------
+       Init on load
+       -------------------------- */
+    window.addEventListener("DOMContentLoaded", () => {
+      initAreas();
+      initYearWeekSelectors();
     });
-  }
-  historyRows = json;
-  lastImportedFilename = fileName;
-  alert('Exported ' + fileName);
-}
-
-/* ======= Celebration & fun ======= */
-function runCelebration(){ if(typeof confetti !== 'undefined') { const end=Date.now()+2000; (function frame(){ confetti({particleCount:10,spread:70,origin:{y:0.6}}); if(Date.now()<end) requestAnimationFrame(frame); })(); } }
-function spawnEmojiRain(set,duration=3800,count=40){ const overlay=document.createElement('div'); overlay.className='emoji-overlay'; document.body.appendChild(overlay); for(let i=0;i<count;i++){ const span=document.createElement('span'); span.className='emoji-float'; span.textContent=set[Math.floor(Math.random()*set.length)]; span.style.left=(Math.random()*100)+'%'; span.style.fontSize=(24+Math.random()*18)+'px'; span.style.animationDelay=(Math.random()*0.7)+'s'; overlay.appendChild(span); } setTimeout(()=>{ if(overlay.parentNode) overlay.parentNode.removeChild(overlay); }, duration); }
-function runWarmHug(){ spawnEmojiRain(["🤗","❤️","✨","🤝"],3800,40); }
-function runTruckBoost(){ spawnEmojiRain(["🚚","🚛","🛣️","⭐"],3800,40); }
-function runLeaderBoost(){ spawnEmojiRain(["🧑‍💼","📈","🚀","🏆"],3800,40); }
-
-/* ======= Helpers & init ======= */
-function toggleMembersSection(){ const checked=document.getElementById('toggleMembers').checked; document.getElementById('membersSection').style.display = checked? 'block':'none'; }
-function updateOverlayAreas(){ recalcFromMembers(); } // recalc draws
-window.addEventListener('DOMContentLoaded', ()=>{ initAreas(); initYearWeekSelectors(); });
-
-</script>
+  </script>
 </body>
 </html>
