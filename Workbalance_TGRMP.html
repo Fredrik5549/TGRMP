@@ -590,7 +590,7 @@
     </div>
   </div>
 
-  <!-- Library -->
+  <!-- Library for Excel export with styling -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 
   <script>
@@ -642,22 +642,12 @@
     const usageInfo = {
       title: "How to use this page",
       html: `
-        <section>
-          <strong>1. Select team and week</strong><br/>
-          Enter the team name and select the week (YYWW).
-        </section>
-        <section>
-          <strong>2. Rate each area</strong><br/>
-          Click the colour buttons for each area to represent the voices in the team.
-          The icons on the circle show how many blue, green, yellow and red you have per area.
-        </section>
-        <section>
-          <strong>3. Team member view (optional)</strong><br/>
-          Turn on “Add status per team member” to rate per person. The circle is calculated from members for the selected week.
-        </section>
-        <section>
-          <strong>4. Excel import/export</strong><br/>
-          You can fill values directly in Excel (even future weeks). Import restores those values. Export suggests the imported filename.
+        <section><strong>1. Select team and week</strong><br/>Enter the team name and select the week (YYWW).</section>
+        <section><strong>2. Rate each area</strong><br/>Click the colour buttons for each area. The icons on the circle show how many blue, green, yellow and red you have per area.</section>
+        <section><strong>3. Team member view (optional)</strong><br/>Turn on “Add status per team member” to rate per person. The circle is calculated from members for the selected week.</section>
+        <section><strong>4. Excel import/export</strong><br/>
+          You can fill values directly in Excel (including future weeks). Import restores those values.
+          Export includes the selected week + the next <strong>3</strong> weeks, and shows the newest weeks on the left to minimize horizontal scrolling.
         </section>
       `
     };
@@ -665,23 +655,13 @@
     const memberFileInfo = {
       title: "Import / export for Excel",
       html: `
-        <section>
-          <strong>Meta</strong><br/>
-          The Excel file contains a sheet called <em>Meta</em> where the team name is stored.
+        <section><strong>Meta</strong><br/>The Excel file contains a sheet called <em>Meta</em> where the team name is stored.</section>
+        <section><strong>Data</strong><br/>
+          The main sheet is <em>Data</em>: Member | Area | Week columns (YYWW). Type: <code>blue</code>, <code>green</code>, <code>yellow</code>, <code>red</code> (or leave empty).
+          The newest weeks are placed on the left in export.
         </section>
-        <section>
-          <strong>Data</strong><br/>
-          The main sheet is <em>Data</em>: each person has four rows (one per area) and weeks are columns (YYWW).<br/>
-          Type: <code>blue</code>, <code>green</code>, <code>yellow</code>, <code>red</code> (or leave empty).
-        </section>
-        <section>
-          <strong>Workload</strong><br/>
-          Separate sheet with workload 1–4 per person and week.
-        </section>
-        <section>
-          <strong>Save As</strong><br/>
-          Browsers cannot silently overwrite files. Export uses Save As when available; otherwise it downloads a file.
-        </section>
+        <section><strong>Workload</strong><br/>Separate sheet with workload 1–4 per person and week.</section>
+        <section><strong>Save As</strong><br/>Browsers cannot silently overwrite files. Export uses a Save As dialog in Edge/Chrome when allowed.</section>
       `
     };
 
@@ -718,6 +698,7 @@
 
     function initAreas() {
       areas.forEach(a => areaData[a] = { blue:0, green:0, yellow:0, red:0 });
+      areas.forEach(updateAreaCounts);
       updateOverlayAreas();
       updateWorkloadOverlay();
     }
@@ -725,7 +706,19 @@
     function increment(area, colour) {
       areaData[area][colour]++;
       overall[colour]++;
+      updateAreaCounts(area);
       updateOverlayAreas();
+    }
+
+    function updateAreaCounts(area) {
+      const el = document.getElementById("counts-" + area.replace(/\s/g,""));
+      if (!el) return;
+      const d = areaData[area];
+      el.innerHTML =
+        `<span><strong>B:</strong> ${d.blue}</span>` +
+        `<span><strong>G:</strong> ${d.green}</span>` +
+        `<span><strong>Y:</strong> ${d.yellow}</span>` +
+        `<span><strong>R:</strong> ${d.red}</span>`;
     }
 
     function makeStatusIcons(d) {
@@ -796,6 +789,7 @@
         alert("That member already exists.");
         return;
       }
+
       members.push({ name, ratings: {}, workload: null });
       nameInput.value = "";
       renderMembersTable();
@@ -833,6 +827,7 @@
             { value:"yellow", label:"🟡" },
             { value:"red", label:"🔴" }
           ];
+
           options.forEach(o => {
             const opt = document.createElement("option");
             opt.value = o.value;
@@ -853,13 +848,14 @@
         const workloadTd = document.createElement("td");
         const wlSelect = document.createElement("select");
         wlSelect.style.fontSize = "11px";
-        [
+        const wlOptions = [
           { value:"", label:"" },
           { value:"1", label:"1" },
           { value:"2", label:"2" },
           { value:"3", label:"3" },
           { value:"4", label:"4" }
-        ].forEach(o => {
+        ];
+        wlOptions.forEach(o => {
           const opt = document.createElement("option");
           opt.value = o.value;
           opt.textContent = o.label;
@@ -906,6 +902,7 @@
         });
       });
 
+      areas.forEach(updateAreaCounts);
       updateOverlayAreas();
       updateWorkloadOverlay();
     }
@@ -914,7 +911,8 @@
       const bar = document.getElementById("workloadBarInner");
       const valueEl = document.getElementById("workloadAvgValue");
 
-      let sum = 0, count = 0;
+      let sum = 0;
+      let count = 0;
       members.forEach(m => {
         if (typeof m.workload === "number" && m.workload >= 1 && m.workload <= 4) {
           sum += m.workload;
@@ -927,6 +925,7 @@
         valueEl.textContent = "–";
         return;
       }
+
       const avg = sum / count;
       const pct = Math.min(100, Math.max(0, (avg / 4) * 100));
       bar.style.height = pct + "%";
@@ -1117,15 +1116,21 @@
       return Math.ceil((((tmp - yearStart) / 86400000) + 1)/7);
     }
 
-    /* ---------- Excel model ---------- */
+    /* ---------- Excel model ----------
+       Sheets:
+       - Meta
+       - Data: Member | Area | YYWW | YYWW | ...
+       - Workload: Member | YYWW | YYWW | ...
+    ------------------------------------------------------ */
     const excelModel = {
       team: "",
       weeks: [],
       members: new Set(),
-      ratings: new Map(),
-      workload: new Map(),
+      ratings: new Map(),   // key: member||area||week => color
+      workload: new Map(),  // key: member||week => "1".."4"
       loaded: false
     };
+
     let lastImportedFilename = null;
 
     function normalizeColor(v) {
@@ -1142,7 +1147,6 @@
       if (!/^\d{4}$/.test(code)) return;
       if (!excelModel.weeks.includes(code)) {
         excelModel.weeks.push(code);
-        excelModel.weeks.sort();
       }
     }
 
@@ -1214,91 +1218,95 @@
 
       const reader = new FileReader();
       reader.onload = e => {
-        try {
-          const data = new Uint8Array(e.target.result);
-          const wb = XLSX.read(data, { type: "array" });
+        const data = new Uint8Array(e.target.result);
+        const wb = XLSX.read(data, { type: "array" });
 
-          excelModel.team = "";
-          excelModel.weeks = [];
-          excelModel.members = new Set();
-          excelModel.ratings = new Map();
-          excelModel.workload = new Map();
-          excelModel.loaded = true;
+        excelModel.team = "";
+        excelModel.weeks = [];
+        excelModel.members = new Set();
+        excelModel.ratings = new Map();
+        excelModel.workload = new Map();
+        excelModel.loaded = true;
 
-          const meta = wb.Sheets["Meta"];
-          if (meta) {
-            const metaAOA = XLSX.utils.sheet_to_json(meta, { header: 1, defval: "" });
-            if (metaAOA && metaAOA[0] && String(metaAOA[0][0]).toLowerCase().includes("team")) {
-              excelModel.team = String(metaAOA[0][1] || "").trim();
-            }
+        const meta = wb.Sheets["Meta"];
+        if (meta) {
+          const metaAOA = XLSX.utils.sheet_to_json(meta, { header: 1, defval: "" });
+          if (metaAOA && metaAOA[0] && String(metaAOA[0][0]).toLowerCase().includes("team")) {
+            excelModel.team = String(metaAOA[0][1] || "").trim();
           }
-          if (excelModel.team) document.getElementById("teamInput").value = excelModel.team;
-
-          const dataSheet = wb.Sheets["Data"] || wb.Sheets["Members"] || wb.Sheets[wb.SheetNames[0]];
-          if (!dataSheet) { alert("No sheet found."); return; }
-
-          const aoa = XLSX.utils.sheet_to_json(dataSheet, { header: 1, defval: "" });
-          if (!aoa.length || aoa.length < 2) { alert("Data sheet is empty."); return; }
-
-          const header = aoa[0].map(x => String(x || "").trim());
-          const weekCols = [];
-          for (let c = 2; c < header.length; c++) {
-            if (/^\d{4}$/.test(header[c])) {
-              weekCols.push({ c, code: header[c] });
-              ensureWeek(header[c]);
-            }
-          }
-          if (!weekCols.length) { alert("Data sheet must have week columns in YYWW format."); return; }
-
-          for (let r = 1; r < aoa.length; r++) {
-            const row = aoa[r] || [];
-            const member = String(row[0] || "").trim();
-            const area = String(row[1] || "").trim();
-            if (!member || !areas.includes(area)) continue;
-
-            excelModel.members.add(member);
-            weekCols.forEach(wc => {
-              const v = normalizeColor(row[wc.c]);
-              if (v) excelModel.ratings.set(`${member}||${area}||${wc.code}`, v);
-            });
-          }
-
-          const wsWL = wb.Sheets["Workload"];
-          if (wsWL) {
-            const wlAOA = XLSX.utils.sheet_to_json(wsWL, { header: 1, defval: "" });
-            if (wlAOA && wlAOA.length > 1) {
-              const wlHeader = wlAOA[0].map(x => String(x || "").trim());
-              const wlWeekCols = [];
-              for (let c = 1; c < wlHeader.length; c++) {
-                if (/^\d{4}$/.test(wlHeader[c])) {
-                  wlWeekCols.push({ c, code: wlHeader[c] });
-                  ensureWeek(wlHeader[c]);
-                }
-              }
-              for (let r = 1; r < wlAOA.length; r++) {
-                const row = wlAOA[r] || [];
-                const member = String(row[0] || "").trim();
-                if (!member) continue;
-                excelModel.members.add(member);
-                wlWeekCols.forEach(wc => {
-                  const v = String(row[wc.c] || "").trim();
-                  if (!v) return;
-                  const num = parseInt(v,10);
-                  if (num >= 1 && num <= 4) excelModel.workload.set(`${member}||${wc.code}`, String(num));
-                });
-              }
-            }
-          }
-
-          rebuildHistoryRows();
-          showWeekPicker();
-
-          const team = excelModel.team || document.getElementById("teamInput").value.trim();
-          renderHistoryCirclesForTeam(team);
-        } catch (err) {
-          console.error(err);
-          alert("Import failed: " + (err && err.message ? err.message : err));
         }
+        if (excelModel.team) document.getElementById("teamInput").value = excelModel.team;
+
+        const dataSheet = wb.Sheets["Data"] || wb.Sheets[wb.SheetNames[0]];
+        if (!dataSheet) {
+          alert("No sheet found.");
+          return;
+        }
+        const aoa = XLSX.utils.sheet_to_json(dataSheet, { header: 1, defval: "" });
+        if (!aoa.length || aoa.length < 2) {
+          alert("Data sheet is empty.");
+          return;
+        }
+
+        const header = aoa[0].map(x => String(x || "").trim());
+        const weekCols = [];
+        for (let c = 2; c < header.length; c++) {
+          if (/^\d{4}$/.test(header[c])) {
+            weekCols.push({ c, code: header[c] });
+            ensureWeek(header[c]);
+          }
+        }
+        if (!weekCols.length) {
+          alert("Data sheet must have week columns in YYWW format.");
+          return;
+        }
+
+        for (let r = 1; r < aoa.length; r++) {
+          const row = aoa[r] || [];
+          const member = String(row[0] || "").trim();
+          const area = String(row[1] || "").trim();
+          if (!member || !areas.includes(area)) continue;
+
+          excelModel.members.add(member);
+
+          weekCols.forEach(wc => {
+            const v = normalizeColor(row[wc.c]);
+            if (v) excelModel.ratings.set(`${member}||${area}||${wc.code}`, v);
+          });
+        }
+
+        const wsWL = wb.Sheets["Workload"];
+        if (wsWL) {
+          const wlAOA = XLSX.utils.sheet_to_json(wsWL, { header: 1, defval: "" });
+          if (wlAOA && wlAOA.length > 1) {
+            const wlHeader = wlAOA[0].map(x => String(x || "").trim());
+            const wlWeekCols = [];
+            for (let c = 1; c < wlHeader.length; c++) {
+              if (/^\d{4}$/.test(wlHeader[c])) {
+                wlWeekCols.push({ c, code: wlHeader[c] });
+                ensureWeek(wlHeader[c]);
+              }
+            }
+            for (let r = 1; r < wlAOA.length; r++) {
+              const row = wlAOA[r] || [];
+              const member = String(row[0] || "").trim();
+              if (!member) continue;
+              excelModel.members.add(member);
+              wlWeekCols.forEach(wc => {
+                const v = String(row[wc.c] || "").trim();
+                if (!v) return;
+                const num = parseInt(v,10);
+                if (num >= 1 && num <= 4) excelModel.workload.set(`${member}||${wc.code}`, String(num));
+              });
+            }
+          }
+        }
+
+        rebuildHistoryRows();
+        showWeekPicker();
+
+        const team = excelModel.team || document.getElementById("teamInput").value.trim();
+        renderHistoryCirclesForTeam(team);
       };
       reader.readAsArrayBuffer(file);
     }
@@ -1320,9 +1328,11 @@
 
       document.getElementById("weekPickerBackdrop").style.display = "flex";
     }
+
     function closeWeekPicker() {
       document.getElementById("weekPickerBackdrop").style.display = "none";
     }
+
     function confirmWeekImport() {
       const week = document.getElementById("importWeekSelect").value;
       closeWeekPicker();
@@ -1331,6 +1341,7 @@
 
     function loadWeekIntoUI(weekCode) {
       if (!/^\d{4}$/.test(weekCode)) return;
+
       setYearWeekFromCode(weekCode);
 
       const toggle = document.getElementById("toggleMembers");
@@ -1367,7 +1378,7 @@
       renderHistoryCirclesForTeam(team);
     }
 
-    /* ---------- Export (FIXED) ---------- */
+    /* ---------- Export (Save As) ---------- */
     const STYLE_HEADER = {
       font: { bold: true, color: { rgb: "FFFFFF" } },
       fill: { fgColor: { rgb: "12213B" } },
@@ -1406,251 +1417,244 @@
       return { ...base, font: { bold: true } };
     }
 
-    function buildNext52Weeks(startCode) {
+    function buildNextNWeeks(startCode, n = 3) {
       const weeks = [];
       let c = startCode;
-      for (let i=0;i<52;i++) {
-        if (/^\d{4}$/.test(c)) weeks.push(c);
+      for (let i = 0; i < n; i++) {
         c = incrementWeekCode(c);
+        if (/^\d{4}$/.test(c)) weeks.push(c);
       }
       return weeks;
     }
 
-    async function exportToExcelSaveAs() {
-      try {
-        if (typeof XLSX === "undefined") {
-          alert("XLSX library did not load. Export cannot run.");
-          return;
-        }
-
-        let team = document.getElementById("teamInput").value.trim();
-        if (!team && excelModel.team) {
-          team = excelModel.team;
-          document.getElementById("teamInput").value = team;
-        }
-        if (!team) {
-          alert("Please enter a team name (or import a file that contains it) before exporting.");
-          return;
-        }
-
-        const weekCode = getYearWeekCode();
-        if (!/^\d{4}$/.test(weekCode)) {
-          alert("Please select a valid year and week so that a YYWW code can be created.");
-          return;
-        }
-
-        if (!excelModel.loaded) {
-          excelModel.loaded = true;
-          excelModel.team = team;
-        }
-        excelModel.team = team;
-
-        ensureWeek(weekCode);
-        buildNext52Weeks(weekCode).forEach(ensureWeek);
-
-        // write current UI -> model (allows updating an existing week)
-        members.forEach(m => {
-          excelModel.members.add(m.name);
-          areas.forEach(a => {
-            const v = String(m.ratings[a] || "").trim().toLowerCase();
-            if (v) excelModel.ratings.set(`${m.name}||${a}||${weekCode}`, v);
-            else excelModel.ratings.delete(`${m.name}||${a}||${weekCode}`);
-          });
-          if (typeof m.workload === "number" && m.workload >= 1 && m.workload <= 4) {
-            excelModel.workload.set(`${m.name}||${weekCode}`, String(m.workload));
-          } else {
-            excelModel.workload.delete(`${m.name}||${weekCode}`);
-          }
-        });
-
-        rebuildHistoryRows();
-        renderMembersTable();
-        renderHistoryCirclesForTeam(team);
-
-        const weeks = excelModel.weeks.slice().sort();
-        const mlist = Array.from(excelModel.members).sort();
-
-        const wb = XLSX.utils.book_new();
-
-        // Meta
-        const metaAOA = [
-          ["Team", team],
-          ["LastExportWeek", weekCode],
-          ["Note", "Type only: blue, green, yellow, red (or empty). Cells are colored at export time based on the text value."]
-        ];
-        const wsMeta = XLSX.utils.aoa_to_sheet(metaAOA);
-        wsMeta["!cols"] = [{ wch: 18 }, { wch: 60 }];
-        XLSX.utils.book_append_sheet(wb, wsMeta, "Meta");
-
-        // Data
-        const dataAOA = [["Member","Area", ...weeks]];
-        mlist.forEach(member => {
-          areas.forEach(area => {
-            const row = [member, area];
-            weeks.forEach(w => row.push(excelModel.ratings.get(`${member}||${area}||${w}`) || ""));
-            dataAOA.push(row);
-          });
-        });
-        const wsData = XLSX.utils.aoa_to_sheet(dataAOA);
-
-        // ✅ Freeze A+B + header (C2)
-        wsData["!views"] = [{
-          state: "frozen",
-          xSplit: 2,
-          ySplit: 1,
-          topLeftCell: "C2",
-          activePane: "bottomRight"
-        }];
-        // header style
-        const rangeData = XLSX.utils.decode_range(wsData["!ref"]);
-        for (let c = rangeData.s.c; c <= rangeData.e.c; c++) {
-          const addr = XLSX.utils.encode_cell({ r: 0, c });
-          if (wsData[addr]) wsData[addr].s = STYLE_HEADER;
-        }
-        // body style
-        for (let r = 1; r <= rangeData.e.r; r++) {
-          const a0 = XLSX.utils.encode_cell({ r, c: 0 });
-          const a1 = XLSX.utils.encode_cell({ r, c: 1 });
-          if (wsData[a0]) wsData[a0].s = { font: { bold: true }, alignment: { vertical: "center" } };
-          if (wsData[a1]) wsData[a1].s = { font: { bold: true }, alignment: { vertical: "center" } };
-          for (let c = 2; c <= rangeData.e.c; c++) {
-            const addr = XLSX.utils.encode_cell({ r, c });
-            if (!wsData[addr]) continue;
-            wsData[addr].s = styleForColorValue(wsData[addr].v);
-          }
-        }
-        wsData["!cols"] = [{ wch: 22 }, { wch: 20 }, ...weeks.map(() => ({ wch: 8 }))];
-        XLSX.utils.book_append_sheet(wb, wsData, "Data");
-
-        // Workload
-        const wlAOA = [["Member", ...weeks]];
-        mlist.forEach(member => {
-          const row = [member];
-          weeks.forEach(w => row.push(excelModel.workload.get(`${member}||${w}`) || ""));
-          wlAOA.push(row);
-        });
-        const wsWL = XLSX.utils.aoa_to_sheet(wlAOA);
-
-        // ✅ Freeze Member + header (B2)
-       wsWL["!views"] = [{
-          state: "frozen",
-          xSplit: 1,
-          ySplit: 1,
-          topLeftCell: "B2",
-          activePane: "bottomRight"
-        }];
-
-        const rangeWL = XLSX.utils.decode_range(wsWL["!ref"]);
-        for (let c = rangeWL.s.c; c <= rangeWL.e.c; c++) {
-          const addr = XLSX.utils.encode_cell({ r: 0, c });
-          if (wsWL[addr]) wsWL[addr].s = STYLE_HEADER;
-        }
-        for (let r = 1; r <= rangeWL.e.r; r++) {
-          const a0 = XLSX.utils.encode_cell({ r, c: 0 });
-          if (wsWL[a0]) wsWL[a0].s = { font: { bold: true }, alignment: { vertical: "center" } };
-          for (let c = 1; c <= rangeWL.e.c; c++) {
-            const addr = XLSX.utils.encode_cell({ r, c });
-            if (!wsWL[addr]) continue;
-            wsWL[addr].s = styleForWorkload(wsWL[addr].v);
-          }
-        }
-        wsWL["!cols"] = [{ wch: 22 }, ...weeks.map(() => ({ wch: 8 }))];
-        XLSX.utils.book_append_sheet(wb, wsWL, "Workload");
-
-        // Summary
-        let wSum = 0, wCount = 0;
-        members.forEach(m => {
-          if (typeof m.workload === "number" && m.workload >= 1 && m.workload <= 4) { wSum += m.workload; wCount++; }
-        });
-        const workloadAvg = wCount ? (wSum / wCount) : null;
-
-        const summaryAOA = [
-          ["Workbalance – TRATON"], [],
-          ["Team", team],
-          ["Week (YYWW)", weekCode], [],
-          ["Area","Blue","Green","Yellow","Red"],
-          ["Manageability", areaData["Manageability"].blue, areaData["Manageability"].green, areaData["Manageability"].yellow, areaData["Manageability"].red],
-          ["Comprehensibility", areaData["Comprehensibility"].blue, areaData["Comprehensibility"].green, areaData["Comprehensibility"].yellow, areaData["Comprehensibility"].red],
-          ["Meaningfulness", areaData["Meaningfulness"].blue, areaData["Meaningfulness"].green, areaData["Meaningfulness"].yellow, areaData["Meaningfulness"].red],
-          ["Recovery", areaData["Recovery"].blue, areaData["Recovery"].green, areaData["Recovery"].yellow, areaData["Recovery"].red],
-          ["Total", overall.blue, overall.green, overall.yellow, overall.red],
-          [],
-          ["Average perceived workload (1–4)", workloadAvg != null ? workloadAvg.toFixed(2) : "n/a"]
-        ];
-        const wsSummary = XLSX.utils.aoa_to_sheet(summaryAOA);
-        wsSummary["!cols"] = [{ wch: 24 }, { wch: 14 }, { wch: 14 }, { wch: 14 }, { wch: 14 }];
-        XLSX.utils.book_append_sheet(wb, wsSummary, "Summary");
-
-        // CircleSnapshot (text)
-        const snapAOA = [["Area","Snapshot (icons)"]];
-        areas.forEach(a => snapAOA.push([a, snapshotString(areaData[a])]));
-        snapAOA.push(["Total", snapshotString(overall)]);
-        snapAOA.push([]);
-        snapAOA.push(["Average perceived workload (1–4)", workloadAvg != null ? workloadAvg.toFixed(2) : "n/a"]);
-        const wsSnap = XLSX.utils.aoa_to_sheet(snapAOA);
-        wsSnap["!cols"] = [{ wch: 24 }, { wch: 70 }];
-        XLSX.utils.book_append_sheet(wb, wsSnap, "CircleSnapshot");
-
-        // filename
-        let suggestedName = lastImportedFilename;
-        if (!suggestedName) {
-          const safeTeam = team.replace(/\s+/g, "_");
-          suggestedName = (safeTeam || "team") + "_workbalance.xlsx";
-        }
-
-        const arrayBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-        const blob = new Blob([arrayBuffer], {
-          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        });
-
-        // Save As if possible, else fallback download
-        if (window.showSaveFilePicker) {
-          try {
-            const handle = await window.showSaveFilePicker({
-              suggestedName,
-              types: [{
-                description: "Excel Workbook",
-                accept: { "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"] }
-              }]
-            });
-            const writable = await handle.createWritable();
-            await writable.write(blob);
-            await writable.close();
-            alert("Saved.");
-            return;
-          } catch (err) {
-            console.warn("Save picker blocked/cancelled -> fallback download", err);
-          }
-        }
-
-        // Fallback download
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = suggestedName;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => {
-          URL.revokeObjectURL(a.href);
-          a.remove();
-        }, 1000);
-      } catch (err) {
-        console.error(err);
-        alert("Export failed: " + (err && err.message ? err.message : err));
-      }
+    function safeSuggestedName(team) {
+      const safeTeam = (team || "team").replace(/[\\\/:*?"<>|]+/g, "_").replace(/\s+/g, "_");
+      return safeTeam + "_workbalance.xlsx";
     }
 
-    /* ---------- Import week picker controls ---------- */
-    function closeWeekPicker() {
-      document.getElementById("weekPickerBackdrop").style.display = "none";
+    function triggerDownloadFallback(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    async function exportToExcelSaveAs() {
+      // Ensure team is available; if imported, use it
+      let team = document.getElementById("teamInput").value.trim();
+      if (!team && excelModel.team) {
+        team = excelModel.team;
+        document.getElementById("teamInput").value = team;
+      }
+      if (!team) {
+        alert("Please enter a team name (or import a file that contains it) before exporting.");
+        return;
+      }
+
+      const weekCode = getYearWeekCode();
+      if (!/^\d{4}$/.test(weekCode)) {
+        alert("Please select a valid year and week so that a YYWW code can be created.");
+        return;
+      }
+
+      if (!excelModel.loaded) {
+        excelModel.loaded = true;
+        excelModel.team = team;
+      }
+      excelModel.team = team;
+
+      // Keep existing weeks + ensure current + next 3 weeks
+      ensureWeek(weekCode);
+      buildNextNWeeks(weekCode, 3).forEach(ensureWeek);
+
+      // Update model with current UI values for selected week (allows updating an existing week)
+      members.forEach(m => {
+        excelModel.members.add(m.name);
+        areas.forEach(a => {
+          const v = String(m.ratings[a] || "").trim().toLowerCase();
+          const key = `${m.name}||${a}||${weekCode}`;
+          if (v) excelModel.ratings.set(key, v);
+          else excelModel.ratings.delete(key);
+        });
+        const wKey = `${m.name}||${weekCode}`;
+        if (typeof m.workload === "number" && m.workload >= 1 && m.workload <= 4) {
+          excelModel.workload.set(wKey, String(m.workload));
+        } else {
+          excelModel.workload.delete(wKey);
+        }
+      });
+
+      rebuildHistoryRows();
+      renderMembersTable();
+      renderHistoryCirclesForTeam(team);
+
+      // IMPORTANT: newest weeks on the LEFT
+      const weeks = excelModel.weeks.slice().sort((a,b) => b.localeCompare(a));
+      const mlist = Array.from(excelModel.members).sort();
+
+      const wb = XLSX.utils.book_new();
+
+      // Meta
+      const metaAOA = [
+        ["Team", team],
+        ["LastExportWeek", weekCode],
+        ["Note", "Type only: blue, green, yellow, red (or empty). Cells are colored at export time based on the text value."]
+      ];
+      const wsMeta = XLSX.utils.aoa_to_sheet(metaAOA);
+      wsMeta["!cols"] = [{ wch: 18 }, { wch: 60 }];
+      XLSX.utils.book_append_sheet(wb, wsMeta, "Meta");
+
+      // Data
+      const dataAOA = [["Member","Area", ...weeks]];
+      mlist.forEach(member => {
+        areas.forEach(area => {
+          const row = [member, area];
+          weeks.forEach(w => row.push(excelModel.ratings.get(`${member}||${area}||${w}`) || ""));
+          dataAOA.push(row);
+        });
+      });
+      const wsData = XLSX.utils.aoa_to_sheet(dataAOA);
+
+      // Freeze: column A+B + header row
+      wsData["!freeze"] = { xSplit: 2, ySplit: 1, topLeftCell: "C2", activePane: "bottomRight", state: "frozen" };
+
+      // Style header + cells
+      const rangeData = XLSX.utils.decode_range(wsData["!ref"]);
+      for (let c = rangeData.s.c; c <= rangeData.e.c; c++) {
+        const addr = XLSX.utils.encode_cell({ r: 0, c });
+        if (wsData[addr]) wsData[addr].s = STYLE_HEADER;
+      }
+      for (let r = 1; r <= rangeData.e.r; r++) {
+        const a0 = XLSX.utils.encode_cell({ r, c: 0 });
+        const a1 = XLSX.utils.encode_cell({ r, c: 1 });
+        if (wsData[a0]) wsData[a0].s = { font: { bold: true }, alignment: { vertical: "center" } };
+        if (wsData[a1]) wsData[a1].s = { font: { bold: true }, alignment: { vertical: "center" } };
+
+        for (let c = 2; c <= rangeData.e.c; c++) {
+          const addr = XLSX.utils.encode_cell({ r, c });
+          if (!wsData[addr]) continue;
+          wsData[addr].s = styleForColorValue(wsData[addr].v);
+        }
+      }
+
+      wsData["!cols"] = [
+        { wch: 22 }, // Member
+        { wch: 20 }, // Area
+        ...weeks.map(() => ({ wch: 8 }))
+      ];
+      XLSX.utils.book_append_sheet(wb, wsData, "Data");
+
+      // Workload
+      const wlAOA = [["Member", ...weeks]];
+      mlist.forEach(member => {
+        const row = [member];
+        weeks.forEach(w => row.push(excelModel.workload.get(`${member}||${w}`) || ""));
+        wlAOA.push(row);
+      });
+      const wsWL = XLSX.utils.aoa_to_sheet(wlAOA);
+
+      // Freeze: column A + header row
+      wsWL["!freeze"] = { xSplit: 1, ySplit: 1, topLeftCell: "B2", activePane: "bottomRight", state: "frozen" };
+
+      const rangeWL = XLSX.utils.decode_range(wsWL["!ref"]);
+      for (let c = rangeWL.s.c; c <= rangeWL.e.c; c++) {
+        const addr = XLSX.utils.encode_cell({ r: 0, c });
+        if (wsWL[addr]) wsWL[addr].s = STYLE_HEADER;
+      }
+      for (let r = 1; r <= rangeWL.e.r; r++) {
+        const a0 = XLSX.utils.encode_cell({ r, c: 0 });
+        if (wsWL[a0]) wsWL[a0].s = { font: { bold: true }, alignment: { vertical: "center" } };
+        for (let c = 1; c <= rangeWL.e.c; c++) {
+          const addr = XLSX.utils.encode_cell({ r, c });
+          if (!wsWL[addr]) continue;
+          wsWL[addr].s = styleForWorkload(wsWL[addr].v);
+        }
+      }
+      wsWL["!cols"] = [{ wch: 22 }, ...weeks.map(() => ({ wch: 8 }))];
+      XLSX.utils.book_append_sheet(wb, wsWL, "Workload");
+
+      // Summary
+      let wSum = 0, wCount = 0;
+      members.forEach(m => {
+        if (typeof m.workload === "number" && m.workload >= 1 && m.workload <= 4) { wSum += m.workload; wCount++; }
+      });
+      const workloadAvg = wCount ? (wSum / wCount) : null;
+
+      const summaryAOA = [
+        ["Workbalance – TRATON"],
+        [],
+        ["Team", team],
+        ["Week (YYWW)", weekCode],
+        [],
+        ["Area","Blue","Green","Yellow","Red"]
+      ];
+      areas.forEach(a => {
+        const d = areaData[a];
+        summaryAOA.push([a, d.blue, d.green, d.yellow, d.red]);
+      });
+      summaryAOA.push(["Total", overall.blue, overall.green, overall.yellow, overall.red]);
+      summaryAOA.push([]);
+      summaryAOA.push(["Average perceived workload (1–4)", workloadAvg != null ? workloadAvg.toFixed(2) : "n/a"]);
+      const wsSummary = XLSX.utils.aoa_to_sheet(summaryAOA);
+      wsSummary["!cols"] = [{ wch: 24 }, { wch: 14 }, { wch: 14 }, { wch: 14 }, { wch: 14 }];
+      XLSX.utils.book_append_sheet(wb, wsSummary, "Summary");
+
+      // CircleSnapshot
+      const snapAOA = [["Area","Snapshot (icons)"]];
+      areas.forEach(a => snapAOA.push([a, snapshotString(areaData[a])]));
+      snapAOA.push(["Total", snapshotString(overall)]);
+      snapAOA.push([]);
+      snapAOA.push(["Average perceived workload (1–4)", workloadAvg != null ? workloadAvg.toFixed(2) : "n/a"]);
+      snapAOA.push([]);
+      snapAOA.push(["Note", "This sheet stores a text snapshot of the circle."]);
+      const wsSnap = XLSX.utils.aoa_to_sheet(snapAOA);
+      wsSnap["!cols"] = [{ wch: 24 }, { wch: 70 }];
+      XLSX.utils.book_append_sheet(wb, wsSnap, "CircleSnapshot");
+
+      // Suggested filename
+      let suggestedName = lastImportedFilename || safeSuggestedName(team);
+
+      const arrayBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+      const blob = new Blob([arrayBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      });
+
+      // Try true Save As dialog (Edge/Chrome)
+      if (window.showSaveFilePicker) {
+        try {
+          const handle = await window.showSaveFilePicker({
+            suggestedName,
+            types: [{
+              description: "Excel Workbook",
+              accept: { "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"] }
+            }]
+          });
+          const writable = await handle.createWritable();
+          await writable.write(blob);
+          await writable.close();
+          alert("Saved (Save As).");
+          return;
+        } catch (err) {
+          // cancelled or blocked -> fallback download
+          alert("Save As was cancelled or blocked. A normal download will be used instead.");
+          triggerDownloadFallback(blob, suggestedName);
+          return;
+        }
+      }
+
+      // Fallback
+      triggerDownloadFallback(blob, suggestedName);
+      alert("Downloaded. (Your browser may append (1) if a file with the same name already exists.)");
     }
 
     /* ---------- INIT ---------- */
     window.addEventListener("DOMContentLoaded", () => {
       initAreas();
       initYearWeekSelectors();
-      if (typeof XLSX === "undefined") {
-        alert("XLSX library did not load. Import/Export will not work.");
-      }
     });
   </script>
 </body>
