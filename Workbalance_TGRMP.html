@@ -1494,8 +1494,13 @@
         const wsData = XLSX.utils.aoa_to_sheet(dataAOA);
 
         // ✅ Freeze A+B + header (C2)
-        wsData["!freeze"] = { xSplit: 2, ySplit: 1, topLeftCell: "C2", activePane: "bottomRight", state: "frozen" };
-
+        wsData["!views"] = [{
+          state: "frozen",
+          xSplit: 2,
+          ySplit: 1,
+          topLeftCell: "C2",
+          activePane: "bottomRight"
+        }];
         // header style
         const rangeData = XLSX.utils.decode_range(wsData["!ref"]);
         for (let c = rangeData.s.c; c <= rangeData.e.c; c++) {
@@ -1527,7 +1532,13 @@
         const wsWL = XLSX.utils.aoa_to_sheet(wlAOA);
 
         // ✅ Freeze Member + header (B2)
-        wsWL["!freeze"] = { xSplit: 1, ySplit: 1, topLeftCell: "B2", activePane: "bottomRight", state: "frozen" };
+       wsWL["!views"] = [{
+          state: "frozen",
+          xSplit: 1,
+          ySplit: 1,
+          topLeftCell: "B2",
+          activePane: "bottomRight"
+        }];
 
         const rangeWL = XLSX.utils.decode_range(wsWL["!ref"]);
         for (let c = rangeWL.s.c; c <= rangeWL.e.c; c++) {
