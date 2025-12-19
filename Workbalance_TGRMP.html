@@ -1557,6 +1557,22 @@
       });
       const wsData = XLSX.utils.aoa_to_sheet(dataAOA);
 
+      // Freeze column A+B and header row
+      wsData["!freeze"] = {
+        xSplit: 2,
+        ySplit: 1,
+        topLeftCell: "C2",
+        activePane: "bottomRight",
+        state: "frozen"
+      };
+      wsWL["!freeze"] = {
+      xSplit: 1,
+      ySplit: 1,
+      topLeftCell: "B2",
+      activePane: "bottomRight",
+      state: "frozen"
+    };
+
       // Style header + cells
       const rangeData = XLSX.utils.decode_range(wsData["!ref"]);
       for (let c = rangeData.s.c; c <= rangeData.e.c; c++) {
