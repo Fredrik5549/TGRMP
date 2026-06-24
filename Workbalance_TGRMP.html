@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -501,6 +500,7 @@
               <th>Meaningfulness</th>
               <th>Recovery</th>
               <th>Workload<br/>(1–4)</th>
+              <th>Recognition</th>
               <th>Recent weeks<br/>(2 latest)</th>
               <th></th>
             </tr>
@@ -661,6 +661,7 @@
           The newest weeks are placed on the left in export.
         </section>
         <section><strong>Workload</strong><br/>Separate sheet with workload 1–4 per person and week.</section>
+        <section><strong>Recognition</strong><br/>Separate sheet with recognition emoji per person and week. Use ⭐, 🏅, ❤️ or leave empty.</section>
         <section><strong>Save As</strong><br/>Browsers cannot silently overwrite files. Export uses a Save As dialog in Edge/Chrome when allowed.</section>
       `
     };
@@ -790,7 +791,7 @@
         return;
       }
 
-      members.push({ name, ratings: {}, workload: null });
+      members.push({ name, ratings: {}, workload: null, recognition: "" });
       nameInput.value = "";
       renderMembersTable();
       recalcFromMembers();
@@ -869,6 +870,28 @@
         });
         workloadTd.appendChild(wlSelect);
         tr.appendChild(workloadTd);
+
+        const recognitionTd = document.createElement("td");
+        const recognitionSelect = document.createElement("select");
+        recognitionSelect.style.fontSize = "16px";
+        const recognitionOptions = [
+          { value:"", label:"" },
+          { value:"⭐", label:"⭐" },
+          { value:"🏅", label:"🏅" },
+          { value:"❤️", label:"❤️" }
+        ];
+        recognitionOptions.forEach(o => {
+          const opt = document.createElement("option");
+          opt.value = o.value;
+          opt.textContent = o.label;
+          if ((m.recognition || "") === o.value) opt.selected = true;
+          recognitionSelect.appendChild(opt);
+        });
+        recognitionSelect.addEventListener("change", () => {
+          m.recognition = recognitionSelect.value;
+        });
+        recognitionTd.appendChild(recognitionSelect);
+        tr.appendChild(recognitionTd);
 
         const prevTd = document.createElement("td");
         prevTd.className = "prev-week-cell";
@@ -966,13 +989,14 @@
 
       return picked.map(r => {
         const w = String(r.Week || "");
+        const recognition = r.Recognition ? ` Rec:${r.Recognition}` : "";
         return `
           <span class="prev-week-chip">
             <strong>${w}</strong>
             M:${mapDot(r.Manageability)}
             C:${mapDot(r.Comprehensibility)}
             Me:${mapDot(r.Meaningfulness)}
-            R:${mapDot(r.Recovery)}
+            R:${mapDot(r.Recovery)}${recognition}
           </span>
         `;
       }).join("");
@@ -1121,13 +1145,15 @@
        - Meta
        - Data: Member | Area | YYWW | YYWW | ...
        - Workload: Member | YYWW | YYWW | ...
+       - Recognition: Member | YYWW | YYWW | ...
     ------------------------------------------------------ */
     const excelModel = {
       team: "",
       weeks: [],
       members: new Set(),
-      ratings: new Map(),   // key: member||area||week => color
-      workload: new Map(),  // key: member||week => "1".."4"
+      ratings: new Map(),      // key: member||area||week => color
+      workload: new Map(),     // key: member||week => "1".."4"
+      recognition: new Map(),  // key: member||week => emoji
       loaded: false
     };
 
@@ -1140,6 +1166,15 @@
       if (s === "grön" || s === "gron") return "green";
       if (s === "gul") return "yellow";
       if (s === "röd" || s === "rod") return "red";
+      return "";
+    }
+
+    function normalizeRecognition(v) {
+      const s = String(v || "").trim();
+      const lower = s.toLowerCase();
+      if (s === "⭐" || lower === "star" || lower === "stjärna" || lower === "stjarna") return "⭐";
+      if (s === "🏅" || lower === "medal" || lower === "medalj") return "🏅";
+      if (s === "❤️" || s === "❤" || lower === "heart" || lower === "hjärta" || lower === "hjarta") return "❤️";
       return "";
     }
 
@@ -1159,6 +1194,8 @@
         }
         const wl = excelModel.workload.get(`${member}||${weekCode}`) || "";
         if (String(wl).trim()) return true;
+        const rec = excelModel.recognition.get(`${member}||${weekCode}`) || "";
+        if (String(rec).trim()) return true;
       }
       return false;
     }
@@ -1187,9 +1224,10 @@
             Comprehensibility: excelModel.ratings.get(`${m}||Comprehensibility||${w}`) || "",
             Meaningfulness: excelModel.ratings.get(`${m}||Meaningfulness||${w}`) || "",
             Recovery: excelModel.ratings.get(`${m}||Recovery||${w}`) || "",
-            Workload: excelModel.workload.get(`${m}||${w}`) || ""
+            Workload: excelModel.workload.get(`${m}||${w}`) || "",
+            Recognition: excelModel.recognition.get(`${m}||${w}`) || ""
           };
-          const any = row.Manageability || row.Comprehensibility || row.Meaningfulness || row.Recovery || row.Workload;
+          const any = row.Manageability || row.Comprehensibility || row.Meaningfulness || row.Recovery || row.Workload || row.Recognition;
           if (any) out.push(row);
         });
       });
@@ -1226,6 +1264,7 @@
         excelModel.members = new Set();
         excelModel.ratings = new Map();
         excelModel.workload = new Map();
+        excelModel.recognition = new Map();
         excelModel.loaded = true;
 
         const meta = wb.Sheets["Meta"];
@@ -1302,6 +1341,31 @@
           }
         }
 
+        const wsRec = wb.Sheets["Recognition"];
+        if (wsRec) {
+          const recAOA = XLSX.utils.sheet_to_json(wsRec, { header: 1, defval: "" });
+          if (recAOA && recAOA.length > 1) {
+            const recHeader = recAOA[0].map(x => String(x || "").trim());
+            const recWeekCols = [];
+            for (let c = 1; c < recHeader.length; c++) {
+              if (/^\d{4}$/.test(recHeader[c])) {
+                recWeekCols.push({ c, code: recHeader[c] });
+                ensureWeek(recHeader[c]);
+              }
+            }
+            for (let r = 1; r < recAOA.length; r++) {
+              const row = recAOA[r] || [];
+              const member = String(row[0] || "").trim();
+              if (!member) continue;
+              excelModel.members.add(member);
+              recWeekCols.forEach(wc => {
+                const v = normalizeRecognition(row[wc.c]);
+                if (v) excelModel.recognition.set(`${member}||${wc.code}`, v);
+              });
+            }
+          }
+        }
+
         rebuildHistoryRows();
         showWeekPicker();
 
@@ -1361,7 +1425,8 @@
             Meaningfulness: excelModel.ratings.get(`${name}||Meaningfulness||${weekCode}`) || "",
             Recovery: excelModel.ratings.get(`${name}||Recovery||${weekCode}`) || ""
           },
-          workload: null
+          workload: null,
+          recognition: excelModel.recognition.get(`${name}||${weekCode}`) || ""
         };
         const wl = excelModel.workload.get(`${name}||${weekCode}`);
         obj.workload = wl ? parseInt(wl,10) : null;
@@ -1415,6 +1480,13 @@
       const base = { alignment: { horizontal: "center", vertical: "center" } };
       if (!s) return base;
       return { ...base, font: { bold: true } };
+    }
+
+    function styleForRecognition(v) {
+      const s = String(v||"").trim();
+      const base = { alignment: { horizontal: "center", vertical: "center" } };
+      if (!s) return base;
+      return { ...base, font: { bold: true, sz: 14 } };
     }
 
     function buildNextNWeeks(startCode, n = 3) {
@@ -1486,6 +1558,10 @@
         } else {
           excelModel.workload.delete(wKey);
         }
+        const rKey = `${m.name}||${weekCode}`;
+        const recognition = normalizeRecognition(m.recognition || "");
+        if (recognition) excelModel.recognition.set(rKey, recognition);
+        else excelModel.recognition.delete(rKey);
       });
 
       rebuildHistoryRows();
@@ -1577,6 +1653,35 @@
       wsWL["!cols"] = [{ wch: 22 }, ...weeks.map(() => ({ wch: 8 }))];
       XLSX.utils.book_append_sheet(wb, wsWL, "Workload");
 
+      // Recognition
+      const recAOA = [["Member", ...weeks]];
+      mlist.forEach(member => {
+        const row = [member];
+        weeks.forEach(w => row.push(excelModel.recognition.get(`${member}||${w}`) || ""));
+        recAOA.push(row);
+      });
+      const wsRec = XLSX.utils.aoa_to_sheet(recAOA);
+
+      // Freeze: column A + header row
+      wsRec["!freeze"] = { xSplit: 1, ySplit: 1, topLeftCell: "B2", activePane: "bottomRight", state: "frozen" };
+
+      const rangeRec = XLSX.utils.decode_range(wsRec["!ref"]);
+      for (let c = rangeRec.s.c; c <= rangeRec.e.c; c++) {
+        const addr = XLSX.utils.encode_cell({ r: 0, c });
+        if (wsRec[addr]) wsRec[addr].s = STYLE_HEADER;
+      }
+      for (let r = 1; r <= rangeRec.e.r; r++) {
+        const a0 = XLSX.utils.encode_cell({ r, c: 0 });
+        if (wsRec[a0]) wsRec[a0].s = { font: { bold: true }, alignment: { vertical: "center" } };
+        for (let c = 1; c <= rangeRec.e.c; c++) {
+          const addr = XLSX.utils.encode_cell({ r, c });
+          if (!wsRec[addr]) continue;
+          wsRec[addr].s = styleForRecognition(wsRec[addr].v);
+        }
+      }
+      wsRec["!cols"] = [{ wch: 22 }, ...weeks.map(() => ({ wch: 8 }))];
+      XLSX.utils.book_append_sheet(wb, wsRec, "Recognition");
+
       // Summary
       let wSum = 0, wCount = 0;
       members.forEach(m => {
@@ -1659,3 +1764,4 @@
   </script>
 </body>
 </html>
+
